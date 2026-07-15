@@ -33,6 +33,7 @@ export async function getProducts() {
       description: p.description,
       price: Number(p.price),
       inventory: p.inventory,
+      sku: p.sku,
       categorySlug: p.category.slug,
       image: p.images[0] || 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80',
       rating: 5.0, // Mock rating since it's not in DB schema yet

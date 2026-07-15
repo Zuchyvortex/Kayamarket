@@ -1,13 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
-import { Leaf, Lock, Mail, User, Phone, ArrowRight } from "lucide-react";
+import { signIn } from "next-auth/react";
+import { registerUser } from "@/app/actions/authActions";
+import { Leaf, Lock, Mail, User, Phone, ArrowRight, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 
 export default function RegisterPage() {
-  const { register } = useAuth();
   const router = useRouter();
   
   const [name, setName] = useState("");
@@ -15,16 +15,33 @@ export default function RegisterPage() {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setErrorMsg("");
     
-    const success = await register(name, email, phone);
-    setLoading(false);
+    const formData = new FormData();
+    const parts = name.split(" ");
+    formData.append("firstName", parts[0] || "");
+    formData.append("lastName", parts.slice(1).join(" ") || "");
+    formData.append("email", email);
+    formData.append("phone", phone);
+    formData.append("password", password);
+
+    const result = await registerUser(formData);
     
-    if (success) {
+    if (result.success) {
+      await signIn("credentials", {
+        redirect: false,
+        email,
+        password
+      });
       router.push("/dashboard");
+    } else {
+      setErrorMsg(result.error || "Registration failed");
+      setLoading(false);
     }
   };
 
@@ -45,6 +62,11 @@ export default function RegisterPage() {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
+          {errorMsg && (
+            <div className="bg-rose-50 text-rose-600 text-xs font-bold p-3 rounded-xl border border-rose-100">
+              {errorMsg}
+            </div>
+          )}
           <div className="space-y-1.5">
             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
               <User className="h-3.5 w-3.5" />
@@ -115,10 +137,14 @@ export default function RegisterPage() {
           </button>
         </form>
 
-        <div className="text-center text-xs text-slate-400 pt-4 border-t border-slate-50">
+        <div className="text-center text-xs text-slate-400 pt-4 border-t border-slate-50 flex flex-col gap-2">
           <p>
             Already have an account? <Link href="/login" className="text-green-600 hover:text-green-700 font-bold transition-colors">Sign In</Link>
           </p>
+          <div className="flex items-center gap-1.5 justify-center text-[10px] text-slate-400 font-medium">
+            <ShieldCheck className="h-3.5 w-3.5 text-green-600" />
+            <span>Secure PostgreSQL Registration</span>
+          </div>
         </div>
       </div>
     </div>

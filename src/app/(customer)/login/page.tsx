@@ -1,28 +1,35 @@
 "use client";
 
 import React, { useState } from "react";
-import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 import { Leaf, Lock, Mail, ArrowRight, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 
 export default function LoginPage() {
-  const { login } = useAuth();
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<'CUSTOMER' | 'ADMIN'>('CUSTOMER');
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setErrorMsg("");
     
-    // Simulate API delay
-    const success = await login(email, role);
+    const result = await signIn("credentials", {
+      redirect: false,
+      email,
+      password
+    });
+    
     setLoading(false);
     
-    if (success) {
+    if (result?.error) {
+      setErrorMsg(result.error);
+    } else {
       if (role === 'ADMIN' || email.toLowerCase().includes('admin')) {
         router.push("/admin");
       } else {
@@ -50,14 +57,14 @@ export default function LoginPage() {
         <div className="bg-slate-50 p-1.5 rounded-xl border border-slate-100 flex gap-2">
           <button 
             type="button"
-            onClick={() => { setRole('CUSTOMER'); if (!email) setEmail("chinedu@example.com"); }}
+            onClick={() => { setRole('CUSTOMER'); if (!email) setEmail("chinedu@example.com"); setPassword("password123"); }}
             className={`flex-1 text-center py-2 rounded-lg text-xs font-bold transition-all focus:outline-none ${role === 'CUSTOMER' ? "bg-white text-green-700 shadow-sm border border-slate-100" : "text-slate-500 hover:text-slate-700"}`}
           >
             Customer Test
           </button>
           <button 
             type="button"
-            onClick={() => { setRole('ADMIN'); if (!email) setEmail("admin@kayamarket.com"); }}
+            onClick={() => { setRole('ADMIN'); if (!email) setEmail("admin@kayamarket.com"); setPassword("admin123"); }}
             className={`flex-1 text-center py-2 rounded-lg text-xs font-bold transition-all focus:outline-none ${role === 'ADMIN' ? "bg-white text-green-700 shadow-sm border border-slate-100" : "text-slate-500 hover:text-slate-700"}`}
           >
             Admin Test
@@ -66,6 +73,11 @@ export default function LoginPage() {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-5">
+          {errorMsg && (
+            <div className="bg-rose-50 text-rose-600 text-xs font-bold p-3 rounded-xl border border-rose-100">
+              {errorMsg}
+            </div>
+          )}
           <div className="space-y-2">
             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
               <Mail className="h-3.5 w-3.5" />
@@ -112,7 +124,7 @@ export default function LoginPage() {
           </p>
           <div className="flex items-center gap-1.5 justify-center text-[10px] text-slate-400 font-medium">
             <ShieldCheck className="h-3.5 w-3.5 text-green-600" />
-            <span>Encrypted mock authentication</span>
+            <span>Secure PostgreSQL Authentication</span>
           </div>
         </div>
       </div>
