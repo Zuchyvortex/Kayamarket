@@ -11,7 +11,7 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, login, logout, loading } = useAuth();
+  const { user, logout, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const [checking, setChecking] = useState(true);
@@ -19,7 +19,6 @@ export default function AdminLayout({
   useEffect(() => {
     if (!loading) {
       if (!user || user.role !== "ADMIN") {
-        // We will show simulated auth panel if not admin, instead of instant hard redirect
         setChecking(false);
       } else {
         setChecking(false);
@@ -35,7 +34,7 @@ export default function AdminLayout({
     );
   }
 
-  // Simulated access denied panel if not logged in as Admin
+  // Access denied panel if not logged in as Admin
   if (!user || user.role !== "ADMIN") {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
@@ -51,14 +50,12 @@ export default function AdminLayout({
           </div>
 
           <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 text-left space-y-3">
-            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Developer / Tester Shortcut</p>
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Administrator Sign In</p>
             <button 
-              onClick={async () => {
-                await login("admin@kayamarket.com", "ADMIN");
-              }}
+              onClick={() => router.push("/login?callbackUrl=/admin")}
               className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 rounded-xl text-xs transition-colors"
             >
-              Simulate Administrator Login
+              Sign In with Admin Account
             </button>
           </div>
 
