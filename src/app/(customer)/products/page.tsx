@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { CATEGORIES, PRODUCTS, Product } from "@/lib/mockData";
+import { Product } from "@/lib/mockData";
+import { getProducts, getCategories } from "@/app/actions/productActions";
 import { Search, SlidersHorizontal, Heart, Plus, ShoppingBag, Eye } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import Link from "next/link";
@@ -12,14 +13,29 @@ function ProductsContent() {
   const { addToCart, toggleWishlist, isInWishlist } = useCart();
 
   // State
-  const [products, setProducts] = useState<Product[]>(PRODUCTS);
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>(PRODUCTS);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<{id: string, name: string, slug: string}[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   
   // Search & Filter state
   const [searchTerm, setSearchTerm] = useState(searchParams.get("search") || "");
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get("category") || "all");
   const [priceRange, setPriceRange] = useState<number>(100000);
   const [sortBy, setSortBy] = useState("default");
+
+  useEffect(() => {
+    async function fetchData() {
+      setIsLoading(true);
+      const fetchedProducts = await getProducts();
+      const fetchedCategories = await getCategories();
+      setProducts(fetchedProducts);
+      setFilteredProducts(fetchedProducts);
+      setCategories(fetchedCategories);
+      setIsLoading(false);
+    }
+    fetchData();
+  }, []);
 
   useEffect(() => {
     // Sync search parameter from URL
@@ -34,7 +50,7 @@ function ProductsContent() {
   }, [searchParams]);
 
   useEffect(() => {
-    let result = [...PRODUCTS];
+    let result = [...products];
 
     // Search query filter
     if (searchTerm.trim()) {
@@ -64,7 +80,7 @@ function ProductsContent() {
     }
 
     setFilteredProducts(result);
-  }, [searchTerm, selectedCategory, priceRange, sortBy]);
+  }, [searchTerm, selectedCategory, priceRange, sortBy, products]);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', minimumFractionDigits: 0 }).format(price);
@@ -109,7 +125,7 @@ function ProductsContent() {
               >
                 All Categories
               </button>
-              {CATEGORIES.map((cat) => (
+              {categories.map((cat) => (
                 <button
                   key={cat.id}
                   onClick={() => setSelectedCategory(cat.slug)}
@@ -163,7 +179,11 @@ function ProductsContent() {
             <span>Found {filteredProducts.length} items</span>
           </div>
 
-          {filteredProducts.length === 0 ? (
+          {isLoading ? (
+            <div className="flex justify-center items-center h-64">
+              <p className="text-slate-500 font-bold animate-pulse">Fetching live products...</p>
+            </div>
+          ) : filteredProducts.length === 0 ? (
             <div className="bg-white rounded-3xl p-16 text-center border border-slate-100 shadow-sm space-y-4">
               <ShoppingBag className="h-16 w-16 mx-auto text-slate-300" />
               <h3 className="text-xl font-bold text-slate-700">No foodstuffs found</h3>
