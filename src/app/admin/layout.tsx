@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
-import { LayoutDashboard, ShoppingBag, FolderTree, AlertTriangle, ClipboardList, Truck, BarChart3, LogOut, ArrowLeft, ShieldAlert } from "lucide-react";
+import { LayoutDashboard, ShoppingBag, FolderTree, AlertTriangle, ClipboardList, Truck, BarChart3, LogOut, ArrowLeft, ShieldAlert, Menu, X } from "lucide-react";
 
 export default function AdminLayout({
   children,
@@ -15,6 +15,7 @@ export default function AdminLayout({
   const router = useRouter();
   const pathname = usePathname();
   const [checking, setChecking] = useState(true);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (!loading) {
@@ -133,9 +134,19 @@ export default function AdminLayout({
         
         {/* Header bar - White, clean border */}
         <header className="h-20 bg-white border-b border-slate-200 px-6 sm:px-8 flex justify-between items-center shrink-0">
+          {/* Mobile hamburger menu toggle */}
+          <button 
+            onClick={() => setMobileSidebarOpen(true)}
+            className="p-2.5 -ml-2 rounded-xl text-slate-500 hover:bg-slate-100 md:hidden transition-all focus:outline-none"
+            title="Open navigation"
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+          
           <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest hidden sm:block">
             KayaMarket Management Console
           </h2>
+          
           <div className="flex items-center space-x-4 ml-auto">
             <div className="text-right">
               <p className="text-xs font-bold text-[#111111]">{user.name}</p>
@@ -152,6 +163,78 @@ export default function AdminLayout({
           {children}
         </main>
       </div>
+
+      {/* Mobile Sidebar Overlay */}
+      {mobileSidebarOpen && (
+        <div className="fixed inset-0 z-50 flex md:hidden">
+          {/* Backdrop overlay */}
+          <div 
+            className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity"
+            onClick={() => setMobileSidebarOpen(false)}
+          ></div>
+
+          {/* Drawer container */}
+          <div className="relative flex w-full max-w-xs flex-1 flex-col bg-white p-6 shadow-2xl animate-in slide-in-from-left duration-300">
+            {/* Close button */}
+            <div className="flex justify-between items-center pb-6 border-b border-slate-100 mb-6">
+              <Link href="/admin" className="flex items-center space-x-2" onClick={() => setMobileSidebarOpen(false)}>
+                <img 
+                  src="/k-1.png" 
+                  alt="Kaya Logo" 
+                  className="h-8 w-auto object-contain"
+                />
+                <span className="text-[10px] bg-slate-900 text-white font-black px-2 py-0.5 rounded-full uppercase tracking-wider">Admin</span>
+              </Link>
+              <button 
+                onClick={() => setMobileSidebarOpen(false)}
+                className="p-2 rounded-xl text-slate-500 hover:bg-slate-100 focus:outline-none"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Links list */}
+            <nav className="flex-1 space-y-1 overflow-y-auto">
+              {sidebarLinks.map((link) => {
+                const active = pathname === link.href;
+                return (
+                  <Link 
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setMobileSidebarOpen(false)}
+                    className={`w-full flex items-center space-x-3 px-4.5 py-3.5 rounded-2xl text-xs font-bold transition-all ${
+                      active 
+                        ? "bg-slate-900 text-white shadow-md" 
+                        : "text-slate-655 hover:bg-slate-50"
+                    }`}
+                  >
+                    <link.icon className={`h-4.5 w-4.5 ${active ? "text-kaya-orange" : "text-slate-400"}`} />
+                    <span>{link.label}</span>
+                  </Link>
+                );
+              })}
+            </nav>
+
+            {/* Drawer footer options */}
+            <div className="space-y-4 pt-6 border-t border-slate-100">
+              <Link href="/" className="flex items-center space-x-3 px-4 py-2.5 rounded-2xl text-xs font-bold text-slate-605 hover:bg-slate-50">
+                <ArrowLeft className="h-4 w-4" />
+                <span>Public Store</span>
+              </Link>
+              <button 
+                onClick={() => {
+                  setMobileSidebarOpen(false);
+                  logout();
+                }}
+                className="w-full flex items-center space-x-3 px-4 py-2.5 rounded-2xl text-xs font-bold text-rose-600 hover:bg-rose-50 transition-colors text-left focus:outline-none"
+              >
+                <LogOut className="h-4 w-4" />
+                <span>Sign Out</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
