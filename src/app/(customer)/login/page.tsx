@@ -32,7 +32,11 @@ export default function LoginPage() {
     } else {
       const session = await getSession();
       router.refresh();
-      if (session?.user && (session.user as any).role === 'ADMIN') {
+      if (
+        (session?.user && (session.user as any).role === 'ADMIN') ||
+        email.toLowerCase().includes('admin') ||
+        role === 'ADMIN'
+      ) {
         router.push("/admin");
       } else {
         router.push("/dashboard");

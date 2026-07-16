@@ -3,6 +3,10 @@ import CredentialsProvider from "next-auth/providers/credentials"
 import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
 
+if (process.env.VERCEL_URL && process.env.NODE_ENV === "production") {
+  process.env.NEXTAUTH_URL = `https://${process.env.VERCEL_URL}`;
+}
+
 export const dynamic = "force-dynamic";
 
 export const authOptions: NextAuthOptions = {
