@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
 import { Lock, Mail, ArrowRight, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 
@@ -21,16 +21,18 @@ export default function LoginPage() {
     
     const result = await signIn("credentials", {
       redirect: false,
-      email,
+      email: email.trim(),
       password
     });
     
     setLoading(false);
     
     if (result?.error) {
-      setErrorMsg(result.error);
+      setErrorMsg(result.error === "CredentialsSignin" ? "Invalid email or password" : result.error);
     } else {
-      if (role === 'ADMIN' || email.toLowerCase().includes('admin')) {
+      const session = await getSession();
+      router.refresh();
+      if (session?.user && (session.user as any).role === 'ADMIN') {
         router.push("/admin");
       } else {
         router.push("/dashboard");

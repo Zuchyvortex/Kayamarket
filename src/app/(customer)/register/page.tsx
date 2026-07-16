@@ -23,22 +23,29 @@ export default function RegisterPage() {
     setErrorMsg("");
     
     const formData = new FormData();
-    const parts = name.split(" ");
+    const parts = name.trim().split(/\s+/);
     formData.append("firstName", parts[0] || "");
     formData.append("lastName", parts.slice(1).join(" ") || "");
-    formData.append("email", email);
-    formData.append("phone", phone);
+    formData.append("email", email.trim());
+    formData.append("phone", phone.trim());
     formData.append("password", password);
 
     const result = await registerUser(formData);
     
     if (result.success) {
-      await signIn("credentials", {
+      const signInResult = await signIn("credentials", {
         redirect: false,
-        email,
+        email: email.trim(),
         password
       });
-      router.push("/dashboard");
+      
+      setLoading(false);
+      if (signInResult?.error) {
+        setErrorMsg(signInResult.error === "CredentialsSignin" ? "Invalid email or password" : signInResult.error);
+      } else {
+        router.push("/dashboard");
+        router.refresh();
+      }
     } else {
       setErrorMsg(result.error || "Registration failed");
       setLoading(false);

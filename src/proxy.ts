@@ -9,9 +9,12 @@ export default withAuth(
 
     if (isAuthPage) {
       if (isAuth) {
+        if (token?.role === 'ADMIN') {
+          return NextResponse.redirect(new URL('/admin', req.url));
+        }
         return NextResponse.redirect(new URL('/dashboard', req.url));
       }
-      return null;
+      return NextResponse.next();
     }
 
     if (!isAuth) {
@@ -26,6 +29,8 @@ export default withAuth(
     if (req.nextUrl.pathname.startsWith('/admin') && token?.role !== 'ADMIN') {
       return NextResponse.redirect(new URL('/dashboard', req.url));
     }
+
+    return NextResponse.next();
   },
   {
     callbacks: {

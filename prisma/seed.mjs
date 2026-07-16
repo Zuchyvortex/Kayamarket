@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
@@ -6,19 +7,25 @@ async function main() {
   console.log('Starting to seed database...');
 
   // 1. Create Admin User
+  const salt = await bcrypt.genSalt(10);
+  const passwordHash = await bcrypt.hash('admin123', salt);
+
   const adminUser = await prisma.user.upsert({
     where: { email: 'admin@kayamarket.com' },
-    update: {},
+    update: {
+      passwordHash: passwordHash, // Ensure it gets updated if seed runs again
+      role: 'ADMIN'
+    },
     create: {
       email: 'admin@kayamarket.com',
-      passwordHash: '$2a$10$X7...mockedhash...', // Mocked for now, in real app use bcrypt
+      passwordHash: passwordHash,
       firstName: 'Kaya',
       lastName: 'Admin',
       phoneNumber: '+2348000000000',
       role: 'ADMIN',
     },
   });
-  console.log('Created Admin User:', adminUser.email);
+  console.log('Created/Updated Admin User:', adminUser.email);
 
   // 2. Create Categories
   const categoriesData = [
