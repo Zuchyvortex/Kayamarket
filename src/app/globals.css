@@ -2,8 +2,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fcfdfd;
-  --foreground: #111827;
+  --background: #ffffff;
+  --foreground: #111111;
   --font-sans: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
   --font-display: "Playfair Display", serif;
 }
@@ -19,7 +19,7 @@
   --color-kaya-green: #0B7A46;
   --color-kaya-green-hover: #096138;
   
-  --color-kaya-black: #0F172A;
+  --color-kaya-black: #111111;
   --color-kaya-gray: #F8FAFC;
   
   --animate-float: float 6s ease-in-out infinite;
@@ -49,13 +49,6 @@
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0B0F19;
-    --foreground: #F8FAFC;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
@@ -66,15 +59,9 @@ body {
 
 /* Premium Custom Utilities */
 .glassmorphism {
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-}
-
-.dark .glassmorphism {
-  background: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
 .text-gradient-orange-green {
@@ -84,15 +71,15 @@ body {
 }
 
 .orange-glow {
-  box-shadow: 0 10px 30px -10px rgba(255, 122, 26, 0.3);
+  box-shadow: 0 10px 30px -10px rgba(255, 122, 26, 0.25);
 }
 
 .green-glow {
-  box-shadow: 0 10px 30px -10px rgba(11, 122, 70, 0.3);
+  box-shadow: 0 10px 30px -10px rgba(11, 122, 70, 0.2);
 }
 
 .premium-card-shadow {
-  box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.05);
+  box-shadow: 0 20px 40px -15px rgba(17, 17, 17, 0.05);
 }
 
 .shimmer-bg {

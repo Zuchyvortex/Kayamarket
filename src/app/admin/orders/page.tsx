@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { MOCK_ORDERS, Order } from "@/lib/mockData";
-import { ChevronRight, RefreshCw, ClipboardList, ShieldCheck } from "lucide-react";
 
 export default function AdminOrdersBoard() {
   const [orders, setOrders] = useState<Order[]>(MOCK_ORDERS);
@@ -22,16 +21,17 @@ export default function AdminOrdersBoard() {
   };
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-10 bg-slate-50 text-[#111111]">
       <div>
-        <h1 className="text-2xl font-black text-white tracking-tight">Orders Board</h1>
-        <p className="text-slate-400 text-xs mt-1">Manage processing pipeline and client dispatch status updates</p>
+        <span className="text-kaya-orange font-bold text-xs uppercase tracking-widest">Fulfillment Board</span>
+        <h1 className="text-2xl font-black text-slate-900 tracking-tight mt-1">Orders Board</h1>
+        <p className="text-slate-550 text-xs">Manage processing pipeline and client dispatch status updates</p>
       </div>
 
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden">
+      <div className="bg-white border border-slate-200 rounded-[2.5rem] overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs font-medium">
-            <thead className="bg-slate-800/50 text-slate-400 uppercase tracking-widest text-[10px] border-b border-slate-800">
+            <thead className="bg-slate-50 text-slate-500 uppercase tracking-widest text-[10px] border-b border-slate-100">
               <tr>
                 <th className="px-6 py-4">Order Details</th>
                 <th className="px-6 py-4">Customer</th>
@@ -42,42 +42,42 @@ export default function AdminOrdersBoard() {
                 <th className="px-6 py-4 text-center">Pipeline Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800 text-slate-300">
+            <tbody className="divide-y divide-slate-100 text-slate-700">
               {orders.map((order) => (
-                <tr key={order.id} className="hover:bg-slate-800/30 transition-colors">
-                  <td className="px-6 py-4 font-bold text-white">
+                <tr key={order.id} className="hover:bg-slate-50 transition-colors">
+                  <td className="px-6 py-4 font-bold text-slate-900">
                     <div>{order.orderNumber}</div>
-                    <span className="text-[9px] text-slate-500 font-bold uppercase">{order.date}</span>
+                    <span className="text-[9px] text-slate-400 font-bold uppercase">{order.date}</span>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="font-bold text-slate-200">{order.customerName}</div>
-                    <span className="text-[10px] text-slate-500">{order.paymentMethod}</span>
+                    <div className="font-extrabold text-slate-850">{order.customerName}</div>
+                    <span className="text-[10px] text-slate-400 font-semibold">{order.paymentMethod}</span>
                   </td>
-                  <td className="px-6 py-4 text-slate-400 max-w-[150px] truncate" title={order.deliveryAddress}>
+                  <td className="px-6 py-4 text-slate-500 max-w-[150px] truncate" title={order.deliveryAddress}>
                     {order.deliveryAddress}
                   </td>
-                  <td className="px-6 py-4 text-slate-400">
-                    <div>{order.deliveryDate}</div>
-                    <span className="text-[9px] text-slate-500 font-bold">{order.deliveryTime}</span>
+                  <td className="px-6 py-4 text-slate-500">
+                    <div className="font-semibold">{order.deliveryDate}</div>
+                    <span className="text-[9px] text-slate-400 font-bold">{order.deliveryTime}</span>
                   </td>
                   <td className="px-6 py-4">
                     <div className="space-y-1">
                       {order.items.map((item, idx) => (
-                        <div key={idx} className="text-[10px] text-slate-400">
-                          {item.productName} <span className="text-white font-bold">x{item.quantity}</span>
+                        <div key={idx} className="text-[10px] text-slate-500">
+                          {item.productName} <span className="text-slate-900 font-extrabold">x{item.quantity}</span>
                         </div>
                       ))}
                     </div>
                   </td>
-                  <td className="px-6 py-4 font-black text-white">{formatPrice(order.total)}</td>
+                  <td className="px-6 py-4 font-black text-slate-900">{formatPrice(order.total)}</td>
                   <td className="px-6 py-4">
                     <div className="flex justify-center items-center">
                       <select 
                         value={order.status} 
                         onChange={(e) => handleStatusChange(order.id, e.target.value as any)}
-                        className={`px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs font-bold focus:outline-none ${
-                          order.status === "Delivered" ? "text-emerald-500" :
-                          order.status === "Cancelled" ? "text-rose-500" : "text-amber-500"
+                        className={`px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs font-black uppercase tracking-wider focus:outline-none ${
+                          order.status === "Delivered" ? "text-kaya-green" :
+                          order.status === "Cancelled" ? "text-rose-600" : "text-amber-700"
                         }`}
                       >
                         <option value="Pending">Pending</option>

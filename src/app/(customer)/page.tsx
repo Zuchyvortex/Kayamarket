@@ -18,11 +18,8 @@ import {
   MapPin, 
   Star, 
   ArrowRight,
-  TrendingUp,
   Percent,
-  Sparkles,
   Smartphone,
-  CheckCircle2,
   Tv,
   Shirt,
   Sparkle,
@@ -122,14 +119,14 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="bg-slate-50 dark:bg-slate-950 min-h-screen text-slate-800 dark:text-slate-100 font-sans selection:bg-kaya-orange selection:text-white overflow-hidden">
+    <div className="bg-white text-[#111111] min-h-screen font-sans selection:bg-kaya-orange selection:text-white overflow-hidden">
       
-      {/* 1. HERO SECTION */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-kaya-black via-slate-900 to-kaya-black text-white pt-16 pb-20 md:pt-24 md:pb-28 px-4 sm:px-6 lg:px-8 border-b border-slate-800">
+      {/* 1. HERO SECTION - REDESIGNED FOR BRIGHT, PREMIUM WHITE BACKGROUND */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-white via-[#F8FAFC] to-white text-[#111111] pt-16 pb-20 md:pt-24 md:pb-28 px-4 sm:px-6 lg:px-8 border-b border-slate-100">
         
         {/* Glow ambient background lights */}
-        <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-kaya-orange/15 rounded-full filter blur-[120px] animate-pulse-slow"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-kaya-green/15 rounded-full filter blur-[120px] animate-pulse-slow"></div>
+        <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-kaya-orange/8 rounded-full filter blur-[120px] animate-pulse-slow"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-kaya-green/8 rounded-full filter blur-[120px] animate-pulse-slow"></div>
         
         <div className="max-w-7xl mx-auto relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
@@ -140,20 +137,20 @@ export default function HomePage() {
               <span>Africa's Premium Marketplace</span>
             </div>
             
-            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black leading-tight tracking-tight animate-fade-in-up">
+            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black leading-tight tracking-tight text-[#111111] animate-fade-in-up">
               Fresh Foodstuff,<br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-kaya-orange via-orange-400 to-amber-350">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-kaya-orange via-orange-500 to-amber-500">
                 Delivered Fast & Fresh.
               </span>
             </h1>
             
-            <p className="text-base sm:text-lg text-slate-350 max-w-xl mx-auto lg:mx-0 font-normal leading-relaxed">
+            <p className="text-base sm:text-lg text-slate-600 max-w-xl mx-auto lg:mx-0 font-normal leading-relaxed">
               We source organic foodstuffs directly from trusted African farmers to bring you high-end, clean groceries. Enjoy prompt delivery, hygienic handling, and zero supplier risk.
             </p>
 
-            {/* In-Hero Search */}
+            {/* In-Hero Search - Styled to stand out on light background */}
             <form onSubmit={handleSearch} className="max-w-xl mx-auto lg:mx-0">
-              <div className="flex flex-col sm:flex-row gap-2 bg-white/10 dark:bg-slate-900/40 p-2.5 rounded-3xl sm:rounded-full border border-white/20 dark:border-slate-800 backdrop-blur-xl shadow-2xl">
+              <div className="flex flex-col sm:flex-row gap-2 bg-white p-2.5 rounded-3xl sm:rounded-full border border-slate-200 backdrop-blur-xl shadow-xl">
                 <div className="relative flex-1">
                   <Search className="absolute left-4.5 top-4 h-5 w-5 text-kaya-orange" />
                   <input
@@ -161,10 +158,10 @@ export default function HomePage() {
                     placeholder="Search fresh tomatoes, yam, parboiled rice..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-13 pr-4 py-3.5 rounded-full bg-transparent text-white placeholder-slate-400 focus:outline-none text-sm font-semibold"
+                    className="w-full pl-13 pr-4 py-3.5 rounded-full bg-transparent text-[#111111] placeholder-slate-400 focus:outline-none text-sm font-semibold"
                   />
                 </div>
-                <button type="submit" className="bg-gradient-to-r from-kaya-orange to-orange-550 hover:from-orange-550 hover:to-kaya-orange text-white px-8 py-3.5 rounded-full font-bold transition-all duration-300 transform hover:scale-105 hover:-translate-y-0.5 hover:shadow-[0_0_25px_rgba(255,122,26,0.5)] text-sm shrink-0 shadow-lg relative overflow-hidden group">
+                <button type="submit" className="bg-gradient-to-r from-kaya-orange to-orange-500 hover:from-orange-500 hover:to-kaya-orange text-white px-8 py-3.5 rounded-full font-bold transition-all duration-300 transform hover:scale-105 hover:-translate-y-0.5 hover:shadow-[0_0_25px_rgba(255,122,26,0.25)] text-sm shrink-0 shadow-lg relative overflow-hidden group">
                   <span className="relative z-10 flex items-center gap-1.5 justify-center">
                     <span>Search Market</span>
                     <ArrowRight className="h-4 w-4" />
@@ -175,9 +172,9 @@ export default function HomePage() {
             </form>
 
             {/* Hero Stats */}
-            <div className="grid grid-cols-3 gap-4 pt-4 border-t border-slate-800 max-w-lg mx-auto lg:mx-0">
+            <div className="grid grid-cols-3 gap-4 pt-4 border-t border-slate-200 max-w-lg mx-auto lg:mx-0">
               <div>
-                <p className="text-2xl font-black text-white">50k+</p>
+                <p className="text-2xl font-black text-[#111111]">50k+</p>
                 <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Happy Users</p>
               </div>
               <div>
@@ -193,42 +190,42 @@ export default function HomePage() {
 
           {/* Hero right side graphic - floating product cards */}
           <div className="lg:col-span-5 relative flex justify-center lg:justify-end mt-12 lg:mt-0">
-            {/* Main Centerpiece Card */}
+            {/* Main Centerpiece Card - Redesigned as clean premium light card */}
             <div className="relative w-80 h-80 sm:w-96 sm:h-96 rounded-[3.5rem] bg-gradient-to-tr from-kaya-orange to-kaya-green p-1 rotate-3 shadow-2xl overflow-hidden hover:rotate-0 transition-all duration-500 group">
-              <div className="w-full h-full bg-slate-900 rounded-[3.3rem] flex flex-col justify-center items-center p-8 text-center border border-white/10 relative overflow-hidden">
+              <div className="w-full h-full bg-white rounded-[3.3rem] flex flex-col justify-center items-center p-8 text-center border border-slate-100 relative overflow-hidden">
                 <img src="/k-1.png" alt="KayaMarket Logo" className="h-16 w-auto mb-6 object-contain group-hover:scale-105 transition-transform duration-500" />
-                <h3 className="text-2xl font-black text-white">Handcrafted Foodstuff</h3>
-                <p className="text-xs text-slate-400 mt-2 max-w-xs leading-relaxed">
+                <h3 className="text-2xl font-black text-[#111111]">Handcrafted Foodstuff</h3>
+                <p className="text-xs text-slate-500 mt-2 max-w-xs leading-relaxed">
                   Carefully handpicked, stone-free grain selection, clean packaging, and direct home delivery.
                 </p>
-                <div className="mt-8 flex gap-3 text-[10px] bg-white/5 px-5 py-2.5 rounded-full border border-white/10 backdrop-blur-md">
+                <div className="mt-8 flex gap-3 text-[10px] bg-slate-50 px-5 py-2.5 rounded-full border border-slate-150">
                   <span className="font-bold text-kaya-orange">Hygienic Sort</span>
-                  <span className="text-white/20">|</span>
+                  <span className="text-slate-200">|</span>
                   <span className="font-bold text-kaya-green">Wholesale Rate</span>
                 </div>
               </div>
             </div>
 
             {/* Floating Card 1 */}
-            <div className="absolute -top-6 -left-6 bg-white dark:bg-slate-900 p-4 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-800 flex items-center space-x-3 animate-float max-w-[200px]">
+            <div className="absolute -top-6 -left-6 bg-white p-4 rounded-3xl shadow-2xl border border-slate-100 flex items-center space-x-3 animate-float max-w-[200px]">
               <div className="w-12 h-12 rounded-xl bg-orange-50 overflow-hidden shrink-0">
                 <img src="https://images.unsplash.com/photo-1595855759920-86582396756a?w=100&auto=format&fit=crop&q=60" className="w-full h-full object-cover" alt="" />
               </div>
               <div>
                 <p className="text-[10px] font-bold text-slate-400 uppercase">Roma Tomato</p>
-                <p className="text-xs font-black text-slate-800 dark:text-white">Fresh Basket</p>
+                <p className="text-xs font-black text-slate-800">Fresh Basket</p>
                 <p className="text-[10px] font-bold text-kaya-green mt-0.5">In Stock</p>
               </div>
             </div>
 
             {/* Floating Card 2 */}
-            <div className="absolute -bottom-8 right-6 bg-white dark:bg-slate-900 p-4 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-800 flex items-center space-x-3 animate-float [animation-delay:2s] max-w-[200px]">
+            <div className="absolute -bottom-8 right-6 bg-white p-4 rounded-3xl shadow-2xl border border-slate-100 flex items-center space-x-3 animate-float [animation-delay:2s] max-w-[200px]">
               <div className="w-12 h-12 rounded-xl bg-green-50 overflow-hidden shrink-0">
                 <img src="https://images.unsplash.com/photo-1586201375761-83865001e31c?w=100&auto=format&fit=crop&q=60" className="w-full h-full object-cover" alt="" />
               </div>
               <div>
                 <p className="text-[10px] font-bold text-slate-400 uppercase">Premium Rice</p>
-                <p className="text-xs font-black text-slate-800 dark:text-white">Stone Free 50kg</p>
+                <p className="text-xs font-black text-slate-800">Stone Free 50kg</p>
                 <p className="text-xs font-bold text-kaya-orange mt-0.5">Best Offer</p>
               </div>
             </div>
@@ -237,12 +234,12 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 2. FEATURED CATEGORIES SECTION */}
+      {/* 2. FEATURED CATEGORIES SECTION - Clean White Canvas */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="flex justify-between items-end mb-12">
           <div>
             <span className="text-kaya-orange font-bold text-xs uppercase tracking-widest">Store Departments</span>
-            <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight mt-1">Featured Categories</h2>
+            <h2 className="text-3xl font-black text-[#111111] tracking-tight mt-1">Featured Categories</h2>
             <p className="text-sm text-slate-500 mt-1">Find organic local ingredients sorted by category</p>
           </div>
           <Link href="/products" className="text-kaya-green hover:text-green-700 font-bold text-sm flex items-center space-x-1 group transition-colors">
@@ -256,23 +253,23 @@ export default function HomePage() {
             <Link 
               key={category.id} 
               href={`/products?category=${category.slug}`}
-              className="bg-white dark:bg-slate-900 p-6 rounded-3xl text-center shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] hover:-translate-y-1.5 transition-all border border-slate-100 dark:border-slate-800 group flex flex-col items-center"
+              className="bg-white p-6 rounded-3xl text-center shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] hover:-translate-y-1.5 transition-all border border-slate-100 group flex flex-col items-center"
             >
-              <div className="w-20 h-20 rounded-2xl overflow-hidden mb-4 relative bg-green-50/50 dark:bg-green-950/20 flex items-center justify-center border border-slate-50 dark:border-slate-800/80">
+              <div className="w-20 h-20 rounded-2xl overflow-hidden mb-4 relative bg-slate-50 flex items-center justify-center border border-slate-100">
                 <img 
                   src={category.image} 
                   alt={category.name} 
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 />
               </div>
-              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 group-hover:text-kaya-green transition-colors">{category.name}</h3>
-              <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1 line-clamp-1">{category.description}</p>
+              <h3 className="text-sm font-bold text-slate-800 group-hover:text-kaya-green transition-colors">{category.name}</h3>
+              <p className="text-[10px] text-slate-400 mt-1 line-clamp-1">{category.description}</p>
             </Link>
           ))}
         </div>
       </section>
 
-      {/* 3. FLASH SALES SECTION (With Live Countdown Ticker) */}
+      {/* 3. FLASH SALES SECTION - Styled with clean light backgrounds */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="bg-gradient-to-r from-kaya-orange to-amber-500 rounded-[3rem] p-8 md:p-12 text-white relative overflow-hidden shadow-xl shadow-orange-500/10">
           
@@ -299,15 +296,15 @@ export default function HomePage() {
 
               {/* Countdown Ticker */}
               <div className="flex justify-center lg:justify-start gap-3 text-center">
-                <div className="bg-slate-900/90 text-white p-3 rounded-2xl w-16 border border-white/10">
+                <div className="bg-[#111111]/90 text-white p-3 rounded-2xl w-16 border border-white/10">
                   <span className="block text-lg font-black">{timeLeft.hours.toString().padStart(2, '0')}</span>
                   <span className="text-[9px] uppercase font-bold text-slate-400">Hrs</span>
                 </div>
-                <div className="bg-slate-900/90 text-white p-3 rounded-2xl w-16 border border-white/10">
+                <div className="bg-[#111111]/90 text-white p-3 rounded-2xl w-16 border border-white/10">
                   <span className="block text-lg font-black">{timeLeft.minutes.toString().padStart(2, '0')}</span>
                   <span className="text-[9px] uppercase font-bold text-slate-400">Min</span>
                 </div>
-                <div className="bg-slate-900/90 text-white p-3 rounded-2xl w-16 border border-white/10">
+                <div className="bg-[#111111]/90 text-white p-3 rounded-2xl w-16 border border-white/10">
                   <span className="block text-lg font-black text-kaya-orange">{timeLeft.seconds.toString().padStart(2, '0')}</span>
                   <span className="text-[9px] uppercase font-bold text-slate-400">Sec</span>
                 </div>
@@ -319,16 +316,16 @@ export default function HomePage() {
               {featuredProducts.slice(0, 2).map((product) => (
                 <div 
                   key={product.id}
-                  className="bg-white dark:bg-slate-900 p-5 rounded-3xl text-slate-800 dark:text-white shadow-lg border border-white/10 relative group/flash overflow-hidden hover:-translate-y-1.5 transition-all duration-300"
+                  className="bg-white p-5 rounded-3xl text-[#111111] shadow-lg border border-slate-100 relative group/flash overflow-hidden hover:-translate-y-1.5 transition-all duration-300"
                 >
                   <span className="absolute top-4 left-4 bg-rose-500 text-white text-[9px] font-black uppercase px-2.5 py-1 rounded-full z-10 shadow-sm">
                     Save 15%
                   </span>
                   
                   {/* Image wrapper */}
-                  <div className="relative h-44 rounded-2xl overflow-hidden bg-slate-50 dark:bg-slate-800">
+                  <div className="relative h-44 rounded-2xl overflow-hidden bg-slate-50">
                     <img src={product.image} className="w-full h-full object-cover group-hover/flash:scale-105 transition-transform duration-500" alt="" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/25 to-transparent"></div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
                   </div>
 
                   {/* Rating / Title */}
@@ -341,23 +338,23 @@ export default function HomePage() {
                       </span>
                     </div>
                     
-                    <h4 className="font-bold text-base truncate text-slate-850 dark:text-white hover:text-kaya-orange transition-colors">
+                    <h4 className="font-bold text-base truncate text-slate-900 hover:text-kaya-orange transition-colors">
                       <Link href={`/products/${product.slug}`}>{product.name}</Link>
                     </h4>
                     
-                    <p className="text-[10px] text-slate-450 dark:text-slate-500">Weight: {product.weight || "Pack"}</p>
+                    <p className="text-[10px] text-slate-400">Weight: {product.weight || "Pack"}</p>
                   </div>
 
                   {/* Price and Add button */}
-                  <div className="mt-5 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex justify-between items-center">
+                  <div className="mt-5 pt-3 border-t border-slate-100 flex justify-between items-center">
                     <div>
                       <p className="text-xs text-slate-400 line-through">{formatPrice(product.price * 1.15)}</p>
-                      <p className="text-lg font-black text-slate-900 dark:text-white">{formatPrice(product.price)}</p>
+                      <p className="text-lg font-black text-slate-900">{formatPrice(product.price)}</p>
                     </div>
                     
                     <button 
                       onClick={() => addToCart(product)}
-                      className="bg-kaya-orange hover:bg-orange-555 text-white p-2.5 rounded-xl shadow-md transition-all duration-300 transform hover:scale-105 flex items-center justify-center"
+                      className="bg-kaya-orange hover:bg-orange-600 text-white p-2.5 rounded-xl shadow-md transition-all duration-300 transform hover:scale-105 flex items-center justify-center"
                     >
                       <Plus className="h-4.5 w-4.5" />
                     </button>
@@ -370,14 +367,14 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 4. MAIN FRESH GROCERIES DIRECTORY */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto bg-white dark:bg-slate-900 rounded-[3.5rem] shadow-[0_4px_30px_rgba(0,0,0,0.01)] border border-slate-100 dark:border-slate-800/80">
+      {/* 4. MAIN FRESH GROCERIES DIRECTORY - Separated by Light Gray Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto bg-[#F8FAFC] rounded-[3.5rem] shadow-[0_4px_30px_rgba(0,0,0,0.01)] border border-slate-100">
         
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12 border-b border-slate-100 dark:border-slate-800/80 pb-8">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12 border-b border-slate-200 pb-8">
           <div>
             <span className="text-kaya-green font-bold text-xs uppercase tracking-widest">Fresh Farm Market</span>
-            <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight mt-1">Shop Fresh Foodstuffs</h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400">100% stone-free, hygienic, packaged and clean local food products</p>
+            <h2 className="text-3xl font-black text-[#111111] tracking-tight mt-1">Shop Fresh Foodstuffs</h2>
+            <p className="text-sm text-slate-500">100% stone-free, hygienic, packaged and clean local food products</p>
           </div>
 
           {/* Categories Tab selector */}
@@ -387,7 +384,7 @@ export default function HomePage() {
               className={`px-5 py-2.5 rounded-full text-xs font-bold transition-all ${
                 activeCategory === "all" 
                   ? "bg-kaya-green text-white shadow-md shadow-green-600/10" 
-                  : "bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
+                  : "bg-white text-slate-650 hover:bg-slate-100 border border-slate-200"
               }`}
             >
               All Products
@@ -399,7 +396,7 @@ export default function HomePage() {
                 className={`px-5 py-2.5 rounded-full text-xs font-bold transition-all ${
                   activeCategory === c.slug 
                     ? "bg-kaya-green text-white shadow-md shadow-green-600/10" 
-                    : "bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
+                    : "bg-white text-slate-650 hover:bg-slate-100 border border-slate-200"
                 }`}
               >
                 {c.name}
@@ -413,16 +410,16 @@ export default function HomePage() {
           {filteredProducts.map((product) => (
             <div 
               key={product.id} 
-              className="group relative bg-white dark:bg-slate-900 rounded-[2.2rem] border border-slate-100 dark:border-slate-800/80 p-4 shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] transition-all duration-500 flex flex-col justify-between overflow-hidden hover:-translate-y-2"
+              className="group relative bg-white rounded-[2.2rem] border border-slate-100 p-4 shadow-sm hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] transition-all duration-500 flex flex-col justify-between overflow-hidden hover:-translate-y-2"
             >
               {/* Wishlist toggle action */}
               <div className="absolute top-6 right-6 z-10 flex flex-col gap-2">
                 <button 
                   onClick={() => toggleWishlist(product)}
-                  className={`p-2.5 rounded-full shadow-lg border border-slate-100 dark:border-slate-800/50 backdrop-blur-md transition-all duration-300 hover:scale-110 ${
+                  className={`p-2.5 rounded-full shadow-lg border border-slate-150 backdrop-blur-md transition-all duration-300 hover:scale-110 ${
                     isInWishlist(product.id) 
                       ? "bg-rose-50 text-rose-500 shadow-rose-100 border-rose-100" 
-                      : "bg-white/90 dark:bg-slate-900/90 text-slate-450 hover:text-rose-500"
+                      : "bg-white/90 text-slate-400 hover:text-rose-500"
                   }`}
                 >
                   <Heart className={`h-4.5 w-4.5 transition-transform ${isInWishlist(product.id) ? "fill-rose-500 scale-115" : ""}`} />
@@ -431,13 +428,13 @@ export default function HomePage() {
 
               <div>
                 {/* Image panel */}
-                <Link href={`/products/${product.slug}`} className="block relative w-full h-56 rounded-2xl overflow-hidden bg-slate-50 dark:bg-slate-800 mb-5 border border-slate-100 dark:border-slate-850">
+                <Link href={`/products/${product.slug}`} className="block relative w-full h-56 rounded-2xl overflow-hidden bg-slate-50 mb-5 border border-slate-100">
                   <img 
                     src={product.image} 
                     alt={product.name} 
                     className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-700 ease-out"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   {product.inventory < 10 && (
                     <span className="absolute bottom-3 left-3 bg-kaya-orange text-white font-black text-[9px] px-3 py-1.5 rounded-full uppercase tracking-widest shadow-md">
                       Low Stock
@@ -446,28 +443,28 @@ export default function HomePage() {
                 </Link>
 
                 {/* Rating & reviews */}
-                <span className="inline-flex items-center space-x-1 text-[10px] bg-slate-50 dark:bg-slate-800 text-slate-650 dark:text-slate-350 px-3 py-1.5 rounded-full font-bold border border-slate-100 dark:border-slate-700/80">
-                  <span className="text-yellow-550 font-black">★</span> 
-                  <span className="font-extrabold">{product.rating}</span>
-                  <span className="text-slate-450 dark:text-slate-500 font-medium">({product.reviewsCount})</span>
+                <span className="inline-flex items-center space-x-1 text-[10px] bg-slate-50 text-slate-650 px-3 py-1.5 rounded-full font-bold border border-slate-150">
+                  <span className="text-yellow-500 font-black">★</span> 
+                  <span className="font-extrabold text-slate-800">{product.rating}</span>
+                  <span className="text-slate-400 font-medium">({product.reviewsCount})</span>
                 </span>
 
                 {/* Details */}
-                <h3 className="font-extrabold text-slate-850 dark:text-white mt-4 text-lg line-clamp-1 group-hover:text-kaya-orange transition-colors">
+                <h3 className="font-extrabold text-[#111111] mt-4 text-lg line-clamp-1 group-hover:text-kaya-orange transition-colors">
                   <Link href={`/products/${product.slug}`}>{product.name}</Link>
                 </h3>
-                <p className="text-xs text-slate-450 dark:text-slate-500 mt-1">Weight: {product.weight || "pack"}</p>
+                <p className="text-xs text-slate-450 mt-1">Weight: {product.weight || "pack"}</p>
               </div>
 
               {/* Price footer bar */}
-              <div className="flex justify-between items-center mt-6 pt-4 border-t border-slate-50 dark:border-slate-800/60">
+              <div className="flex justify-between items-center mt-6 pt-4 border-t border-slate-100">
                 <div>
                   <p className="text-[9px] text-slate-400 uppercase tracking-widest font-black">Our Price</p>
-                  <span className="text-xl font-black text-slate-900 dark:text-white">{formatPrice(product.price)}</span>
+                  <span className="text-xl font-black text-slate-900">{formatPrice(product.price)}</span>
                 </div>
                 <button 
                   onClick={() => addToCart(product)}
-                  className="bg-slate-900 dark:bg-slate-800 hover:bg-gradient-to-r hover:from-kaya-orange hover:to-orange-500 text-white p-3.5 rounded-2xl shadow-md hover:shadow-orange-500/20 transition-all duration-300 transform hover:scale-108 hover:-translate-y-0.5 relative overflow-hidden group/btn"
+                  className="bg-slate-900 hover:bg-gradient-to-r hover:from-kaya-orange hover:to-orange-500 text-white p-3.5 rounded-2xl shadow-md hover:shadow-orange-500/20 transition-all duration-300 transform hover:scale-108 hover:-translate-y-0.5 relative overflow-hidden group/btn"
                 >
                   <ShoppingCart className="h-4.5 w-4.5 relative z-10" />
                 </button>
@@ -482,9 +479,9 @@ export default function HomePage() {
       {/* 5. EXTENDED MARKET COLLECTIONS: ELECTRONICS, FASHION, BEAUTY, HOME ESSENTIALS */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="text-center max-w-2xl mx-auto mb-12">
-          <span className="text-kaya-orange font-bold text-xs uppercase tracking-widest px-4 py-1.5 bg-orange-50 dark:bg-orange-950/20 rounded-full">Kaya Mall Collections</span>
+          <span className="text-kaya-orange font-bold text-xs uppercase tracking-widest px-4 py-1.5 bg-orange-50 rounded-full">Kaya Mall Collections</span>
           <h2 className="text-3xl sm:text-4xl font-black tracking-tight mt-3">Extended Marketplace Catalog</h2>
-          <p className="text-slate-500 dark:text-slate-400 mt-2 text-sm">
+          <p className="text-slate-500 mt-2 text-sm">
             Beyond foodstuff, discover our curated collections of premium home essentials, kitchenwares, cosmetics, and African fashion styles.
           </p>
         </div>
@@ -502,8 +499,8 @@ export default function HomePage() {
               onClick={() => setActiveMallTab(tab.id)}
               className={`flex items-center space-x-2 px-5 py-3 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
                 activeMallTab === tab.id
-                  ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 shadow-lg"
-                  : "bg-white dark:bg-slate-900 text-slate-650 dark:text-slate-350 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-100 dark:border-slate-800"
+                  ? "bg-slate-900 text-white shadow-lg"
+                  : "bg-white text-slate-650 hover:bg-slate-100 border border-slate-200"
               }`}
             >
               <tab.icon className={`h-4.5 w-4.5 ${activeMallTab === tab.id ? "text-kaya-orange" : "text-slate-400"}`} />
@@ -517,9 +514,9 @@ export default function HomePage() {
           {mallCollections[activeMallTab as keyof typeof mallCollections].map((item, index) => (
             <div 
               key={item.id} 
-              className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-6 border border-slate-100 dark:border-slate-800/80 shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] transition-all flex flex-col sm:flex-row gap-6 group"
+              className="bg-white rounded-[2.5rem] p-6 border border-slate-150 shadow-sm hover:shadow-[0_20px_40px_rgba(0,0,0,0.04)] transition-all flex flex-col sm:flex-row gap-6 group"
             >
-              <div className="w-full sm:w-44 h-44 rounded-2xl overflow-hidden bg-slate-50 dark:bg-slate-800 shrink-0 border border-slate-100 dark:border-slate-800/50">
+              <div className="w-full sm:w-44 h-44 rounded-2xl overflow-hidden bg-slate-50 shrink-0 border border-slate-100">
                 <img src={item.image} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="" />
               </div>
               
@@ -532,15 +529,14 @@ export default function HomePage() {
                       {item.rating}
                     </span>
                   </div>
-                  <h3 className="font-extrabold text-slate-955 dark:text-white text-lg line-clamp-1 group-hover:text-kaya-green transition-colors">{item.name}</h3>
+                  <h3 className="font-extrabold text-[#111111] text-lg line-clamp-1 group-hover:text-kaya-green transition-colors">{item.name}</h3>
                   <p className="text-xs text-slate-500 leading-relaxed font-light">{item.desc}</p>
                 </div>
                 
-                <div className="flex justify-between items-center mt-6 pt-3 border-t border-slate-50 dark:border-slate-800/50">
-                  <span className="text-xl font-black text-slate-900 dark:text-white">{formatPrice(item.price)}</span>
+                <div className="flex justify-between items-center mt-6 pt-3 border-t border-slate-100">
+                  <span className="text-xl font-black text-slate-900">{formatPrice(item.price)}</span>
                   <button 
                     onClick={() => {
-                      // Custom cart item mapper
                       const mappedProduct: Product = {
                         id: item.id,
                         name: item.name,
@@ -573,8 +569,8 @@ export default function HomePage() {
       {/* 6. WEEKLY/MONTHLY FOOD BASKETS (Bundles) */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="text-center max-w-xl mx-auto mb-16">
-          <span className="text-kaya-green font-bold text-xs uppercase tracking-widest bg-green-50 dark:bg-green-950/20 px-4 py-1.5 rounded-full">Kaya Combo Bundles</span>
-          <h2 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white mt-3 tracking-tight">Kaya Food Baskets</h2>
+          <span className="text-kaya-green font-bold text-xs uppercase tracking-widest bg-green-50 px-4 py-1.5 rounded-full">Kaya Combo Bundles</span>
+          <h2 className="text-3xl sm:text-4xl font-black text-[#111111] mt-3 tracking-tight">Kaya Food Baskets</h2>
           <p className="text-slate-500 mt-2 text-sm leading-relaxed">
             Curated combos of essential local cooking ingredients to save you time and money. Fill your pantry in a single click.
           </p>
@@ -582,11 +578,11 @@ export default function HomePage() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
           {foodBaskets.map((basket, i) => (
-            <div key={i} className="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800/80 overflow-hidden shadow-[0_4px_25px_rgba(0,0,0,0.01)] hover:shadow-[0_25px_50px_rgba(0,0,0,0.08)] transition-all duration-300 group flex flex-col justify-between">
+            <div key={i} className="bg-white rounded-[2.5rem] border border-slate-150 overflow-hidden shadow-sm hover:shadow-[0_25px_50px_rgba(0,0,0,0.06)] transition-all duration-300 group flex flex-col justify-between">
               <div>
-                <div className="relative w-full h-56 bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                <div className="relative w-full h-56 bg-slate-100 overflow-hidden">
                   <img src={basket.image} alt={basket.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent"></div>
                   <div className="absolute bottom-6 left-6">
                     <span className="text-amber-300 text-[10px] font-black uppercase tracking-widest bg-white/10 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">Recommended Combo</span>
                     <h3 className="text-white text-xl font-extrabold mt-2">{basket.name}</h3>
@@ -594,16 +590,16 @@ export default function HomePage() {
                 </div>
                 
                 <div className="p-8">
-                  <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed italic">
+                  <p className="text-slate-600 text-sm leading-relaxed italic">
                     "{basket.description}"
                   </p>
                 </div>
               </div>
 
-              <div className="p-8 pt-0 flex justify-between items-center border-t border-slate-50 dark:border-slate-800/50">
+              <div className="p-8 pt-0 flex justify-between items-center border-t border-slate-100">
                 <div>
                   <p className="text-[10px] text-slate-400 uppercase tracking-widest font-black">Bundle Price</p>
-                  <span className="text-2xl font-black text-slate-900 dark:text-white">{formatPrice(basket.price)}</span>
+                  <span className="text-2xl font-black text-slate-900">{formatPrice(basket.price)}</span>
                 </div>
                 
                 <button 
@@ -634,18 +630,18 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 7. WHY CHOOSE KAYAMARKET (Brand Promise & Testimonials) */}
-      <section className="py-20 bg-slate-900 text-white rounded-[4rem] mx-4 sm:mx-6 lg:mx-8 px-8 sm:px-12 relative overflow-hidden">
-        <div className="absolute right-0 bottom-0 w-96 h-96 bg-kaya-green/10 rounded-full filter blur-3xl opacity-50"></div>
-        <div className="absolute left-0 top-0 w-96 h-96 bg-kaya-orange/10 rounded-full filter blur-3xl opacity-50"></div>
+      {/* 7. WHY CHOOSE KAYAMARKET - Redesigned as clean premium light gray container with high-contrast text */}
+      <section className="py-20 bg-[#F8FAFC] text-[#111111] rounded-[4rem] mx-4 sm:mx-6 lg:mx-8 px-8 sm:px-12 relative overflow-hidden border border-slate-100">
+        <div className="absolute right-0 bottom-0 w-96 h-96 bg-kaya-green/5 rounded-full filter blur-3xl opacity-50"></div>
+        <div className="absolute left-0 top-0 w-96 h-96 bg-kaya-orange/5 rounded-full filter blur-3xl opacity-50"></div>
         
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center relative z-10">
           
           <div className="space-y-8">
             <div>
               <span className="text-kaya-orange font-bold text-xs uppercase tracking-widest">Our Direct Promise</span>
-              <h2 className="text-3xl sm:text-4xl font-black mt-3 tracking-tight">The Kaya Guarantee</h2>
-              <p className="text-slate-400 mt-4 leading-relaxed font-light">
+              <h2 className="text-3xl sm:text-4xl font-black mt-3 tracking-tight text-[#111111]">The Kaya Guarantee</h2>
+              <p className="text-slate-600 mt-4 leading-relaxed font-light">
                 We've combined the efficiency and pricing structure of a traditional open market with a premium, reliable delivery infrastructure.
               </p>
             </div>
@@ -657,22 +653,22 @@ export default function HomePage() {
                 { icon: Clock, title: "Flexible Delivery Scheduling", desc: "Select your preferred delivery date and morning/afternoon time slots at checkout to fit your schedule." }
               ].map((item, i) => (
                 <div key={i} className="flex gap-4 group">
-                  <div className="w-12 h-12 rounded-2xl bg-white/5 text-kaya-orange flex items-center justify-center shrink-0 border border-white/10 group-hover:bg-kaya-orange group-hover:text-white transition-colors duration-300">
+                  <div className="w-12 h-12 rounded-2xl bg-white border border-slate-200 text-kaya-orange flex items-center justify-center shrink-0 group-hover:bg-kaya-orange group-hover:text-white transition-colors duration-300 shadow-sm">
                     <item.icon className="h-5 w-5" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-white text-lg">{item.title}</h3>
-                    <p className="text-sm text-slate-400 mt-1 leading-relaxed">{item.desc}</p>
+                    <h3 className="font-bold text-slate-900 text-lg">{item.title}</h3>
+                    <p className="text-sm text-slate-500 mt-1 leading-relaxed">{item.desc}</p>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Testimonial slider / block */}
-          <div className="bg-white/5 border border-white/10 backdrop-blur-md p-8 sm:p-12 rounded-[3rem] space-y-6">
+          {/* Testimonial Panel */}
+          <div className="bg-white border border-slate-150 p-8 sm:p-12 rounded-[3rem] space-y-6 shadow-sm">
             <span className="text-xs font-bold text-kaya-green uppercase tracking-widest">Happy Customers</span>
-            <h3 className="text-2xl font-black text-white">What Users Say</h3>
+            <h3 className="text-2xl font-black text-[#111111]">What Users Say</h3>
             
             <div className="space-y-8">
               {[
@@ -680,12 +676,12 @@ export default function HomePage() {
                 { name: "Dr. Tunde Alao", role: "Lekki Resident", text: "Very prompt delivery slots. I scheduled afternoon delivery and got my fresh tomatoes basket right on time. Highly recommended." }
               ].map((t, idx) => (
                 <div key={idx} className="border-l-2 border-kaya-orange pl-5 space-y-2">
-                  <p className="text-slate-350 italic text-sm leading-relaxed">
+                  <p className="text-slate-600 italic text-sm leading-relaxed">
                     "{t.text}"
                   </p>
                   <div>
-                    <p className="text-xs font-bold text-white">{t.name}</p>
-                    <p className="text-[10px] text-slate-500 font-bold uppercase">{t.role}</p>
+                    <p className="text-xs font-bold text-slate-900">{t.name}</p>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase">{t.role}</p>
                   </div>
                 </div>
               ))}
@@ -695,27 +691,27 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 8. MOBILE APP DOWNLOAD SECTION */}
+      {/* 8. MOBILE APP DOWNLOAD SECTION - Redesigned to stand out on light background */}
       <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="bg-gradient-to-tr from-slate-900 via-slate-950 to-slate-900 rounded-[3.5rem] p-10 md:p-16 border border-slate-800 text-white relative overflow-hidden shadow-2xl">
-          <div className="absolute right-0 top-0 w-96 h-96 bg-kaya-orange/10 rounded-full filter blur-[100px] animate-pulse"></div>
-          <div className="absolute left-1/4 bottom-0 w-72 h-72 bg-kaya-green/10 rounded-full filter blur-[80px]"></div>
+        <div className="bg-white rounded-[3.5rem] p-10 md:p-16 border border-slate-200 text-[#111111] relative overflow-hidden shadow-2xl">
+          <div className="absolute right-0 top-0 w-96 h-96 bg-kaya-orange/5 rounded-full filter blur-[100px] animate-pulse"></div>
+          <div className="absolute left-1/4 bottom-0 w-72 h-72 bg-kaya-green/5 rounded-full filter blur-[80px]"></div>
 
           <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             
             {/* Download Text panel */}
             <div className="lg:col-span-7 space-y-8 text-center lg:text-left">
-              <div className="inline-flex items-center space-x-2 bg-white/5 px-4 py-1.5 rounded-full text-xs font-bold text-kaya-orange border border-white/10 uppercase tracking-widest">
+              <div className="inline-flex items-center space-x-2 bg-slate-50 px-4 py-1.5 rounded-full text-xs font-bold text-kaya-orange border border-slate-250 uppercase tracking-widest">
                 <Smartphone className="h-4 w-4" />
                 <span>KayaMobile App</span>
               </div>
               
-              <h2 className="text-3xl sm:text-5xl font-black leading-tight tracking-tight">
+              <h2 className="text-3xl sm:text-5xl font-black leading-tight tracking-tight text-[#111111]">
                 Order Fresh Foodstuffs <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-kaya-orange to-amber-400">Direct From Your Mobile.</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-kaya-orange to-amber-500">Direct From Your Mobile.</span>
               </h2>
               
-              <p className="text-slate-400 text-sm max-w-lg mx-auto lg:mx-0 leading-relaxed font-light">
+              <p className="text-slate-600 text-sm max-w-lg mx-auto lg:mx-0 leading-relaxed font-light">
                 Download the official KayaMarket mobile application today. Experience faster loading speeds, quick checkout, real-time dispatch tracking, and notifications on fresh harvest arrivals.
               </p>
 
@@ -725,11 +721,11 @@ export default function HomePage() {
                   href="https://apple.com" 
                   target="_blank" 
                   rel="noreferrer"
-                  className="bg-white hover:bg-slate-100 text-slate-900 px-6 py-3 rounded-2xl font-bold text-xs flex items-center gap-2.5 transition-all shadow-lg hover:-translate-y-0.5"
+                  className="bg-slate-900 hover:bg-slate-800 text-white px-6 py-3 rounded-2xl font-bold text-xs flex items-center gap-2.5 transition-all shadow-lg hover:-translate-y-0.5"
                 >
-                  <img src="https://upload.wikimedia.org/wikipedia/commons/3/31/Apple_logo_white.svg" className="h-5 w-5 brightness-0" alt="" />
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/3/31/Apple_logo_white.svg" className="h-5 w-5 invert" alt="" />
                   <div className="text-left">
-                    <p className="text-[8px] uppercase text-slate-500 font-bold leading-none">Download on the</p>
+                    <p className="text-[8px] uppercase text-slate-400 font-bold leading-none">Download on the</p>
                     <p className="text-sm font-black leading-tight">App Store</p>
                   </div>
                 </a>
@@ -737,11 +733,11 @@ export default function HomePage() {
                   href="https://google.com" 
                   target="_blank" 
                   rel="noreferrer"
-                  className="bg-slate-900 hover:bg-slate-800 text-white px-6 py-3 rounded-2xl font-bold text-xs flex items-center gap-2.5 transition-all border border-slate-800 shadow-lg hover:-translate-y-0.5"
+                  className="bg-white hover:bg-slate-50 text-slate-900 px-6 py-3 rounded-2xl font-bold text-xs flex items-center gap-2.5 transition-all border border-slate-250 shadow-lg hover:-translate-y-0.5"
                 >
                   <img src="https://upload.wikimedia.org/wikipedia/commons/d/d7/Google_Play_Store_badge_EN.svg" className="h-5 w-5" alt="" />
                   <div className="text-left">
-                    <p className="text-[8px] uppercase text-slate-400 font-bold leading-none">Get it on</p>
+                    <p className="text-[8px] uppercase text-slate-500 font-bold leading-none">Get it on</p>
                     <p className="text-sm font-black leading-tight">Google Play</p>
                   </div>
                 </a>
@@ -791,7 +787,7 @@ export default function HomePage() {
       <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
         <div className="text-center mb-16">
           <HelpCircle className="h-10 w-10 text-kaya-green mx-auto mb-4" />
-          <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Got Questions?</h2>
+          <h2 className="text-3xl font-black text-[#111111] tracking-tight">Got Questions?</h2>
           <p className="text-slate-500 mt-2 text-sm">Everything you need to know about purchasing foodstuffs on KayaMarket</p>
         </div>
 
@@ -802,16 +798,16 @@ export default function HomePage() {
             { q: "Are the foodstuffs stone-free and clean?", a: "Yes, 100%. Our rice, beans, and grains are thoroughly sorted, washed, and cleaned using modern processing systems before packaging, saving you hours of sorting." },
             { q: "Can I return items if I'm not satisfied?", a: "Customer satisfaction is our priority. If an item is damaged or does not meet quality expectations, you can return it to our dispatch rider immediately at the point of delivery for a replacement or refund." }
           ].map((faq, i) => (
-            <div key={i} className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 overflow-hidden shadow-sm">
+            <div key={i} className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
               <button 
                 onClick={() => setFaqOpen(faqOpen === i ? null : i)}
-                className="w-full px-6 py-5 text-left font-bold text-slate-850 dark:text-slate-200 hover:text-kaya-green flex justify-between items-center transition-colors focus:outline-none"
+                className="w-full px-6 py-5 text-left font-bold text-slate-800 hover:text-kaya-green flex justify-between items-center transition-colors focus:outline-none"
               >
                 <span>{faq.q}</span>
                 <span className="text-kaya-green text-lg font-black">{faqOpen === i ? "−" : "+"}</span>
               </button>
               {faqOpen === i && (
-                <div className="px-6 pb-6 text-sm text-slate-650 dark:text-slate-400 leading-relaxed border-t border-slate-50 dark:border-slate-800/80 pt-4 font-light">
+                <div className="px-6 pb-6 text-sm text-slate-600 leading-relaxed border-t border-slate-100 pt-4 font-light bg-slate-50">
                   {faq.a}
                 </div>
               )}
@@ -821,15 +817,15 @@ export default function HomePage() {
       </section>
 
       {/* 10. CONTACT SECTION */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-slate-200 dark:border-slate-800/80">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-slate-200">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           
           <div className="space-y-6">
-            <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Get in Touch</h2>
+            <h2 className="text-3xl font-black text-[#111111] tracking-tight">Get in Touch</h2>
             <p className="text-slate-500 text-sm leading-relaxed">
               Have bulk orders or customized requests? Want to partner as a farmer or supplier? Contact our team today.
             </p>
-            <div className="space-y-4 text-sm text-slate-600 dark:text-slate-400 font-semibold">
+            <div className="space-y-4 text-sm text-slate-600 font-semibold">
               <div className="flex items-center gap-3">
                 <Phone className="h-5 w-5 text-kaya-green" />
                 <span>+234 (0) 803 123 4567</span>
@@ -845,26 +841,26 @@ export default function HomePage() {
             </div>
           </div>
 
-          <form onSubmit={(e) => { e.preventDefault(); alert("Message sent successfully!"); }} className="lg:col-span-2 bg-white dark:bg-slate-900 p-8 sm:p-10 rounded-[2.5rem] border border-slate-100 dark:border-slate-800/80 shadow-sm space-y-6">
+          <form onSubmit={(e) => { e.preventDefault(); alert("Message sent successfully!"); }} className="lg:col-span-2 bg-[#F8FAFC] p-8 sm:p-10 rounded-[2.5rem] border border-slate-200 shadow-sm space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">Your Name</label>
-                <input type="text" required placeholder="Chinedu Okafor" className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:outline-none focus:ring-2 focus:ring-kaya-green/20 text-sm font-semibold text-slate-800 dark:text-white" />
+                <label className="text-xs font-bold text-slate-600 uppercase tracking-widest">Your Name</label>
+                <input type="text" required placeholder="Chinedu Okafor" className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-kaya-green/20 text-sm font-semibold text-slate-800" />
               </div>
               <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">Email Address</label>
-                <input type="email" required placeholder="chinedu@example.com" className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:outline-none focus:ring-2 focus:ring-kaya-green/20 text-sm font-semibold text-slate-800 dark:text-white" />
+                <label className="text-xs font-bold text-slate-600 uppercase tracking-widest">Email Address</label>
+                <input type="email" required placeholder="chinedu@example.com" className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-kaya-green/20 text-sm font-semibold text-slate-800" />
               </div>
             </div>
             
             <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">Subject</label>
-              <input type="text" required placeholder="Bulk Order inquiry" className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:outline-none focus:ring-2 focus:ring-kaya-green/20 text-sm font-semibold text-slate-800 dark:text-white" />
+              <label className="text-xs font-bold text-slate-600 uppercase tracking-widest">Subject</label>
+              <input type="text" required placeholder="Bulk Order inquiry" className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-kaya-green/20 text-sm font-semibold text-slate-800" />
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">Your Message</label>
-              <textarea required rows={4} placeholder="Tell us how we can help you..." className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:outline-none focus:ring-2 focus:ring-kaya-green/20 text-sm font-semibold text-slate-800 dark:text-white"></textarea>
+              <label className="text-xs font-bold text-slate-600 uppercase tracking-widest">Your Message</label>
+              <textarea required rows={4} placeholder="Tell us how we can help you..." className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-kaya-green/20 text-sm font-semibold text-slate-800"></textarea>
             </div>
 
             <button type="submit" className="w-full sm:w-auto bg-kaya-green hover:bg-green-700 text-white font-bold px-8 py-3.5 rounded-xl shadow-md transition-colors text-sm">
