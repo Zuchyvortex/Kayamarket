@@ -67,6 +67,7 @@ body {
 .text-gradient-orange-green {
   background: linear-gradient(135deg, #FF7A1A 0%, #0B7A46 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
