@@ -51,7 +51,7 @@ export default function RegisterPage() {
         
         {/* Glow ambient background lights */}
         <div className="absolute top-0 right-0 w-24 h-24 bg-kaya-orange/10 rounded-bl-[3rem]"></div>
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-kaya-green/10 rounded-tr-[3rem]"></div>
+        <div className="absolute bottom-0 left-0 w-24 h-24 bg-orange-50/50 rounded-tr-[3rem]"></div>
         
         {/* Logo and title */}
         <div className="text-center space-y-4">
@@ -78,7 +78,7 @@ export default function RegisterPage() {
           
           <div className="space-y-1.5">
             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-              <User className="h-3.5 w-3.5 text-kaya-green" />
+              <User className="h-3.5 w-3.5 text-kaya-orange" />
               <span>Full Name</span>
             </label>
             <input 
@@ -108,7 +108,7 @@ export default function RegisterPage() {
 
           <div className="space-y-1.5">
             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-              <Phone className="h-3.5 w-3.5 text-kaya-green" />
+              <Phone className="h-3.5 w-3.5 text-kaya-orange" />
               <span>Phone Number</span>
             </label>
             <input 
@@ -139,7 +139,7 @@ export default function RegisterPage() {
           <button 
             type="submit" 
             disabled={loading}
-            className="w-full bg-gradient-to-r from-kaya-orange to-orange-500 hover:from-orange-500 hover:to-kaya-orange text-white font-bold py-3.5 px-6 rounded-2xl shadow-lg hover:shadow-orange-500/25 transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center space-x-2 text-xs orange-glow pt-4"
+            className="w-full bg-gradient-to-r from-kaya-orange to-orange-500 hover:from-orange-500 hover:to-kaya-orange text-white font-bold py-3.5 px-6 rounded-2xl shadow-lg hover:shadow-orange-500/25 transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center space-x-2 text-xs focus:outline-none"
           >
             <span>{loading ? "Registering..." : "Create Account"}</span>
             <ArrowRight className="h-4 w-4" />
@@ -148,10 +148,10 @@ export default function RegisterPage() {
 
         <div className="text-center text-xs text-slate-400 pt-4 border-t border-slate-100 flex flex-col gap-2 relative z-10">
           <p>
-            Already have an account? <Link href="/login" className="text-kaya-green hover:text-green-700 font-bold transition-colors">Sign In</Link>
+            Already have an account? <Link href="/login" className="text-kaya-orange hover:text-orange-600 font-bold transition-colors">Sign In</Link>
           </p>
           <div className="flex items-center gap-1.5 justify-center text-[10px] text-slate-450 font-medium mt-1">
-            <ShieldCheck className="h-3.5 w-3.5 text-kaya-green" />
+            <ShieldCheck className="h-3.5 w-3.5 text-kaya-orange" />
             <span>Secure Enterprise Registration</span>
           </div>
         </div>

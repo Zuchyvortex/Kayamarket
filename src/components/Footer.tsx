@@ -27,16 +27,16 @@ export default function Footer() {
             </div>
             <div>
               <h4 className="font-bold text-white text-sm">24h Scheduled Delivery</h4>
-              <p className="text-xs text-slate-500 mt-0.5">Flexible time windows at checkout</p>
+              <p className="text-xs text-slate-550 mt-0.5">Flexible time windows at checkout</p>
             </div>
           </div>
           <div className="flex flex-col md:flex-row items-center gap-4 px-4">
-            <div className="p-3 bg-kaya-green/10 rounded-2xl text-kaya-green shrink-0">
+            <div className="p-3 bg-kaya-orange/10 rounded-2xl text-kaya-orange shrink-0">
               <ShieldCheck className="h-6 w-6" />
             </div>
             <div>
               <h4 className="font-bold text-white text-sm">100% Quality Checked</h4>
-              <p className="text-xs text-slate-500 mt-0.5">Thoroughly sorted, stone-free foodstuffs</p>
+              <p className="text-xs text-slate-550 mt-0.5">Thoroughly sorted, stone-free foodstuffs</p>
             </div>
           </div>
           <div className="flex flex-col md:flex-row items-center gap-4 px-4">
@@ -45,7 +45,7 @@ export default function Footer() {
             </div>
             <div>
               <h4 className="font-bold text-white text-sm">Instant Return Policy</h4>
-              <p className="text-xs text-slate-500 mt-0.5">Return items on spot with dispatch rider</p>
+              <p className="text-xs text-slate-550 mt-0.5">Return items on spot with dispatch rider</p>
             </div>
           </div>
         </div>
@@ -117,7 +117,7 @@ export default function Footer() {
               placeholder="Your email address" 
               className="w-full px-4 py-2.5 text-xs rounded-xl bg-slate-800 border border-slate-700 focus:outline-none focus:border-kaya-orange text-white placeholder-slate-500 font-semibold" 
             />
-            <button type="submit" className="bg-gradient-to-r from-kaya-orange to-orange-500 hover:from-orange-500 hover:to-kaya-orange text-white px-5 py-2.5 rounded-xl font-bold text-xs transition-all shadow-md shrink-0 flex items-center justify-center gap-1">
+            <button type="submit" className="bg-gradient-to-r from-kaya-orange to-orange-500 hover:from-orange-500 hover:to-kaya-orange text-white px-5 py-2.5 rounded-xl font-bold text-xs transition-all shadow-md shrink-0 flex items-center justify-center gap-1 focus:outline-none">
               <span>Subscribe</span>
               <ArrowRight className="h-3 w-3" />
             </button>

@@ -40,7 +40,7 @@ export default function AdminLayout({
           </div>
           <div className="space-y-2">
             <h1 className="text-xl font-black text-[#111111] tracking-tight">Admin Area Access Denied</h1>
-            <p className="text-xs text-slate-500 leading-relaxed">
+            <p className="text-xs text-slate-550 leading-relaxed">
               This area is restricted to KayaMarket Administrators. Standard customers cannot view these analytics and management tools.
             </p>
           </div>
@@ -49,13 +49,13 @@ export default function AdminLayout({
             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Administrator Sign In</p>
             <button 
               onClick={() => router.push("/login?callbackUrl=/admin")}
-              className="w-full bg-kaya-orange hover:bg-orange-600 text-white font-bold py-2.5 rounded-xl text-xs transition-colors shadow-md"
+              className="w-full bg-kaya-orange hover:bg-orange-600 text-white font-bold py-2.5 rounded-xl text-xs transition-colors shadow-md focus:outline-none"
             >
               Sign In with Admin Account
             </button>
           </div>
 
-          <Link href="/" className="inline-flex items-center gap-1.5 text-xs text-kaya-green font-bold hover:text-green-700">
+          <Link href="/" className="inline-flex items-center gap-1.5 text-xs text-kaya-orange font-bold hover:text-orange-600">
             <ArrowLeft className="h-3.5 w-3.5" />
             <span>Return to Public Homepage</span>
           </Link>
@@ -139,7 +139,7 @@ export default function AdminLayout({
           <div className="flex items-center space-x-4 ml-auto">
             <div className="text-right">
               <p className="text-xs font-bold text-[#111111]">{user.name}</p>
-              <p className="text-[10px] text-kaya-green font-bold uppercase tracking-wider">Administrator</p>
+              <p className="text-[10px] text-kaya-orange font-bold uppercase tracking-wider">Administrator</p>
             </div>
             <div className="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center font-bold text-sm text-kaya-orange uppercase">
               {user.name.slice(0, 2)}

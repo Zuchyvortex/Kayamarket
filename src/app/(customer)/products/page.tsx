@@ -87,14 +87,14 @@ function ProductsContent() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 bg-white text-[#111111]">
       
       {/* Page Title & Search Bar */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12 border-b border-slate-105 dark:border-slate-800/80 pb-8">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12 border-b border-slate-100 pb-8">
         <div>
-          <span className="text-kaya-green font-bold text-xs uppercase tracking-widest">Kaya Directory</span>
-          <h1 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight mt-1">Kaya Marketplace</h1>
-          <p className="text-slate-500 dark:text-slate-400 text-sm">Browse, filter and find certified foodstuffs and grocery supplies</p>
+          <span className="text-kaya-orange font-bold text-xs uppercase tracking-widest">Kaya Directory</span>
+          <h1 className="text-3xl sm:text-4xl font-black text-[#111111] tracking-tight mt-1">Kaya Marketplace</h1>
+          <p className="text-slate-500 text-sm">Browse, filter and find certified foodstuffs and grocery supplies</p>
         </div>
 
         <div className="relative w-full md:w-80 group">
@@ -103,7 +103,7 @@ function ProductsContent() {
             placeholder="Search groceries..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-11 pr-4 py-3 rounded-full border border-slate-200 dark:border-slate-800 focus:outline-none focus:ring-2 focus:ring-kaya-orange/20 focus:border-kaya-orange bg-white dark:bg-slate-900 text-sm font-semibold text-slate-750 dark:text-slate-200 shadow-inner"
+            className="w-full pl-11 pr-4 py-3 rounded-full border border-slate-200 focus:outline-none focus:ring-2 focus:ring-kaya-orange/20 focus:border-kaya-orange bg-white text-sm font-semibold text-slate-700 shadow-inner"
           />
           <Search className="absolute left-4 top-3.5 h-4.5 w-4.5 text-slate-400 group-focus-within:text-kaya-orange transition-colors" />
         </div>
@@ -112,10 +112,10 @@ function ProductsContent() {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-10">
         
         {/* SIDEBAR FILTERS - Luxury design */}
-        <div className="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-[0_4px_25px_rgba(0,0,0,0.01)] h-fit space-y-8">
-          <div className="flex items-center gap-2 pb-4 border-b border-slate-100 dark:border-slate-800/80">
-            <SlidersHorizontal className="h-4.5 w-4.5 text-kaya-green" />
-            <h2 className="font-extrabold text-slate-850 dark:text-white">Filter Market</h2>
+        <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-[0_4px_25px_rgba(0,0,0,0.01)] h-fit space-y-8">
+          <div className="flex items-center gap-2 pb-4 border-b border-slate-100">
+            <SlidersHorizontal className="h-4.5 w-4.5 text-kaya-orange" />
+            <h2 className="font-extrabold text-slate-800">Filter Market</h2>
           </div>
 
           {/* Categories */}
@@ -126,8 +126,8 @@ function ProductsContent() {
                 onClick={() => setSelectedCategory("all")}
                 className={`text-left px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
                   selectedCategory === "all" 
-                    ? "bg-green-50 dark:bg-green-950/20 text-kaya-green shadow-sm" 
-                    : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"
+                    ? "bg-orange-50 text-kaya-orange shadow-sm" 
+                    : "text-slate-600 hover:bg-slate-50"
                 }`}
               >
                 All Categories
@@ -138,8 +138,8 @@ function ProductsContent() {
                   onClick={() => setSelectedCategory(cat.slug)}
                   className={`text-left px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
                     selectedCategory === cat.slug 
-                      ? "bg-green-50 dark:bg-green-950/20 text-kaya-green shadow-sm" 
-                      : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"
+                      ? "bg-orange-50 text-kaya-orange shadow-sm" 
+                      : "text-slate-600 hover:bg-slate-50"
                   }`}
                 >
                   {cat.name}
@@ -159,9 +159,9 @@ function ProductsContent() {
                 step="1000"
                 value={priceRange}
                 onChange={(e) => setPriceRange(Number(e.target.value))}
-                className="w-full accent-kaya-orange cursor-pointer bg-slate-100 dark:bg-slate-800 h-1.5 rounded"
+                className="w-full accent-kaya-orange cursor-pointer bg-slate-100 h-1.5 rounded"
               />
-              <div className="flex justify-between text-xs font-extrabold text-slate-600 dark:text-slate-450">
+              <div className="flex justify-between text-xs font-extrabold text-slate-500">
                 <span>{formatPrice(1000)}</span>
                 <span>{formatPrice(priceRange)}</span>
               </div>
@@ -174,7 +174,7 @@ function ProductsContent() {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="w-full px-4 py-3 border border-slate-200 dark:border-slate-850 rounded-xl focus:outline-none focus:ring-2 focus:ring-kaya-orange/20 focus:border-kaya-orange text-xs font-bold text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-950"
+              className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-kaya-orange/20 focus:border-kaya-orange text-xs font-bold text-slate-700 bg-white"
             >
               <option value="default">Best Match</option>
               <option value="price-low">Price: Low to High</option>
@@ -192,16 +192,16 @@ function ProductsContent() {
 
           {isLoading ? (
             <div className="flex flex-col justify-center items-center h-80 gap-3">
-              <RefreshCw className="h-8 w-8 text-kaya-green animate-spin" />
-              <p className="text-slate-450 font-bold animate-pulse text-xs">Fetching live products...</p>
+              <RefreshCw className="h-8 w-8 text-kaya-orange animate-spin" />
+              <p className="text-slate-500 font-bold animate-pulse text-xs">Fetching live products...</p>
             </div>
           ) : filteredProducts.length === 0 ? (
-            <div className="bg-white dark:bg-slate-900 rounded-[3rem] p-16 text-center border border-slate-100 dark:border-slate-800 shadow-sm space-y-6">
-              <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-full w-fit mx-auto">
+            <div className="bg-white rounded-[3rem] p-16 text-center border border-slate-200 shadow-sm space-y-6">
+              <div className="p-4 bg-slate-50 rounded-full w-fit mx-auto">
                 <ShoppingBag className="h-10 w-10 text-slate-400" />
               </div>
               <div className="space-y-2">
-                <h3 className="text-xl font-extrabold text-slate-800 dark:text-white">No foodstuffs found</h3>
+                <h3 className="text-xl font-extrabold text-slate-800">No foodstuffs found</h3>
                 <p className="text-sm text-slate-400 max-w-sm mx-auto">We couldn't find any products matching your current filters. Try resetting filters.</p>
               </div>
               <button
@@ -211,7 +211,7 @@ function ProductsContent() {
                   setPriceRange(100000);
                   setSortBy("default");
                 }}
-                className="bg-kaya-green hover:bg-green-700 text-white font-bold px-6 py-3 rounded-full text-xs transition-colors shadow-md shadow-green-500/10"
+                className="bg-kaya-orange hover:bg-orange-600 text-white font-bold px-6 py-3 rounded-full text-xs transition-colors shadow-md shadow-orange-500/10"
               >
                 Reset Filters
               </button>
@@ -221,16 +221,16 @@ function ProductsContent() {
               {filteredProducts.map((product) => (
                 <div 
                   key={product.id} 
-                  className="group relative bg-white dark:bg-slate-900 rounded-[2.2rem] border border-slate-100 dark:border-slate-800/80 p-4 shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] transition-all flex flex-col justify-between overflow-hidden hover:-translate-y-1.5 duration-350"
+                  className="group relative bg-white rounded-[2.2rem] border border-slate-200 p-4 shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] transition-all flex flex-col justify-between overflow-hidden hover:-translate-y-1.5 duration-350"
                 >
                   {/* Heart wishlist button */}
                   <div className="absolute top-6 right-6 z-10">
                     <button
                       onClick={() => toggleWishlist(product)}
-                      className={`p-2.5 rounded-full shadow-md border border-slate-100 dark:border-slate-800 backdrop-blur-md transition-all ${
+                      className={`p-2.5 rounded-full shadow-md border border-slate-100 backdrop-blur-md transition-all ${
                         isInWishlist(product.id) 
                           ? "bg-rose-50 text-rose-500 border-rose-100" 
-                          : "bg-white/90 dark:bg-slate-900/90 text-slate-450 hover:text-rose-500"
+                          : "bg-white/90 text-slate-450 hover:text-rose-500"
                       }`}
                     >
                       <Heart className={`h-4.5 w-4.5 ${isInWishlist(product.id) ? "fill-rose-500" : ""}`} />
@@ -239,7 +239,7 @@ function ProductsContent() {
 
                   <div>
                     {/* Image panel */}
-                    <Link href={`/products/${product.slug}`} className="block relative w-full h-48 rounded-2xl overflow-hidden bg-slate-50 dark:bg-slate-800 mb-4 border border-slate-100 dark:border-slate-850">
+                    <Link href={`/products/${product.slug}`} className="block relative w-full h-48 rounded-2xl overflow-hidden bg-slate-50 mb-4 border border-slate-100">
                       <img
                         src={product.image}
                         alt={product.name}
@@ -248,23 +248,23 @@ function ProductsContent() {
                     </Link>
 
                     {/* Meta info */}
-                    <span className="inline-flex items-center gap-1 text-[10px] bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-2.5 py-1 rounded-full font-bold border border-slate-100 dark:border-slate-700/80">
+                    <span className="inline-flex items-center gap-1 text-[10px] bg-slate-50 text-slate-600 px-2.5 py-1 rounded-full font-bold border border-slate-100">
                       <Star className="h-3 w-3 fill-amber-500 text-amber-500" />
                       <span>{product.rating}</span>
-                      <span className="text-slate-400 dark:text-slate-500 font-medium">({product.reviewsCount})</span>
+                      <span className="text-slate-400 font-medium">({product.reviewsCount})</span>
                     </span>
 
                     {/* Details */}
-                    <h3 className="font-extrabold text-slate-850 dark:text-white mt-3 text-base line-clamp-1 group-hover:text-kaya-orange transition-colors">
+                    <h3 className="font-extrabold text-slate-850 mt-3 text-base line-clamp-1 group-hover:text-kaya-orange transition-colors">
                       <Link href={`/products/${product.slug}`}>{product.name}</Link>
                     </h3>
                     <p className="text-xs text-slate-400 mt-0.5">Weight: {product.weight || "pack"}</p>
                   </div>
 
                   {/* Pricing and Cart footer */}
-                  <div className="flex justify-between items-center mt-6 pt-3 border-t border-slate-50 dark:border-slate-800/80">
+                  <div className="flex justify-between items-center mt-6 pt-3 border-t border-slate-100">
                     <div>
-                      <span className="text-base font-black text-slate-900 dark:text-white">{formatPrice(product.price)}</span>
+                      <span className="text-base font-black text-slate-900">{formatPrice(product.price)}</span>
                     </div>
                     <button
                       onClick={() => addToCart(product)}
@@ -288,7 +288,7 @@ export default function ProductsPage() {
   return (
     <Suspense fallback={
       <div className="max-w-7xl mx-auto px-4 py-20 text-center flex flex-col justify-center items-center gap-3">
-        <RefreshCw className="h-8 w-8 text-kaya-green animate-spin" />
+        <RefreshCw className="h-8 w-8 text-kaya-orange animate-spin" />
         <p className="text-slate-500 font-bold animate-pulse text-sm">Loading Kaya Marketplace...</p>
       </div>
     }>

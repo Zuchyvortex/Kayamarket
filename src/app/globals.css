@@ -64,8 +64,8 @@ body {
   -webkit-backdrop-filter: blur(20px);
 }
 
-.text-gradient-orange-green {
-  background: linear-gradient(135deg, #FF7A1A 0%, #0B7A46 100%);
+.text-gradient-orange {
+  background: linear-gradient(135deg, #FF7A1A 0%, #FF9F43 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -73,10 +73,6 @@ body {
 
 .orange-glow {
   box-shadow: 0 10px 30px -10px rgba(255, 122, 26, 0.25);
-}
-
-.green-glow {
-  box-shadow: 0 10px 30px -10px rgba(11, 122, 70, 0.2);
 }
 
 .premium-card-shadow {

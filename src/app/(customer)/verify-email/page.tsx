@@ -26,7 +26,7 @@ export default function VerifyEmailPage() {
         
         {/* Glow ambient background lights */}
         <div className="absolute top-0 right-0 w-24 h-24 bg-kaya-orange/10 rounded-bl-[3rem]"></div>
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-kaya-green/10 rounded-tr-[3rem]"></div>
+        <div className="absolute bottom-0 left-0 w-24 h-24 bg-orange-50/50 rounded-tr-[3rem]"></div>
         
         {/* Logo and title */}
         <div className="text-center space-y-4">
@@ -39,7 +39,7 @@ export default function VerifyEmailPage() {
           </Link>
           <div className="space-y-1">
             <h1 className="text-2xl font-black text-slate-900 tracking-tight">Verify Account</h1>
-            <p className="text-xs text-slate-500">Confirm your email address to unlock premium access</p>
+            <p className="text-xs text-slate-550">Confirm your email address to unlock premium access</p>
           </div>
         </div>
 
@@ -56,7 +56,7 @@ export default function VerifyEmailPage() {
             </div>
             <Link 
               href="/dashboard" 
-              className="inline-block bg-slate-900 hover:bg-slate-800 text-white font-bold px-6 py-3 rounded-full text-xs transition-colors"
+              className="inline-block bg-slate-900 hover:bg-slate-850 text-white font-bold px-6 py-3 rounded-full text-xs transition-colors"
             >
               Go to My Dashboard
             </Link>
@@ -65,7 +65,7 @@ export default function VerifyEmailPage() {
           <form onSubmit={handleVerify} className="space-y-5 relative z-10">
             <div className="space-y-2">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-                <Mail className="h-3.5 w-3.5 text-kaya-green" />
+                <Mail className="h-3.5 w-3.5 text-kaya-orange" />
                 <span>Verification Code</span>
               </label>
               <input 
@@ -82,7 +82,7 @@ export default function VerifyEmailPage() {
             <button 
               type="submit" 
               disabled={loading}
-              className="w-full bg-gradient-to-r from-kaya-orange to-orange-500 hover:from-orange-500 hover:to-kaya-orange text-white font-bold py-3.5 px-6 rounded-2xl shadow-lg hover:shadow-orange-500/25 transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center space-x-2 text-xs orange-glow"
+              className="w-full bg-gradient-to-r from-kaya-orange to-orange-500 hover:from-orange-500 hover:to-kaya-orange text-white font-bold py-3.5 px-6 rounded-2xl shadow-lg hover:shadow-orange-500/25 transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center space-x-2 text-xs focus:outline-none"
             >
               <span>{loading ? "Verifying..." : "Verify Code"}</span>
               <ArrowRight className="h-4 w-4" />
@@ -92,10 +92,10 @@ export default function VerifyEmailPage() {
 
         <div className="text-center text-xs text-slate-400 pt-4 border-t border-slate-100 flex flex-col gap-2 relative z-10">
           <p>
-            Didn't receive a code? <button onClick={() => alert("Verification code resent!")} className="text-kaya-green hover:underline font-bold transition-colors">Resend Code</button>
+            Didn't receive a code? <button onClick={() => alert("Verification code resent!")} className="text-kaya-orange hover:underline font-bold transition-colors focus:outline-none">Resend Code</button>
           </p>
-          <div className="flex items-center gap-1.5 justify-center text-[10px] text-slate-455 font-medium mt-1">
-            <ShieldCheck className="h-3.5 w-3.5 text-kaya-green" />
+          <div className="flex items-center gap-1.5 justify-center text-[10px] text-slate-450 font-medium mt-1">
+            <ShieldCheck className="h-3.5 w-3.5 text-kaya-orange" />
             <span>Secure Verification Service</span>
           </div>
         </div>

@@ -79,7 +79,7 @@ export default function CustomerDashboard() {
               className={`w-full flex items-center space-x-3 px-4.5 py-3.5 rounded-2xl text-xs font-bold transition-all text-left focus:outline-none ${
                 activeTab === tab.id 
                   ? "bg-slate-900 text-white shadow-md" 
-                  : "text-slate-650 hover:bg-white hover:shadow-sm"
+                  : "text-slate-655 hover:bg-white hover:shadow-sm"
               }`}
             >
               <tab.icon className="h-4.5 w-4.5" />
@@ -130,7 +130,7 @@ export default function CustomerDashboard() {
                         </div>
                         <div>
                           <span className={`inline-block px-3.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
-                            order.status === "Delivered" ? "bg-green-50 text-kaya-green border border-green-150" :
+                            order.status === "Delivered" ? "bg-green-50 text-emerald-700 border border-green-150" :
                             order.status === "Cancelled" ? "bg-rose-50 text-rose-700 border border-rose-100" : 
                             "bg-amber-50 text-amber-700 border border-amber-100"
                           }`}>
@@ -220,7 +220,7 @@ export default function CustomerDashboard() {
                     <div key={product.id} className="bg-white rounded-3xl border border-slate-200 p-4 shadow-sm relative flex flex-col justify-between hover:shadow-md transition-all">
                       <button 
                         onClick={() => toggleWishlist(product)}
-                        className="absolute top-6 right-6 z-10 p-2.5 bg-rose-50 text-rose-500 rounded-full shadow-sm"
+                        className="absolute top-6 right-6 z-10 p-2.5 bg-rose-50 text-rose-500 rounded-full shadow-sm border border-rose-100"
                       >
                         <Heart className="h-4 w-4 fill-rose-500" />
                       </button>
@@ -253,7 +253,7 @@ export default function CustomerDashboard() {
                 <h2 className="text-xl font-extrabold text-slate-900">Address Book</h2>
                 <button 
                   onClick={() => setShowAddressForm(!showAddressForm)}
-                  className="bg-kaya-orange hover:bg-orange-655 text-white font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-1 shadow-md"
+                  className="bg-kaya-orange hover:bg-orange-600 text-white font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-1 shadow-md"
                 >
                   <Plus className="h-3.5 w-3.5" />
                   <span>Add New</span>
@@ -263,10 +263,10 @@ export default function CustomerDashboard() {
               {/* Add form */}
               {showAddressForm && (
                 <form onSubmit={handleAddAddress} className="bg-slate-50 p-6 rounded-3xl border border-slate-200 space-y-4 animate-in slide-in-from-top duration-300">
-                  <h3 className="font-bold text-xs text-slate-600 uppercase">New Address Details</h3>
+                  <h3 className="font-bold text-xs text-slate-655 uppercase">New Address Details</h3>
                   
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase">Street Address</label>
+                    <label className="text-[10px] font-bold text-slate-450 uppercase">Street Address</label>
                     <input 
                       type="text" 
                       required 
@@ -279,7 +279,7 @@ export default function CustomerDashboard() {
                   
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label className="text-[10px] font-bold text-slate-400 uppercase">City</label>
+                      <label className="text-[10px] font-bold text-slate-450 uppercase">City</label>
                       <input 
                         type="text" 
                         required 
@@ -290,7 +290,7 @@ export default function CustomerDashboard() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-[10px] font-bold text-slate-400 uppercase">State</label>
+                      <label className="text-[10px] font-bold text-slate-450 uppercase">State</label>
                       <input 
                         type="text" 
                         required 
@@ -314,12 +314,12 @@ export default function CustomerDashboard() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {addresses.map((addr) => (
-                  <div key={addr.id} className={`bg-white p-6 rounded-3xl border border-slate-200 flex flex-col justify-between space-y-4 hover:shadow-sm transition-all ${addr.isDefault ? "ring-2 ring-kaya-green bg-green-50/5" : ""}`}>
+                  <div key={addr.id} className={`bg-white p-6 rounded-3xl border border-slate-200 flex flex-col justify-between space-y-4 hover:shadow-sm transition-all ${addr.isDefault ? "ring-2 ring-kaya-orange bg-orange-50/5" : ""}`}>
                     <div>
                       <div className="flex justify-between items-start">
-                        <MapPin className="h-5 w-5 text-kaya-green" />
+                        <MapPin className="h-5 w-5 text-kaya-orange" />
                         {addr.isDefault && (
-                          <span className="text-[9px] bg-green-100 text-kaya-green px-2.5 py-0.5 rounded-full font-black uppercase tracking-wider">
+                          <span className="text-[9px] bg-orange-100 text-kaya-orange px-2.5 py-0.5 rounded-full font-black uppercase tracking-wider">
                             Default
                           </span>
                         )}
@@ -332,7 +332,7 @@ export default function CustomerDashboard() {
                       {!addr.isDefault && (
                         <button 
                           onClick={() => setDefaultAddress(addr.id)}
-                          className="text-[10px] font-black uppercase text-kaya-green hover:text-green-700"
+                          className="text-[10px] font-black uppercase text-kaya-orange hover:text-orange-600"
                         >
                           Set Default
                         </button>

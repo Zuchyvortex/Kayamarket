@@ -92,7 +92,7 @@ export default function Navbar() {
               <Search className="absolute left-4 top-4 h-4.5 w-4.5 text-slate-400 group-focus-within:text-kaya-orange transition-colors" />
               <button 
                 type="submit" 
-                className="absolute right-2.5 top-2 bg-gradient-to-r from-kaya-orange to-orange-500 hover:from-orange-500 hover:to-kaya-orange text-white px-4 py-1.5 rounded-full text-xs font-bold transition-all shadow-md hover:shadow-orange-500/20"
+                className="absolute right-2.5 top-2 bg-gradient-to-r from-kaya-orange to-orange-500 hover:from-orange-500 hover:to-kaya-orange text-white px-4 py-1.5 rounded-full text-xs font-bold transition-all shadow-md hover:shadow-orange-500/20 focus:outline-none"
               >
                 Search
               </button>
@@ -106,9 +106,9 @@ export default function Navbar() {
             <div className="relative hidden lg:block">
               <button
                 onClick={() => setCatDropdownOpen(!catDropdownOpen)}
-                className="flex items-center space-x-1.5 px-3 py-2 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-100 transition-all"
+                className="flex items-center space-x-1.5 px-3 py-2 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-100 transition-all focus:outline-none"
               >
-                <Grid className="h-4 w-4 text-kaya-green" />
+                <Grid className="h-4 w-4 text-kaya-orange" />
                 <span>Categories</span>
                 <ChevronDown className={`h-3 w-3 transition-transform duration-300 ${catDropdownOpen ? "rotate-180" : ""}`} />
               </button>
@@ -123,7 +123,7 @@ export default function Navbar() {
                       key={cat.id}
                       href={`/products?category=${cat.slug}`}
                       onClick={() => setCatDropdownOpen(false)}
-                      className="flex items-center space-x-3 px-4 py-2.5 text-sm font-semibold text-slate-750 hover:bg-green-50/50 hover:text-kaya-green transition-colors"
+                      className="flex items-center space-x-3 px-4 py-2.5 text-sm font-semibold text-slate-750 hover:bg-orange-50 hover:text-kaya-orange transition-colors"
                     >
                       <img src={cat.image} className="w-6 h-6 rounded-lg object-cover" alt="" />
                       <span>{cat.name}</span>
@@ -154,7 +154,7 @@ export default function Navbar() {
                 href="/dashboard" 
                 className="hidden lg:flex items-center space-x-1.5 px-3 py-2 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-100 transition-all"
               >
-                <History className="h-4 w-4 text-kaya-green" />
+                <History className="h-4 w-4 text-kaya-orange" />
                 <span>Orders</span>
               </Link>
             )}
@@ -162,7 +162,7 @@ export default function Navbar() {
             {/* Wishlist Link */}
             <Link 
               href="/dashboard?tab=wishlist" 
-              className="relative p-2.5 rounded-xl hover:bg-slate-100 text-slate-650 hover:text-rose-500 transition-all group"
+              className="relative p-2.5 rounded-xl hover:bg-slate-100 text-slate-655 hover:text-rose-500 transition-all group"
               title="My Wishlist"
             >
               <Heart className="h-5 w-5 transition-transform group-hover:scale-110" />
@@ -177,7 +177,7 @@ export default function Navbar() {
             <div className="relative">
               <button 
                 onClick={() => setNotifOpen(!notifOpen)}
-                className="relative p-2.5 rounded-xl hover:bg-slate-100 text-slate-650 hover:text-kaya-orange transition-all"
+                className="relative p-2.5 rounded-xl hover:bg-slate-100 text-slate-655 hover:text-kaya-orange transition-all focus:outline-none"
                 title="Notifications"
               >
                 <Bell className="h-5 w-5" />
@@ -188,7 +188,7 @@ export default function Navbar() {
                 <div className="absolute right-0 mt-3 w-80 bg-white rounded-2xl shadow-2xl border border-slate-100 py-3 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
                   <div className="px-4 py-2 border-b border-slate-50 mb-2 flex justify-between items-center">
                     <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Alerts</p>
-                    <button onClick={() => setNotifOpen(false)} className="text-[10px] text-kaya-green font-bold">Close</button>
+                    <button onClick={() => setNotifOpen(false)} className="text-[10px] text-kaya-orange font-bold focus:outline-none">Close</button>
                   </div>
                   {notifications.map(n => (
                     <div key={n.id} className="px-4 py-3 hover:bg-slate-50 border-b border-slate-55 last:border-b-0 transition-colors">
@@ -207,7 +207,7 @@ export default function Navbar() {
                   onClick={() => setDropdownOpen(!dropdownOpen)}
                   className="flex items-center space-x-2 px-3 py-2 rounded-xl text-slate-700 hover:bg-slate-100 font-bold text-sm transition-all focus:outline-none"
                 >
-                  <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-kaya-orange to-kaya-green text-white flex items-center justify-center text-xs uppercase shadow-sm">
+                  <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-kaya-orange to-orange-400 text-white flex items-center justify-center text-xs uppercase shadow-sm">
                     {user.name.slice(0, 2)}
                   </div>
                   <span className="max-w-[80px] truncate hidden sm:block">Hello, {user.name.split(" ")[0]}</span>
@@ -218,13 +218,13 @@ export default function Navbar() {
                   <div className="absolute right-0 mt-3 w-56 bg-white rounded-2xl shadow-2xl border border-slate-100 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
                     <div className="px-4 py-3 border-b border-slate-50">
                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Signed in as</p>
-                      <p className="text-sm font-bold text-slate-800 truncate">{user.email}</p>
+                      <p className="text-sm font-bold text-slate-850 truncate">{user.email}</p>
                     </div>
                     {user.role === "ADMIN" ? (
                       <Link
                         href="/admin"
                         onClick={() => setDropdownOpen(false)}
-                        className="flex items-center space-x-2.5 px-4 py-3 text-sm font-bold text-slate-700 hover:bg-orange-50/50 hover:text-kaya-orange transition-colors"
+                        className="flex items-center space-x-2.5 px-4 py-3 text-sm font-bold text-slate-700 hover:bg-orange-50 hover:text-kaya-orange transition-colors"
                       >
                         <LayoutDashboard className="h-4.5 w-4.5 text-kaya-orange" />
                         <span>Admin Console</span>
@@ -233,9 +233,9 @@ export default function Navbar() {
                       <Link
                         href="/dashboard"
                         onClick={() => setDropdownOpen(false)}
-                        className="flex items-center space-x-2.5 px-4 py-3 text-sm font-bold text-slate-700 hover:bg-green-50/50 hover:text-kaya-green transition-colors"
+                        className="flex items-center space-x-2.5 px-4 py-3 text-sm font-bold text-slate-700 hover:bg-orange-50 hover:text-kaya-orange transition-colors"
                       >
-                        <User className="h-4.5 w-4.5 text-kaya-green" />
+                        <User className="h-4.5 w-4.5 text-kaya-orange" />
                         <span>My Account</span>
                       </Link>
                     )}
@@ -244,7 +244,7 @@ export default function Navbar() {
                         setDropdownOpen(false);
                         logout();
                       }}
-                      className="w-full flex items-center space-x-2.5 px-4 py-3 text-sm font-bold text-rose-600 hover:bg-rose-50/50 transition-colors text-left"
+                      className="w-full flex items-center space-x-2.5 px-4 py-3 text-sm font-bold text-rose-600 hover:bg-rose-50/50 transition-colors text-left focus:outline-none"
                     >
                       <LogOut className="h-4.5 w-4.5" />
                       <span>Log Out</span>
@@ -255,7 +255,7 @@ export default function Navbar() {
             ) : (
               <Link
                 href="/login"
-                className="text-kaya-green hover:text-kaya-green-hover font-bold text-sm px-4 py-2 rounded-xl hover:bg-green-50/50 transition-colors"
+                className="text-kaya-orange hover:text-orange-600 font-bold text-sm px-4 py-2 rounded-xl hover:bg-orange-50 transition-colors"
               >
                 Sign In
               </Link>
@@ -264,12 +264,12 @@ export default function Navbar() {
             {/* Shopping Cart Button */}
             <Link
               href="/cart"
-              className="relative bg-gradient-to-r from-kaya-orange to-orange-500 text-white p-3 rounded-full shadow-lg hover:shadow-orange-500/25 transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 flex items-center justify-center orange-glow"
+              className="relative bg-gradient-to-r from-kaya-orange to-orange-500 text-white p-3 rounded-full shadow-lg hover:shadow-orange-500/25 transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 flex items-center justify-center"
               title="Shopping Cart"
             >
               <ShoppingBag className="h-5 w-5" />
               {cartCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 bg-kaya-green text-white text-[10px] font-black rounded-full h-5.5 w-5.5 flex items-center justify-center border-2 border-white shadow-md">
+                <span className="absolute -top-1.5 -right-1.5 bg-slate-900 text-white text-[10px] font-black rounded-full h-5.5 w-5.5 flex items-center justify-center border-2 border-white shadow-md">
                   {cartCount}
                 </span>
               )}
@@ -278,7 +278,7 @@ export default function Navbar() {
             {/* Mobile Menu Toggle */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2.5 rounded-xl text-slate-650 hover:bg-slate-100 md:hidden transition-all"
+              className="p-2.5 rounded-xl text-slate-655 hover:bg-slate-100 md:hidden transition-all focus:outline-none"
             >
               {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
@@ -309,7 +309,7 @@ export default function Navbar() {
               onClick={() => setMobileMenuOpen(false)}
               className="flex items-center space-x-2 p-3 bg-slate-50 rounded-2xl font-bold text-xs"
             >
-              <Grid className="h-4 w-4 text-kaya-green" />
+              <Grid className="h-4 w-4 text-kaya-orange" />
               <span>Browse Shop</span>
             </Link>
             <Link 
@@ -326,7 +326,7 @@ export default function Navbar() {
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex items-center space-x-2 p-3 bg-slate-50 rounded-2xl font-bold text-xs"
               >
-                <History className="h-4 w-4 text-kaya-green" />
+                <History className="h-4 w-4 text-kaya-orange" />
                 <span>My Orders</span>
               </Link>
             )}
@@ -347,7 +347,7 @@ export default function Navbar() {
                   setMobileMenuOpen(false);
                   logout();
                 }}
-                className="w-full bg-slate-100 hover:bg-rose-55 hover:text-rose-500 p-3 rounded-2xl font-bold text-xs transition-colors flex items-center justify-center space-x-2"
+                className="w-full bg-slate-100 hover:bg-rose-50 hover:text-rose-550 p-3 rounded-2xl font-bold text-xs transition-colors flex items-center justify-center space-x-2 focus:outline-none"
               >
                 <LogOut className="h-4 w-4" />
                 <span>Sign Out ({user.name.split(" ")[0]})</span>
@@ -356,7 +356,7 @@ export default function Navbar() {
               <Link
                 href="/login"
                 onClick={() => setMobileMenuOpen(false)}
-                className="w-full bg-kaya-green text-white p-3 rounded-2xl font-bold text-xs text-center block"
+                className="w-full bg-kaya-orange text-white p-3 rounded-2xl font-bold text-xs text-center block"
               >
                 Sign In
               </Link>

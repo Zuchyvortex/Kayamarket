@@ -32,7 +32,7 @@ export default function ResetPasswordPage() {
         
         {/* Glow ambient background lights */}
         <div className="absolute top-0 right-0 w-24 h-24 bg-kaya-orange/10 rounded-bl-[3rem]"></div>
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-kaya-green/10 rounded-tr-[3rem]"></div>
+        <div className="absolute bottom-0 left-0 w-24 h-24 bg-orange-50/50 rounded-tr-[3rem]"></div>
         
         {/* Logo and title */}
         <div className="text-center space-y-4">
@@ -45,7 +45,7 @@ export default function ResetPasswordPage() {
           </Link>
           <div className="space-y-1">
             <h1 className="text-2xl font-black text-slate-900 tracking-tight">Reset Password</h1>
-            <p className="text-xs text-slate-500">Create a secure new password for your account</p>
+            <p className="text-xs text-slate-555">Create a secure new password for your account</p>
           </div>
         </div>
 
@@ -92,7 +92,7 @@ export default function ResetPasswordPage() {
 
             <div className="space-y-2">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-                <Lock className="h-3.5 w-3.5 text-kaya-green" />
+                <Lock className="h-3.5 w-3.5 text-kaya-orange" />
                 <span>Confirm New Password</span>
               </label>
               <input 
@@ -108,7 +108,7 @@ export default function ResetPasswordPage() {
             <button 
               type="submit" 
               disabled={loading}
-              className="w-full bg-gradient-to-r from-kaya-orange to-orange-500 hover:from-orange-500 hover:to-kaya-orange text-white font-bold py-3.5 px-6 rounded-2xl shadow-lg hover:shadow-orange-500/25 transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center space-x-2 text-xs orange-glow"
+              className="w-full bg-gradient-to-r from-kaya-orange to-orange-500 hover:from-orange-500 hover:to-kaya-orange text-white font-bold py-3.5 px-6 rounded-2xl shadow-lg hover:shadow-orange-500/25 transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center space-x-2 text-xs focus:outline-none"
             >
               <span>{loading ? "Resetting password..." : "Confirm New Password"}</span>
               <ArrowRight className="h-4 w-4" />
@@ -118,10 +118,10 @@ export default function ResetPasswordPage() {
 
         <div className="text-center text-xs text-slate-400 pt-4 border-t border-slate-100 flex flex-col gap-2 relative z-10">
           <p>
-            Cancel and return to <Link href="/login" className="text-kaya-green hover:text-green-700 font-bold transition-colors">Sign In</Link>
+            Cancel and return to <Link href="/login" className="text-kaya-orange hover:text-orange-600 font-bold transition-colors">Sign In</Link>
           </p>
           <div className="flex items-center gap-1.5 justify-center text-[10px] text-slate-450 font-medium mt-1">
-            <ShieldCheck className="h-3.5 w-3.5 text-kaya-green" />
+            <ShieldCheck className="h-3.5 w-3.5 text-kaya-orange" />
             <span>Secure Password Configuration</span>
           </div>
         </div>
