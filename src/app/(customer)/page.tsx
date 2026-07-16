@@ -38,6 +38,16 @@ export default function HomePage() {
   // Custom states for visual effects
   const [activeMallTab, setActiveMallTab] = useState("electronics");
   const [timeLeft, setTimeLeft] = useState({ hours: 14, minutes: 32, seconds: 45 });
+  const [scrollY, setScrollY] = useState(0);
+
+  // Parallax scroll position tracker
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // Countdown timer simulation
   useEffect(() => {
@@ -121,14 +131,27 @@ export default function HomePage() {
   return (
     <div className="bg-white text-[#111111] min-h-screen font-sans selection:bg-kaya-orange selection:text-white overflow-hidden">
       
-      {/* 1. HERO SECTION - REDESIGNED FOR BRIGHT, PREMIUM WHITE BACKGROUND */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-white via-[#F8FAFC] to-white text-[#111111] pt-16 pb-20 md:pt-24 md:pb-28 px-4 sm:px-6 lg:px-8 border-b border-slate-100">
+      {/* 1. HERO SECTION - PREMIUM FULL-WIDTH BACKGROUND */}
+      <section className="relative overflow-hidden text-[#111111] pt-16 pb-20 md:pt-24 md:pb-28 px-4 sm:px-6 lg:px-8 border-b border-slate-100 min-h-[500px]">
         
+        {/* Background Image Container with Slow Zoom and Parallax Scroll */}
+        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+          <div 
+            className="absolute inset-0 bg-cover bg-center hero-bg-zoom transition-transform duration-75 ease-out"
+            style={{ 
+              backgroundImage: "url('/w-1.png')",
+              transform: `translateY(${scrollY * 0.12}px) scale(1.02)`,
+            }}
+          />
+          {/* Subtle Premium White Overlay (75-92% opacity) to keep typography extremely readable */}
+          <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/90 to-white/75 lg:bg-gradient-to-r lg:from-white/93 lg:via-white/88 lg:to-white/68"></div>
+        </div>
+
         {/* Glow ambient background lights */}
-        <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-kaya-orange/8 rounded-full filter blur-[120px] animate-pulse-slow"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-kaya-orange/5 rounded-full filter blur-[120px] animate-pulse-slow"></div>
+        <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-kaya-orange/8 rounded-full filter blur-[120px] animate-pulse-slow z-10 pointer-events-none"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-kaya-orange/5 rounded-full filter blur-[120px] animate-pulse-slow z-10 pointer-events-none"></div>
         
-        <div className="max-w-7xl mx-auto relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <div className="max-w-7xl mx-auto relative z-20 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
           {/* Hero left text panel */}
           <div className="lg:col-span-7 space-y-8 text-center lg:text-left">
