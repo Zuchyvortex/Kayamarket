@@ -18,7 +18,7 @@ export default function RootLayout({
       lang="en"
       className="h-full antialiased"
     >
-      <body className="min-h-full flex flex-col bg-slate-50 text-slate-800">
+      <body className="min-h-full flex flex-col bg-white text-slate-800">
         <Providers>{children}</Providers>
       </body>
     </html>
