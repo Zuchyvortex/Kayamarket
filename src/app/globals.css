@@ -13,6 +13,14 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  
+  --color-kaya-orange: #FF7A1A;
+  --color-kaya-orange-hover: #e06812;
+  --color-kaya-green: #0B7A46;
+  --color-kaya-green-hover: #096138;
+  
+  --color-kaya-black: #1A1A1A;
+  --color-kaya-gray: #F7F7F7;
 }
 
 @media (prefers-color-scheme: dark) {

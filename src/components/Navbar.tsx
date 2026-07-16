@@ -26,11 +26,11 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2 shrink-0">
-            <div className="bg-green-600 p-2 rounded-xl text-white">
-              <Leaf className="h-6 w-6" />
+          <Link href="/" className="flex items-center space-x-2 shrink-0 group">
+            <div className="relative h-10 w-10 overflow-hidden transition-transform group-hover:scale-105 duration-300">
+              <img src="/K.png" alt="KayaMarket Logo" className="object-contain w-full h-full" />
             </div>
-            <span className="text-2xl font-black text-green-900 tracking-tight">KayaMarket</span>
+            <span className="text-2xl font-black text-kaya-black tracking-tight group-hover:text-kaya-orange transition-colors">KayaMarket</span>
           </Link>
 
           {/* Search bar */}
@@ -58,7 +58,7 @@ export default function Navbar() {
               <div className="relative">
                 <button
                   onClick={() => setDropdownOpen(!dropdownOpen)}
-                  className="flex items-center space-x-1 text-slate-700 hover:text-green-700 font-semibold text-sm transition-colors focus:outline-none"
+                  className="flex items-center space-x-1 text-slate-700 hover:text-kaya-orange font-semibold text-sm transition-colors focus:outline-none"
                 >
                   <span className="max-w-[100px] truncate">Hello, {user.name.split(" ")[0]}</span>
                   <ChevronDown className="h-4 w-4" />
@@ -74,7 +74,7 @@ export default function Navbar() {
                       <Link
                         href="/admin"
                         onClick={() => setDropdownOpen(false)}
-                        className="flex items-center space-x-2 px-4 py-3 text-sm text-slate-700 hover:bg-green-50 hover:text-green-700 transition-colors"
+                        className="flex items-center space-x-2 px-4 py-3 text-sm text-slate-700 hover:bg-orange-50 hover:text-kaya-orange transition-colors"
                       >
                         <LayoutDashboard className="h-4 w-4" />
                         <span>Admin Dashboard</span>
@@ -83,7 +83,7 @@ export default function Navbar() {
                       <Link
                         href="/dashboard"
                         onClick={() => setDropdownOpen(false)}
-                        className="flex items-center space-x-2 px-4 py-3 text-sm text-slate-700 hover:bg-green-50 hover:text-green-700 transition-colors"
+                        className="flex items-center space-x-2 px-4 py-3 text-sm text-slate-700 hover:bg-orange-50 hover:text-kaya-orange transition-colors"
                       >
                         <User className="h-4 w-4" />
                         <span>My Dashboard</span>
@@ -105,7 +105,7 @@ export default function Navbar() {
             ) : (
               <Link
                 href="/login"
-                className="text-green-700 font-bold hover:text-green-900 transition-colors text-sm"
+                className="text-kaya-green font-bold hover:text-kaya-green-hover transition-colors text-sm"
               >
                 Sign In
               </Link>
@@ -114,11 +114,11 @@ export default function Navbar() {
             {/* Shopping Cart Button */}
             <Link
               href="/cart"
-              className="relative bg-green-600 hover:bg-green-700 text-white p-3 rounded-full shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 flex items-center justify-center"
+              className="relative bg-gradient-to-r from-kaya-orange to-orange-400 text-white p-3 rounded-full shadow-lg hover:shadow-orange-500/25 transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 flex items-center justify-center"
             >
               <ShoppingBag className="h-5 w-5" />
               {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-amber-500 text-white text-[10px] font-black rounded-full h-5 w-5 flex items-center justify-center border-2 border-white">
+                <span className="absolute -top-2 -right-2 bg-kaya-green text-white text-[10px] font-black rounded-full h-5 w-5 flex items-center justify-center border-2 border-white shadow-sm">
                   {cartCount}
                 </span>
               )}

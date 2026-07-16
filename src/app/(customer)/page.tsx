@@ -62,56 +62,59 @@ export default function HomePage() {
   return (
     <div className="bg-slate-50 min-h-screen">
       {/* HERO SECTION */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-green-900 via-green-800 to-emerald-950 text-white py-16 md:py-24 px-4 sm:px-6 lg:px-8">
-        <div className="absolute inset-0 z-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:24px_24px]"></div>
+      <section className="relative overflow-hidden bg-gradient-to-br from-kaya-black via-slate-900 to-kaya-black text-white py-16 md:py-24 px-4 sm:px-6 lg:px-8">
+        <div className="absolute inset-0 z-0 opacity-20 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:24px_24px]"></div>
         
         <div className="max-w-7xl mx-auto relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-8 text-center lg:text-left">
-            <span className="inline-flex items-center space-x-2 bg-green-500/20 text-green-300 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border border-green-500/30">
+            <span className="inline-flex items-center space-x-2 bg-kaya-green/20 text-kaya-green px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border border-kaya-green/30 animate-pulse">
               <Leaf className="h-3 w-3" />
               <span>100% Brand Certified Fresh</span>
             </span>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight tracking-tight">
+            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black leading-tight tracking-tight">
               Fresh Foodstuff & Groceries <br/>
-              <span className="text-amber-400">Direct From the Source.</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-kaya-orange to-orange-300">Direct From the Source.</span>
             </h1>
-            <p className="text-base sm:text-lg text-green-100/90 max-w-xl mx-auto lg:mx-0 font-light leading-relaxed">
+            <p className="text-base sm:text-lg text-slate-300 max-w-xl mx-auto lg:mx-0 font-light leading-relaxed">
               We source directly from trusted farmers, wholesalers, and suppliers to bring you high-quality foodstuffs under the **KayaMarket** brand. Fast delivery, fresh guarantee, zero vendor risk.
             </p>
 
             {/* In-Hero Search */}
             <form onSubmit={handleSearch} className="max-w-md mx-auto lg:mx-0">
-              <div className="flex flex-col sm:flex-row gap-2 bg-white/10 p-2 rounded-2xl sm:rounded-full border border-white/20 backdrop-blur-md">
+              <div className="flex flex-col sm:flex-row gap-2 bg-white/10 p-2 rounded-2xl sm:rounded-full border border-white/20 backdrop-blur-xl shadow-2xl">
                 <div className="relative flex-1">
-                  <Search className="absolute left-4 top-3.5 h-5 w-5 text-green-300" />
+                  <Search className="absolute left-4 top-3.5 h-5 w-5 text-kaya-orange" />
                   <input
                     type="text"
                     placeholder="Search tomatoes, yam, rice..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3 rounded-full bg-transparent text-white placeholder-green-200/50 focus:outline-none text-sm"
+                    className="w-full pl-12 pr-4 py-3 rounded-full bg-transparent text-white placeholder-slate-400 focus:outline-none text-sm"
                   />
                 </div>
-                <button type="submit" className="bg-amber-500 hover:bg-amber-400 text-green-950 px-6 py-3 rounded-full font-bold transition-all text-sm shrink-0 shadow-lg">
-                  Search Market
+                <button type="submit" className="bg-gradient-to-r from-kaya-orange to-orange-500 hover:from-orange-500 hover:to-kaya-orange text-white px-8 py-3 rounded-full font-bold transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 hover:shadow-[0_0_20px_rgba(255,122,26,0.6)] text-sm shrink-0 shadow-lg relative overflow-hidden group">
+                  <span className="relative z-10">Search Market</span>
+                  <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                 </button>
               </div>
             </form>
           </div>
 
-          <div className="relative flex justify-center lg:justify-end">
-            <div className="absolute top-12 left-12 w-64 h-64 bg-green-500/30 rounded-full filter blur-3xl opacity-30"></div>
-            <div className="relative w-72 h-72 sm:w-96 sm:h-96 rounded-[2.5rem] bg-gradient-to-tr from-amber-400 to-green-600 p-1 rotate-3 shadow-2xl overflow-hidden hover:rotate-0 transition-all duration-500">
-              <div className="w-full h-full bg-green-900 rounded-[2.3rem] flex flex-col justify-center items-center p-8 text-center border-4 border-green-800">
-                <Leaf className="h-16 w-16 text-amber-400 mb-4 animate-bounce" />
-                <h3 className="text-2xl font-black text-white">Warmth of a Local Market</h3>
-                <p className="text-xs text-green-200/80 mt-2 max-w-xs">
-                  Packaged and delivered to your doorstep with premium standards.
+          <div className="relative flex justify-center lg:justify-end mt-12 lg:mt-0">
+            <div className="absolute top-12 left-12 w-72 h-72 bg-kaya-orange/20 rounded-full filter blur-[100px] opacity-60 animate-pulse"></div>
+            <div className="absolute bottom-12 right-12 w-64 h-64 bg-kaya-green/30 rounded-full filter blur-[80px] opacity-60 animate-pulse"></div>
+            <div className="relative w-72 h-72 sm:w-96 sm:h-96 rounded-[3rem] bg-gradient-to-tr from-kaya-orange to-kaya-green p-1 rotate-3 shadow-2xl overflow-hidden hover:rotate-0 transition-all duration-500 group">
+              <div className="w-full h-full bg-kaya-black rounded-[2.8rem] flex flex-col justify-center items-center p-8 text-center border border-white/10 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <img src="/K.png" alt="KayaMarket Logo" className="h-20 w-20 mb-6 object-contain brightness-0 invert group-hover:scale-110 transition-transform duration-500" />
+                <h3 className="text-3xl font-black text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-slate-300 transition-colors">Premium Quality</h3>
+                <p className="text-sm text-slate-400 mt-2 max-w-xs font-light">
+                  Sourced from farms. Packaged with care. Delivered with warmth.
                 </p>
-                <div className="mt-6 flex gap-3 text-xs bg-white/10 px-4 py-2 rounded-full border border-white/10">
-                  <span className="font-bold text-amber-300">Fast Shipping</span>
-                  <span className="text-white/30">|</span>
-                  <span className="font-bold text-green-300">Hygiene Checked</span>
+                <div className="mt-8 flex gap-3 text-xs bg-white/5 px-5 py-2.5 rounded-full border border-white/10 backdrop-blur-md">
+                  <span className="font-bold text-kaya-orange">Fast Shipping</span>
+                  <span className="text-white/20">|</span>
+                  <span className="font-bold text-kaya-green">Hygiene Checked</span>
                 </div>
               </div>
             </div>
@@ -181,53 +184,57 @@ export default function HomePage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
           {filteredProducts.map((product) => (
-            <div key={product.id} className="group relative bg-white rounded-3xl border border-slate-100 p-4 shadow-sm hover:shadow-lg transition-all flex flex-col justify-between">
+            <div key={product.id} className="group relative bg-white rounded-3xl border border-slate-100/50 p-4 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] transition-all duration-500 flex flex-col justify-between overflow-hidden hover:-translate-y-2">
               {/* Actions */}
               <div className="absolute top-6 right-6 z-10 flex flex-col gap-2">
                 <button 
                   onClick={() => toggleWishlist(product)}
-                  className={`p-2.5 rounded-full shadow-md border border-slate-50 backdrop-blur-md transition-all ${isInWishlist(product.id) ? "bg-rose-50 text-rose-600" : "bg-white/80 hover:bg-white text-slate-400 hover:text-slate-600"}`}
+                  className={`p-2.5 rounded-full shadow-lg border border-white/50 backdrop-blur-md transition-all duration-300 hover:scale-110 ${isInWishlist(product.id) ? "bg-rose-50 text-rose-500 shadow-rose-100" : "bg-white/90 hover:bg-white text-slate-400 hover:text-rose-500"}`}
                 >
-                  <Heart className={`h-4 w-4 ${isInWishlist(product.id) ? "fill-rose-600" : ""}`} />
+                  <Heart className={`h-4 w-4 transition-transform ${isInWishlist(product.id) ? "fill-rose-500 scale-110 animate-pulse" : ""}`} />
                 </button>
               </div>
 
               <div>
                 {/* Image */}
-                <Link href={`/products/${product.slug}`} className="block relative w-full h-48 rounded-2xl overflow-hidden bg-slate-50 mb-4">
+                <Link href={`/products/${product.slug}`} className="block relative w-full h-56 rounded-2xl overflow-hidden bg-slate-50 mb-5">
                   <img 
                     src={product.image} 
                     alt={product.name} 
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
                   />
+                  <div className="absolute inset-0 bg-gradient-to-t from-kaya-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   {product.inventory < 10 && (
-                    <span className="absolute bottom-3 left-3 bg-amber-500 text-green-950 font-bold text-[10px] px-2.5 py-1 rounded-full uppercase tracking-wider">
+                    <span className="absolute bottom-3 left-3 bg-kaya-orange text-white font-bold text-[10px] px-3 py-1.5 rounded-full uppercase tracking-wider shadow-md">
                       Low Stock
                     </span>
                   )}
                 </Link>
 
                 {/* Rating */}
-                <span className="text-[10px] bg-green-50 text-green-700 px-2 py-0.5 rounded-full font-bold">
-                  ★ {product.rating} ({product.reviewsCount})
+                <span className="inline-flex items-center space-x-1 text-[10px] bg-slate-50 text-slate-600 px-2.5 py-1 rounded-full font-bold border border-slate-100">
+                  <span className="text-yellow-400">★</span> 
+                  <span>{product.rating}</span>
+                  <span className="text-slate-400 font-normal">({product.reviewsCount})</span>
                 </span>
 
                 {/* Details */}
-                <h3 className="font-bold text-slate-800 mt-2 line-clamp-1 group-hover:text-green-700 transition-colors">
+                <h3 className="font-bold text-slate-800 mt-3 text-lg line-clamp-1 group-hover:text-kaya-orange transition-colors">
                   <Link href={`/products/${product.slug}`}>{product.name}</Link>
                 </h3>
-                <p className="text-xs text-slate-400 mt-1">{product.weight ? `Weight: ${product.weight}` : "Unit: pack"}</p>
+                <p className="text-xs text-slate-500 mt-1">{product.weight ? `Weight: ${product.weight}` : "Unit: pack"}</p>
               </div>
 
-              <div className="flex justify-between items-center mt-5 pt-3 border-t border-slate-50">
+              <div className="flex justify-between items-center mt-6 pt-4 border-t border-slate-100/50">
                 <div>
-                  <span className="text-lg font-black text-slate-800">{formatPrice(product.price)}</span>
+                  <span className="text-xl font-black text-kaya-black">{formatPrice(product.price)}</span>
                 </div>
                 <button 
                   onClick={() => addToCart(product)}
-                  className="bg-green-600 hover:bg-green-700 text-white p-2.5 rounded-2xl shadow-md hover:shadow-lg transition-all"
+                  className="bg-kaya-black hover:bg-gradient-to-r hover:from-kaya-orange hover:to-orange-500 text-white p-3 rounded-2xl shadow-md hover:shadow-[0_0_15px_rgba(255,122,26,0.5)] transition-all duration-300 transform hover:scale-110 hover:-translate-y-1 relative overflow-hidden group/btn"
                 >
-                  <Plus className="h-4 w-4" />
+                  <Plus className="h-5 w-5 relative z-10" />
+                  <div className="absolute inset-0 bg-white/20 rounded-2xl scale-0 group-hover/btn:scale-100 transition-transform duration-300 ease-out opacity-0 group-hover/btn:opacity-100"></div>
                 </button>
               </div>
             </div>

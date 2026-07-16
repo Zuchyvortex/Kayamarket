@@ -10,10 +10,10 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-12 border-b border-green-800/50 pb-12 mb-8">
         <div className="space-y-4">
           <div className="flex items-center space-x-2 text-white">
-            <div className="bg-green-600 p-1.5 rounded-lg text-white">
-              <Leaf className="h-5 w-5" />
+            <div className="relative h-8 w-8">
+              <img src="/K.png" alt="KayaMarket Logo" className="object-contain w-full h-full brightness-0 invert opacity-90" />
             </div>
-            <span className="text-xl font-bold tracking-tight">KayaMarket</span>
+            <span className="text-2xl font-bold tracking-tight">KayaMarket</span>
           </div>
           <p className="text-sm leading-relaxed max-w-xs">
             Nigeria's premium single-vendor online grocery platform. Sourced directly from farms, delivered with warmth.
