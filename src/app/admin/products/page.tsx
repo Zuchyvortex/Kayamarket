@@ -1,16 +1,22 @@
 "use client";
 
-import React, { useState } from "react";
-import { PRODUCTS, CATEGORIES, Product } from "@/lib/mockData";
-import { Search, Plus, Trash2, X } from "lucide-react";
+import React, { useState, useEffect, useTransition } from "react";
+import { getProducts, getCategories, createProduct, deleteProduct, updateProduct } from "@/app/actions/productActions";
+import { Search, Plus, Trash2, X, Loader2, Edit } from "lucide-react";
+import ImageUploader from "@/components/ImageUploader";
 
 export default function AdminProductsManager() {
-  const [products, setProducts] = useState<Product[]>(PRODUCTS);
+  const [products, setProducts] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isPending, startTransition] = useTransition();
+
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   
   // Modal / Form state
   const [showAddForm, setShowAddForm] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
@@ -18,12 +24,64 @@ export default function AdminProductsManager() {
   const [categorySlug, setCategorySlug] = useState("rice");
   const [weight, setWeight] = useState("");
   const [sku, setSku] = useState("");
+  const [image, setImage] = useState("");
+  const [isActive, setIsActive] = useState(true);
+  const [isFeatured, setIsFeatured] = useState(false);
+  const [isBestSeller, setIsBestSeller] = useState(false);
+  const [isNewArrival, setIsNewArrival] = useState(false);
 
-  const handleAddProduct = (e: React.FormEvent) => {
+  const fetchData = () => {
+    startTransition(() => {
+      Promise.all([getProducts(), getCategories()]).then(([prods, cats]) => {
+        setProducts(prods);
+        setCategories(cats);
+        if (cats.length > 0 && !categorySlug) setCategorySlug(cats[0].slug);
+        setLoading(false);
+      });
+    });
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const resetForm = () => {
+    setEditingId(null);
+    setName("");
+    setDescription("");
+    setPrice("");
+    setInventory("");
+    setSku("");
+    setWeight("");
+    setImage("");
+    setIsActive(true);
+    setIsFeatured(false);
+    setIsBestSeller(false);
+    setIsNewArrival(false);
+    setShowAddForm(false);
+  };
+
+  const handleEdit = (product: any) => {
+    setEditingId(product.id);
+    setName(product.name);
+    setDescription(product.description || "");
+    setPrice(product.price.toString());
+    setInventory(product.inventory.toString());
+    setCategorySlug(product.categorySlug);
+    setSku(product.sku || "");
+    setWeight(product.weight || "");
+    setImage(product.image || "");
+    setIsActive(product.isActive ?? true);
+    setIsFeatured(product.isFeatured ?? false);
+    setIsBestSeller(product.isBestSeller ?? false);
+    setIsNewArrival(product.isNewArrival ?? false);
+    setShowAddForm(true);
+  };
+
+  const handleSaveProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     if (name && price && inventory) {
-      const newProduct: Product = {
-        id: `p-${Date.now()}`,
+      const productData = {
         name,
         slug: name.toLowerCase().replace(/ /g, "-"),
         description,
@@ -32,28 +90,28 @@ export default function AdminProductsManager() {
         categorySlug,
         sku: sku || `SKU-${Date.now()}`,
         weight,
-        image: "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=500&auto=format&fit=crop&q=60", // default mock image
-        rating: 5.0,
-        reviewsCount: 0
+        images: image,
+        isActive,
+        isFeatured,
+        isBestSeller,
+        isNewArrival
       };
 
-      setProducts([newProduct, ...products]);
+      if (editingId) {
+        await updateProduct(editingId, productData);
+      } else {
+        await createProduct(productData);
+      }
       
-      // Reset form
-      setName("");
-      setDescription("");
-      setPrice("");
-      setInventory("");
-      setSku("");
-      setWeight("");
-      setShowAddForm(false);
-      alert("Product added successfully to Mock list!");
+      resetForm();
+      fetchData();
     }
   };
 
-  const handleDeleteProduct = (id: string) => {
+  const handleDeleteProduct = async (id: string) => {
     if (confirm("Are you sure you want to delete this product?")) {
-      setProducts(products.filter(p => p.id !== id));
+      await deleteProduct(id);
+      fetchData();
     }
   };
 
@@ -106,7 +164,7 @@ export default function AdminProductsManager() {
             className="px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold focus:outline-none"
           >
             <option value="all">All Categories</option>
-            {CATEGORIES.map(c => (
+            {categories.map(c => (
               <option key={c.id} value={c.slug}>{c.name}</option>
             ))}
           </select>
@@ -129,15 +187,24 @@ export default function AdminProductsManager() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-slate-750">
-              {filteredProducts.map((p) => (
+              {loading && (
+                <tr>
+                  <td colSpan={7} className="px-6 py-12 text-center">
+                    <Loader2 className="w-8 h-8 text-kaya-orange animate-spin mx-auto" />
+                  </td>
+                </tr>
+              )}
+              {!loading && filteredProducts.map((p) => (
                 <tr key={p.id} className="hover:bg-slate-50 transition-colors">
                   <td className="px-6 py-4 flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-slate-50 overflow-hidden shrink-0 border border-slate-200">
-                      <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
+                      <img src={p.image || "/w-1.png"} alt={p.name} className="w-full h-full object-cover" />
                     </div>
                     <div>
                       <h4 className="font-extrabold text-slate-900 max-w-[200px] truncate">{p.name}</h4>
-                      <span className="text-[10px] text-slate-400 font-bold">ID: {p.id}</span>
+                      <span className="text-[10px] text-slate-400 font-bold">
+                        {p.isActive ? "Active" : "Disabled"} {p.isFeatured && "• Featured"}
+                      </span>
                     </div>
                   </td>
                   <td className="px-6 py-4">{p.sku}</td>
@@ -151,6 +218,12 @@ export default function AdminProductsManager() {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex justify-center items-center gap-2">
+                      <button 
+                        onClick={() => handleEdit(p)}
+                        className="p-2.5 text-slate-400 hover:text-kaya-orange hover:bg-orange-50 rounded-xl transition-all"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </button>
                       <button 
                         onClick={() => handleDeleteProduct(p.id)}
                         className="p-2.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
@@ -179,8 +252,12 @@ export default function AdminProductsManager() {
 
             <h3 className="text-xl font-black text-slate-900 mb-6 border-b border-slate-100 pb-3">Add New Foodstuff</h3>
 
-            <form onSubmit={handleAddProduct} className="space-y-4 text-xs font-semibold">
+            <form onSubmit={handleSaveProduct} className="space-y-4 text-xs font-semibold max-h-[70vh] overflow-y-auto px-1 pb-4">
               <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5 col-span-2">
+                  <label className="text-slate-450 font-bold uppercase tracking-wider">Product Image</label>
+                  <ImageUploader defaultImage={image} onUpload={setImage} />
+                </div>
                 <div className="space-y-1.5 col-span-2">
                   <label className="text-slate-450 font-bold uppercase tracking-wider">Product Name</label>
                   <input 
@@ -209,11 +286,13 @@ export default function AdminProductsManager() {
                   <label className="text-slate-455 font-bold uppercase tracking-wider">Category</label>
                   <select 
                     value={categorySlug} onChange={(e) => setCategorySlug(e.target.value)}
-                    className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none font-bold"
+                    className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none font-bold capitalize"
                   >
-                    {CATEGORIES.map(c => (
+                    {categories.map(c => (
                       <option key={c.id} value={c.slug}>{c.name}</option>
                     ))}
+                    {/* Fallbacks if empty */}
+                    {categories.length === 0 && <option value="rice">Rice</option>}
                   </select>
                 </div>
                 <div className="space-y-1.5">
@@ -240,11 +319,31 @@ export default function AdminProductsManager() {
                     className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-kaya-orange/20"
                   ></textarea>
                 </div>
+                
+                {/* Flags */}
+                <div className="col-span-2 grid grid-cols-2 gap-4 mt-2">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} className="rounded text-kaya-orange focus:ring-kaya-orange w-4 h-4" />
+                    <span className="text-slate-700">Active (Visible)</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" checked={isFeatured} onChange={(e) => setIsFeatured(e.target.checked)} className="rounded text-kaya-orange focus:ring-kaya-orange w-4 h-4" />
+                    <span className="text-slate-700">Featured</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" checked={isBestSeller} onChange={(e) => setIsBestSeller(e.target.checked)} className="rounded text-kaya-orange focus:ring-kaya-orange w-4 h-4" />
+                    <span className="text-slate-700">Best Seller</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" checked={isNewArrival} onChange={(e) => setIsNewArrival(e.target.checked)} className="rounded text-kaya-orange focus:ring-kaya-orange w-4 h-4" />
+                    <span className="text-slate-700">New Arrival</span>
+                  </label>
+                </div>
               </div>
 
-              <div className="flex gap-3 justify-end pt-4 border-t border-slate-100 mt-2">
+              <div className="flex gap-3 justify-end pt-4 border-t border-slate-100 mt-2 sticky bottom-0 bg-white">
                 <button 
-                  type="button" onClick={() => setShowAddForm(false)}
+                  type="button" onClick={resetForm}
                   className="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-650 font-bold rounded-xl"
                 >
                   Cancel
@@ -253,7 +352,7 @@ export default function AdminProductsManager() {
                   type="submit" 
                   className="px-6 py-3 bg-kaya-orange hover:bg-orange-600 text-white font-bold rounded-xl shadow-lg shadow-orange-500/10"
                 >
-                  Add Product
+                  {editingId ? "Update Product" : "Save Product"}
                 </button>
               </div>
             </form>

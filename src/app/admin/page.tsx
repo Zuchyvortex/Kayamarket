@@ -1,16 +1,31 @@
-"use client";
-
 import React from "react";
-import { PRODUCTS, MOCK_ORDERS } from "@/lib/mockData";
+import { prisma } from "@/lib/prisma";
 import { ArrowUpRight, TrendingUp, ShoppingCart, UserCheck, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 
-export default function AdminDashboardHome() {
-  // Statistics Aggregation
-  const totalRevenue = MOCK_ORDERS.filter(o => o.status !== "Cancelled").reduce((acc, curr) => acc + curr.total, 0);
-  const totalOrders = MOCK_ORDERS.length;
-  const activeCustomers = 84; // Mock value
-  const lowStockCount = PRODUCTS.filter(p => p.inventory < 10).length;
+export const dynamic = "force-dynamic";
+
+export default async function AdminDashboardHome() {
+  const [totalOrders, orders, products, usersCount, revenueObj, lowStockCount] = await Promise.all([
+    prisma.order.count(),
+    prisma.order.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: 5,
+      include: { user: true }
+    }),
+    prisma.product.findMany({
+      where: { inventory: { lt: 10 } },
+      take: 3
+    }),
+    prisma.user.count({ where: { role: 'CUSTOMER' } }),
+    prisma.order.aggregate({
+      _sum: { totalAmount: true },
+      where: { status: { not: 'CANCELLED' } }
+    }),
+    prisma.product.count({ where: { inventory: { lt: 10 } } })
+  ]);
+
+  const totalRevenue = Number(revenueObj._sum.totalAmount || 0);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', minimumFractionDigits: 0 }).format(price);
@@ -28,8 +43,8 @@ export default function AdminDashboardHome() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {[
           { label: "Total Revenue", val: formatPrice(totalRevenue), change: "+12.4% from last week", icon: TrendingUp, color: "text-emerald-600 bg-emerald-50" },
-          { label: "Total Orders", val: totalOrders, change: "+8.3% from yesterday", icon: ShoppingCart, color: "text-kaya-orange bg-orange-50" },
-          { label: "Active Customers", val: activeCustomers, change: "+15.6% new users", icon: UserCheck, color: "text-slate-950 bg-slate-100" },
+          { label: "Total Orders", val: totalOrders, change: "Live from DB", icon: ShoppingCart, color: "text-kaya-orange bg-orange-50" },
+          { label: "Active Customers", val: usersCount, change: "Registered users", icon: UserCheck, color: "text-slate-950 bg-slate-100" },
           { label: "Low-Stock Alerts", val: lowStockCount, change: `${lowStockCount} items need attention`, icon: AlertTriangle, color: "text-rose-600 bg-rose-50" }
         ].map((kpi, idx) => (
           <div key={idx} className="bg-white border border-slate-200 p-6 rounded-[2rem] space-y-4 shadow-sm hover:shadow-md transition-shadow">
@@ -90,11 +105,11 @@ export default function AdminDashboardHome() {
           </div>
 
           <div className="space-y-4">
-            {PRODUCTS.filter(p => p.inventory < 10).slice(0, 3).map((p) => (
+            {products.map((p) => (
               <div key={p.id} className="flex justify-between items-center">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-slate-50 overflow-hidden shrink-0 border border-slate-100">
-                    <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
+                    <img src={p.images?.[0] || "/w-1.png"} alt={p.name} className="w-full h-full object-cover" />
                   </div>
                   <div>
                     <h4 className="text-xs font-bold text-slate-800 truncate max-w-[120px]">{p.name}</h4>
@@ -107,6 +122,9 @@ export default function AdminDashboardHome() {
                 </div>
               </div>
             ))}
+            {products.length === 0 && (
+              <p className="text-xs text-slate-500 text-center py-4">All products are adequately stocked.</p>
+            )}
           </div>
         </div>
       </div>
@@ -130,26 +148,29 @@ export default function AdminDashboardHome() {
                 <th className="px-6 py-4">Date</th>
                 <th className="px-6 py-4">Total Price</th>
                 <th className="px-6 py-4">Status</th>
-                <th className="px-6 py-4">Payment</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-slate-700">
-              {MOCK_ORDERS.map((order) => (
+              {orders.map((order) => (
                 <tr key={order.id} className="hover:bg-slate-50 transition-colors">
                   <td className="px-6 py-4 font-bold text-slate-900">{order.orderNumber}</td>
-                  <td className="px-6 py-4">{order.customerName}</td>
-                  <td className="px-6 py-4">{order.date}</td>
-                  <td className="px-6 py-4 font-black text-slate-900">{formatPrice(order.total)}</td>
+                  <td className="px-6 py-4">{order.user.firstName} {order.user.lastName}</td>
+                  <td className="px-6 py-4">{new Date(order.createdAt).toLocaleDateString()}</td>
+                  <td className="px-6 py-4 font-black text-slate-900">{formatPrice(Number(order.totalAmount))}</td>
                   <td className="px-6 py-4">
                     <span className={`inline-block px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider ${
-                      order.status === "Delivered" ? "bg-green-50 text-kaya-green border border-green-150" : "bg-amber-50 text-amber-700 border border-amber-100"
+                      order.status === "DELIVERED" ? "bg-green-50 text-kaya-green border border-green-150" : "bg-amber-50 text-amber-700 border border-amber-100"
                     }`}>
                       {order.status}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-slate-400">{order.paymentMethod}</td>
                 </tr>
               ))}
+              {orders.length === 0 && (
+                <tr>
+                  <td colSpan={5} className="px-6 py-8 text-center text-slate-500">No orders found.</td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

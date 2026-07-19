@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
-import { LayoutDashboard, ShoppingBag, FolderTree, AlertTriangle, ClipboardList, Truck, BarChart3, LogOut, ArrowLeft, ShieldAlert, Menu, X } from "lucide-react";
+import { LayoutDashboard, ShoppingBag, FolderTree, AlertTriangle, ClipboardList, Truck, BarChart3, LogOut, ArrowLeft, ShieldAlert, Menu, X, Layout, Users } from "lucide-react";
 
 export default function AdminLayout({
   children,
@@ -67,6 +67,8 @@ export default function AdminLayout({
 
   const sidebarLinks = [
     { href: "/admin", label: "Overview", icon: LayoutDashboard },
+    { href: "/admin/homepage", label: "Homepage Manager", icon: Layout },
+    { href: "/admin/customers", label: "Customer Manager", icon: Users },
     { href: "/admin/products", label: "Products Manager", icon: ShoppingBag },
     { href: "/admin/categories", label: "Category Manager", icon: FolderTree },
     { href: "/admin/inventory", label: "Inventory & Alerts", icon: AlertTriangle },

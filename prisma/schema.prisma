@@ -18,12 +18,20 @@ model User {
   firstName     String
   lastName      String
   phoneNumber   String?
+  profileImage  String?
+  status        UserStatus @default(ACTIVE)
+  lastLogin     DateTime?
   role          Role      @default(CUSTOMER)
   addresses     Address[]
   orders        Order[]
   wishlist      Wishlist[]
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
 }
 
 enum Role {
@@ -51,6 +59,7 @@ model Category {
   slug        String    @unique
   description String?
   imageUrl    String?
+  isFeatured  Boolean   @default(false)
   products    Product[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -67,7 +76,10 @@ model Product {
   categoryId    String
   category      Category    @relation(fields: [categoryId], references: [id])
   images        String[]
+  isActive      Boolean     @default(true)
   isFeatured    Boolean     @default(false)
+  isBestSeller  Boolean     @default(false)
+  isNewArrival  Boolean     @default(false)
   orderItems    OrderItem[]
   wishlistedBy  Wishlist[]
   createdAt     DateTime    @default(now())
@@ -115,4 +127,19 @@ model Wishlist {
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@unique([userId, productId])
+}
+
+model HomepageConfig {
+  id                  String   @id @default("default")
+  heroBannerImage     String?
+  heroBannerTitle     String?
+  heroBannerSubtitle  String?
+  heroBannerLink      String?
+  promotionalBanners  String[] 
+  videoUrl            String?
+  announcementText    String?
+  announcementActive  Boolean  @default(false)
+  flashSaleActive     Boolean  @default(false)
+  flashSaleEndTime    DateTime?
+  updatedAt           DateTime @updatedAt
 }

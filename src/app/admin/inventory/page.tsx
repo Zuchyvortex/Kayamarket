@@ -1,21 +1,41 @@
 "use client";
 
-import React, { useState } from "react";
-import { PRODUCTS, Product } from "@/lib/mockData";
-import { ShieldAlert, Plus, Minus } from "lucide-react";
+import React, { useState, useEffect, useTransition } from "react";
+import { getProducts, updateProductStock } from "@/app/actions/productActions";
+import { ShieldAlert, Plus, Minus, Loader2 } from "lucide-react";
 
 export default function AdminInventoryManager() {
-  const [products, setProducts] = useState<Product[]>(PRODUCTS);
+  const [products, setProducts] = useState<any[]>([]);
   const [manualInputs, setManualInputs] = useState<{ [key: string]: number }>({});
+  const [loading, setLoading] = useState(true);
+  const [isPending, startTransition] = useTransition();
 
-  const handleStockAdjustment = (productId: string, amount: number) => {
-    setProducts(products.map(p => {
-      if (p.id === productId) {
-        const newStock = Math.max(0, p.inventory + amount);
-        return { ...p, inventory: newStock };
-      }
-      return p;
-    }));
+  const fetchProducts = () => {
+    startTransition(() => {
+      getProducts().then((data) => {
+        setProducts(data);
+        setLoading(false);
+      });
+    });
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const handleStockAdjustment = async (productId: string, amount: number) => {
+    const product = products.find(p => p.id === productId);
+    if (!product) return;
+    
+    const newStock = Math.max(0, product.inventory + amount);
+    // Optimistic update
+    setProducts(products.map(p => p.id === productId ? { ...p, inventory: newStock } : p));
+    
+    const res = await updateProductStock(productId, newStock);
+    if (!res.success) {
+      alert("Failed to update stock");
+      fetchProducts(); // revert
+    }
   };
 
   const handleManualStockChange = (productId: string, val: string) => {
@@ -25,16 +45,19 @@ export default function AdminInventoryManager() {
     }
   };
 
-  const handleSaveManualStock = (productId: string) => {
+  const handleSaveManualStock = async (productId: string) => {
     const newVal = manualInputs[productId];
     if (newVal !== undefined) {
-      setProducts(products.map(p => {
-        if (p.id === productId) {
-          return { ...p, inventory: newVal };
-        }
-        return p;
-      }));
-      alert("Stock level updated successfully!");
+      // Optimistic update
+      setProducts(products.map(p => p.id === productId ? { ...p, inventory: newVal } : p));
+      
+      const res = await updateProductStock(productId, newVal);
+      if (res.success) {
+        alert("Stock level updated successfully!");
+      } else {
+        alert("Failed to update stock");
+        fetchProducts(); // revert
+      }
     }
   };
 
@@ -77,7 +100,14 @@ export default function AdminInventoryManager() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-slate-750">
-              {products.map((p) => (
+              {loading && (
+                <tr>
+                  <td colSpan={6} className="px-6 py-12 text-center">
+                    <Loader2 className="w-8 h-8 text-kaya-orange animate-spin mx-auto" />
+                  </td>
+                </tr>
+              )}
+              {!loading && products.map((p) => (
                 <tr key={p.id} className="hover:bg-slate-50 transition-colors">
                   <td className="px-6 py-4 flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-slate-50 overflow-hidden shrink-0 border border-slate-200">

@@ -20,8 +20,11 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="max-w-md mx-auto px-4 py-20 bg-white">
-      <div className="bg-white p-8 sm:p-10 rounded-[3rem] border border-slate-200 shadow-2xl space-y-8 relative overflow-hidden">
+    <div className="min-h-screen w-full flex items-center justify-center py-12 px-4 bg-cover bg-center bg-no-repeat relative animate-in fade-in duration-700" style={{ backgroundImage: "url('/w-2.png')" }}>
+      {/* Dark overlay */}
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm z-0"></div>
+
+      <div className="w-full max-w-md bg-white/95 backdrop-blur-xl p-8 sm:p-10 rounded-[3rem] border border-white/20 shadow-2xl space-y-8 relative overflow-hidden z-10 animate-in slide-in-from-bottom-8 duration-700">
         
         {/* Glow ambient background lights */}
         <div className="absolute top-0 right-0 w-24 h-24 bg-kaya-orange/10 rounded-bl-[3rem]"></div>
