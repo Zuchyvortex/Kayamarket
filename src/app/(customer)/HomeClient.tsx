@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { 
   Search, 
@@ -769,36 +770,15 @@ export default function HomeClient({ initialProducts, initialCategories, homepag
 
             {/* Graphic Mockup Panel */}
             <div className="lg:col-span-5 relative flex justify-center">
-              <div className="relative w-64 h-[450px] bg-slate-900 rounded-[2.8rem] border-[6px] border-slate-800 shadow-2xl p-3 flex flex-col justify-between overflow-hidden">
-                <div className="h-4 w-24 bg-slate-800 rounded-full mx-auto mb-2"></div>
-                
-                {/* App Screen mock */}
-                <div className="flex-1 bg-slate-950 rounded-[2rem] p-4 flex flex-col justify-between border border-slate-800 overflow-hidden relative">
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center border-b border-slate-800 pb-2">
-                      <img src="/k-1.png" className="h-6 w-auto object-contain" alt="" />
-                      <span className="text-[8px] font-black text-kaya-orange bg-orange-500/10 px-2 py-0.5 rounded">Active</span>
-                    </div>
-                    
-                    <div className="bg-slate-900/60 p-3 rounded-2xl border border-slate-800">
-                      <p className="text-[8px] text-slate-400 font-bold uppercase">Today's Hot Offer</p>
-                      <p className="text-[10px] font-black text-white mt-0.5">Roma Tomatoes (15kg)</p>
-                      <p className="text-xs font-black text-kaya-orange mt-1">₦15,000</p>
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <p className="text-[8px] text-slate-400 font-bold uppercase">Popular Categories</p>
-                      <div className="grid grid-cols-2 gap-1.5">
-                        <span className="bg-slate-900 p-2 rounded-xl text-[8px] font-bold text-center border border-slate-800">Rice & Grains</span>
-                        <span className="bg-slate-900 p-2 rounded-xl text-[8px] font-bold text-center border border-slate-800">Beans & Tubers</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <button className="w-full bg-kaya-orange text-white py-2 rounded-xl text-[9px] font-black shadow-md shadow-orange-500/10">
-                    Fast Checkout Now
-                  </button>
-                </div>
+              <div className="relative flex justify-center items-center">
+                <Image
+                  src="/t-1.png"
+                  alt="KayaMarket Mobile App Mockup"
+                  width={852}
+                  height={1846}
+                  loading="lazy"
+                  className="w-auto h-[450px] sm:h-[500px] max-w-full object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-500"
+                />
               </div>
             </div>
 
