@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { 
   Search, 
@@ -769,17 +770,60 @@ export default function HomeClient({ initialProducts, initialCategories, homepag
             </div>
 
             {/* Graphic Mockup Panel */}
-            <div className="lg:col-span-5 relative flex justify-center">
-              <div className="relative flex justify-center items-center">
-                <Image
-                  src="/t-1.png"
-                  alt="KayaMarket Mobile App Mockup"
-                  width={852}
-                  height={1846}
-                  loading="lazy"
-                  className="w-auto h-[450px] sm:h-[500px] max-w-full object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-500"
+            <div className="lg:col-span-5 relative flex justify-center items-center py-6">
+              {/* Outer Entrance Scroll Container */}
+              <motion.div
+                initial={{ opacity: 0, x: 60, scale: 0.95 }}
+                whileInView={{ opacity: 1, x: 0, scale: 1 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{
+                  duration: 0.9,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
+                className="relative flex flex-col items-center justify-center group"
+              >
+                {/* Ambient Kaya Orange Glow */}
+                <div className="absolute w-72 h-72 sm:w-80 sm:h-80 bg-[#FF6A00]/15 rounded-full filter blur-[80px] pointer-events-none -z-10 animate-pulse-slow"></div>
+
+                {/* Floating Phone Container */}
+                <motion.div
+                  animate={{
+                    y: [0, -14, 0],
+                    rotate: [0, 1.2, -1.2, 0],
+                  }}
+                  transition={{
+                    duration: 5.5,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                  whileHover={{ y: -8, scale: 1.02 }}
+                  className="relative z-10 flex justify-center items-center cursor-pointer transition-transform duration-300"
+                >
+                  <Image
+                    src="/t-1.png"
+                    alt="KayaMarket Mobile App Mockup"
+                    width={852}
+                    height={1846}
+                    loading="lazy"
+                    priority={false}
+                    className="w-auto h-[460px] sm:h-[500px] lg:h-[540px] max-w-full object-contain filter drop-shadow-[0_20px_35px_rgba(0,0,0,0.18)]"
+                  />
+                </motion.div>
+
+                {/* Soft Realistic Floating Shadow Beneath Phone */}
+                <motion.div
+                  animate={{
+                    scale: [1, 0.82, 1],
+                    opacity: [0.25, 0.12, 0.25],
+                  }}
+                  transition={{
+                    duration: 5.5,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                  className="w-48 sm:w-56 h-5 bg-slate-900/30 rounded-[100%] filter blur-md mt-2 pointer-events-none"
                 />
-              </div>
+              </motion.div>
             </div>
 
           </div>
