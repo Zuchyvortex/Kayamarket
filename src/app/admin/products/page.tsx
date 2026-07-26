@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useTransition } from "react";
 import { getProducts, getCategories, createProduct, deleteProduct, updateProduct } from "@/app/actions/productActions";
 import { Search, Plus, Trash2, X, Loader2, Edit } from "lucide-react";
-import ImageUploader from "@/components/ImageUploader";
+import MediaManager from "@/components/MediaManager";
 
 export default function AdminProductsManager() {
   const [products, setProducts] = useState<any[]>([]);
@@ -24,7 +24,7 @@ export default function AdminProductsManager() {
   const [categorySlug, setCategorySlug] = useState("rice");
   const [weight, setWeight] = useState("");
   const [sku, setSku] = useState("");
-  const [image, setImage] = useState("");
+  const [images, setImages] = useState<string[]>([]);
   const [isActive, setIsActive] = useState(true);
   const [isFeatured, setIsFeatured] = useState(false);
   const [isBestSeller, setIsBestSeller] = useState(false);
@@ -53,7 +53,7 @@ export default function AdminProductsManager() {
     setInventory("");
     setSku("");
     setWeight("");
-    setImage("");
+    setImages([]);
     setIsActive(true);
     setIsFeatured(false);
     setIsBestSeller(false);
@@ -70,7 +70,7 @@ export default function AdminProductsManager() {
     setCategorySlug(product.categorySlug);
     setSku(product.sku || "");
     setWeight(product.weight || "");
-    setImage(product.image || "");
+    setImages(product.images || (product.image ? [product.image] : []));
     setIsActive(product.isActive ?? true);
     setIsFeatured(product.isFeatured ?? false);
     setIsBestSeller(product.isBestSeller ?? false);
@@ -90,7 +90,7 @@ export default function AdminProductsManager() {
         categorySlug,
         sku: sku || `SKU-${Date.now()}`,
         weight,
-        images: image,
+        images: images,
         isActive,
         isFeatured,
         isBestSeller,
@@ -255,8 +255,13 @@ export default function AdminProductsManager() {
             <form onSubmit={handleSaveProduct} className="space-y-4 text-xs font-semibold max-h-[70vh] overflow-y-auto px-1 pb-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5 col-span-2">
-                  <label className="text-slate-450 font-bold uppercase tracking-wider">Product Image</label>
-                  <ImageUploader defaultImage={image} onUpload={setImage} />
+                  <label className="text-slate-450 font-bold uppercase tracking-wider">Product Media Manager</label>
+                  <MediaManager 
+                    images={images} 
+                    onChange={setImages} 
+                    productName={name} 
+                    categorySlug={categorySlug} 
+                  />
                 </div>
                 <div className="space-y-1.5 col-span-2">
                   <label className="text-slate-450 font-bold uppercase tracking-wider">Product Name</label>

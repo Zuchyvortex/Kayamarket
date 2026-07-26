@@ -41,14 +41,24 @@ export default function HomeClient({ initialProducts, initialCategories, homepag
   const [activeMallTab, setActiveMallTab] = useState("electronics");
   const [timeLeft, setTimeLeft] = useState({ hours: 14, minutes: 32, seconds: 45 });
   const [scrollY, setScrollY] = useState(0);
+  const [windowWidth, setWindowWidth] = useState(1200);
+  const [isPhoneHovered, setIsPhoneHovered] = useState(false);
 
-  // Parallax scroll position tracker
+  // Parallax scroll position tracker & resize listener
   useEffect(() => {
+    setWindowWidth(window.innerWidth);
     const handleScroll = () => {
       setScrollY(window.scrollY);
     };
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
     window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleResize);
+    };
   }, []);
 
   // Countdown timer simulation
@@ -770,60 +780,253 @@ export default function HomeClient({ initialProducts, initialCategories, homepag
             </div>
 
             {/* Graphic Mockup Panel */}
-            <div className="lg:col-span-5 relative flex justify-center items-center py-6">
-              {/* Outer Entrance Scroll Container */}
-              <motion.div
-                initial={{ opacity: 0, x: 60, scale: 0.95 }}
-                whileInView={{ opacity: 1, x: 0, scale: 1 }}
-                viewport={{ once: true, amount: 0.3 }}
-                transition={{
-                  duration: 0.9,
-                  ease: [0.16, 1, 0.3, 1],
+            <div className="lg:col-span-5 relative flex justify-center items-center py-12 min-h-[520px] md:min-h-[580px]">
+              
+              {/* Dotted Grid Background */}
+              <div 
+                className="absolute inset-0 opacity-[0.06] pointer-events-none rounded-[3rem]"
+                style={{
+                  backgroundImage: "radial-gradient(#FF6A00 1.5px, transparent 1.5px)",
+                  backgroundSize: "20px 20px"
                 }}
-                className="relative flex flex-col items-center justify-center group"
-              >
-                {/* Ambient Kaya Orange Glow */}
-                <div className="absolute w-72 h-72 sm:w-80 sm:h-80 bg-[#FF6A00]/15 rounded-full filter blur-[80px] pointer-events-none -z-10 animate-pulse-slow"></div>
+              />
+              
+              {/* Soft glow / orange gradient blurs */}
+              <div className="absolute w-80 h-80 bg-gradient-to-tr from-kaya-orange/12 to-amber-500/5 rounded-full filter blur-[100px] pointer-events-none -z-10 animate-pulse-slow"></div>
+              
+              {/* Elegant curved SVG connecting lines with flow animation */}
+              <svg className="absolute inset-0 w-full h-full pointer-events-none -z-10" viewBox="0 0 500 500">
+                <defs>
+                  <linearGradient id="line-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#FF6A00" stopOpacity="0.25" />
+                    <stop offset="50%" stopColor="#FFA000" stopOpacity="0.15" />
+                    <stop offset="100%" stopColor="#FF6A00" stopOpacity="0.05" />
+                  </linearGradient>
+                </defs>
+                <motion.circle 
+                  cx="250" cy="250" r={135 * (windowWidth < 640 ? 0.5 : windowWidth < 1024 ? 0.75 : 1)} 
+                  stroke="url(#line-grad)" strokeWidth="1.2" fill="none" 
+                  strokeDasharray="8, 12"
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
+                />
+                <motion.circle 
+                  cx="250" cy="250" r={195 * (windowWidth < 640 ? 0.5 : windowWidth < 1024 ? 0.75 : 1)} 
+                  stroke="url(#line-grad)" strokeWidth="1.5" fill="none" 
+                  strokeDasharray="4, 8"
+                  animate={{ rotate: -360 }}
+                  transition={{ duration: 80, repeat: Infinity, ease: "linear" }}
+                />
+                <motion.circle 
+                  cx="250" cy="250" r={255 * (windowWidth < 640 ? 0.5 : windowWidth < 1024 ? 0.75 : 1)} 
+                  stroke="url(#line-grad)" strokeWidth="1.2" fill="none" 
+                  strokeDasharray="20, 30"
+                  animate={{ rotate: 180 }}
+                  transition={{ duration: 100, repeat: Infinity, ease: "linear" }}
+                />
+              </svg>
 
-                {/* Floating Phone Container */}
+              {/* Tiny floating particles */}
+              <div className="absolute inset-0 pointer-events-none overflow-hidden -z-10">
+                {[...Array(8)].map((_, i) => {
+                  const randomX = Math.sin(i) * 150 + 250;
+                  const randomY = Math.cos(i) * 150 + 250;
+                  return (
+                    <motion.div
+                      key={i}
+                      className="absolute w-1.5 h-1.5 bg-kaya-orange/30 rounded-full"
+                      style={{ left: randomX, top: randomY }}
+                      animate={{
+                        y: [0, -30, 0],
+                        x: [0, Math.sin(i) * 20, 0],
+                        opacity: [0.3, 0.7, 0.3]
+                      }}
+                      transition={{
+                        duration: 5 + (i % 4),
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                        delay: i * 0.5
+                      }}
+                    />
+                  );
+                })}
+              </div>
+
+              {/* Orbiting Food Items */}
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
+                {(() => {
+                  const activeProducts = initialProducts.filter(p => p.isActive && p.image).slice(0, 12);
+                  const fallbackProducts = [
+                    { name: "Premium Rice", image: "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=120&auto=format&fit=crop&q=60" },
+                    { name: "Fresh Tomatoes", image: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=120&auto=format&fit=crop&q=60" },
+                    { name: "Abuja Yam", image: "https://images.unsplash.com/photo-1596484552834-3a57fd8cb689?w=120&auto=format&fit=crop&q=60" },
+                    { name: "Palm Oil", image: "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=120&auto=format&fit=crop&q=60" },
+                    { name: "Fresh Peppers", image: "https://images.unsplash.com/photo-1595855759920-86582396756a?w=120&auto=format&fit=crop&q=60" },
+                    { name: "Broiler Chicken", image: "https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=120&auto=format&fit=crop&q=60" },
+                    { name: "Garri", image: "https://images.unsplash.com/photo-1542838132-92c53300491e?w=120&auto=format&fit=crop&q=60" },
+                    { name: "Fresh Vegetables", image: "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=120&auto=format&fit=crop&q=60" },
+                  ];
+                  
+                  const displayProducts = [...activeProducts];
+                  if (displayProducts.length < 8) {
+                    fallbackProducts.forEach(fp => {
+                      if (displayProducts.length < 8 && !displayProducts.some(dp => dp.name.toLowerCase() === fp.name.toLowerCase())) {
+                        displayProducts.push({
+                          id: `fallback-${fp.name}`,
+                          name: fp.name,
+                          image: fp.image,
+                          isActive: true
+                        } as any);
+                      }
+                    });
+                  }
+
+                  const isMobile = windowWidth < 640;
+                  const isTablet = windowWidth >= 640 && windowWidth < 1024;
+                  const maxItems = isMobile ? 3 : isTablet ? 5 : 8;
+                  const radiusMultiplier = isMobile ? 0.45 : isTablet ? 0.72 : 1.0;
+
+                  const rings = [
+                    { rx: 135, ry: 135, speed: 28, clockwise: true },
+                    { rx: 195, ry: 195, speed: 40, clockwise: false },
+                    { rx: 255, ry: 255, speed: 52, clockwise: true }
+                  ];
+
+                  return displayProducts.slice(0, maxItems).map((product, idx) => {
+                    const ring = rings[idx % rings.length];
+                    const rx = ring.rx * radiusMultiplier;
+                    const ry = ring.ry * radiusMultiplier;
+                    
+                    const steps = 8;
+                    const xKeyframes = [];
+                    const yKeyframes = [];
+                    const startAngle = (idx / maxItems) * 2 * Math.PI;
+                    const dir = ring.clockwise ? 1 : -1;
+                    
+                    for (let s = 0; s <= steps; s++) {
+                      const angle = startAngle + (s / steps) * 2 * Math.PI * dir;
+                      xKeyframes.push(rx * Math.cos(angle));
+                      yKeyframes.push(ry * Math.sin(angle));
+                    }
+
+                    return (
+                      <div 
+                        key={product.id}
+                        className="absolute pointer-events-auto"
+                        style={{ 
+                          transform: `translateY(${scrollY * (0.03 + (idx % 3) * 0.015)}px)`,
+                          transition: "transform 0.1s ease-out"
+                        }}
+                      >
+                        <motion.div
+                          animate={{
+                            x: xKeyframes,
+                            y: yKeyframes
+                          }}
+                          transition={{
+                            duration: ring.speed,
+                            repeat: Infinity,
+                            ease: "linear"
+                          }}
+                        >
+                          <motion.div
+                            animate={{
+                              y: [0, -6, 0],
+                              scale: isPhoneHovered ? 1.08 : 1
+                            }}
+                            transition={{
+                              duration: 3.5 + (idx % 3),
+                              repeat: Infinity,
+                              ease: "easeInOut"
+                            }}
+                            whileHover={{ 
+                              scale: 1.15,
+                              zIndex: 50
+                            }}
+                            className="relative w-14 h-14 sm:w-18 sm:h-18 rounded-full bg-white/90 backdrop-blur-md p-1 border border-white/60 flex items-center justify-center transition-all duration-300 shadow-[0_8px_20px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_28px_rgba(255,106,0,0.15)] ring-2 ring-orange-500/5 hover:ring-orange-500/35 cursor-pointer overflow-hidden group"
+                            title={product.name}
+                          >
+                            <img 
+                              src={product.image} 
+                              alt={product.name} 
+                              className="w-full h-full object-cover rounded-full group-hover:scale-105 transition-transform duration-300"
+                            />
+                            <div className="absolute inset-0 bg-orange-500/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                          </motion.div>
+                        </motion.div>
+                      </div>
+                    );
+                  });
+                })()}
+              </div>
+
+              {/* Phone Container */}
+              <div 
+                style={{ 
+                  transform: `translateY(${scrollY * 0.015}px)`,
+                  transition: "transform 0.1s ease-out"
+                }}
+                className="z-10 relative"
+              >
+                {/* Outer Entrance Scroll Container */}
                 <motion.div
-                  animate={{
-                    y: [0, -14, 0],
-                    rotate: [0, 1.2, -1.2, 0],
-                  }}
+                  initial={{ opacity: 0, x: 50, scale: 0.9, rotate: 3 }}
+                  whileInView={{ opacity: 1, x: 0, scale: 1, rotate: 0 }}
+                  viewport={{ once: true, amount: 0.3 }}
                   transition={{
-                    duration: 5.5,
-                    repeat: Infinity,
-                    ease: "easeInOut",
+                    duration: 1.1,
+                    ease: [0.16, 1, 0.3, 1],
                   }}
-                  whileHover={{ y: -8, scale: 1.02 }}
-                  className="relative z-10 flex justify-center items-center cursor-pointer transition-transform duration-300"
+                  onMouseEnter={() => setIsPhoneHovered(true)}
+                  onMouseLeave={() => setIsPhoneHovered(false)}
+                  className="relative flex flex-col items-center justify-center group cursor-pointer"
                 >
-                  <Image
-                    src="/t-1.png"
-                    alt="KayaMarket Mobile App Mockup"
-                    width={852}
-                    height={1846}
-                    loading="lazy"
-                    priority={false}
-                    className="w-auto h-[460px] sm:h-[500px] lg:h-[540px] max-w-full object-contain filter drop-shadow-[0_20px_35px_rgba(0,0,0,0.18)]"
+                  {/* Floating Phone Container */}
+                  <motion.div
+                    animate={{
+                      y: [0, -10, 0],
+                      rotate: [0, 0.8, -0.8, 0],
+                    }}
+                    transition={{
+                      duration: 6,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                    whileHover={{ 
+                      scale: 1.025,
+                    }}
+                    className="relative z-10 flex justify-center items-center transition-all duration-500"
+                  >
+                    <Image
+                      src="/t-1.png"
+                      alt="KayaMarket Mobile App Mockup"
+                      width={852}
+                      height={1846}
+                      loading="lazy"
+                      priority={false}
+                      className={`w-auto h-[460px] sm:h-[500px] lg:h-[540px] max-w-full object-contain transition-all duration-500 ${
+                        isPhoneHovered 
+                          ? "filter drop-shadow-[0_28px_45px_rgba(255,106,0,0.22)]" 
+                          : "filter drop-shadow-[0_20px_35px_rgba(0,0,0,0.14)]"
+                      }`}
+                    />
+                  </motion.div>
+
+                  {/* Soft Realistic Floating Shadow Beneath Phone */}
+                  <motion.div
+                    animate={{
+                      scale: [1, 0.86, 1],
+                      opacity: isPhoneHovered ? [0.35, 0.22, 0.35] : [0.22, 0.12, 0.22],
+                    }}
+                    transition={{
+                      duration: 6,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                    className="w-48 sm:w-56 h-5 bg-slate-900/30 rounded-[100%] filter blur-md mt-2 pointer-events-none transition-opacity duration-500"
                   />
                 </motion.div>
-
-                {/* Soft Realistic Floating Shadow Beneath Phone */}
-                <motion.div
-                  animate={{
-                    scale: [1, 0.82, 1],
-                    opacity: [0.25, 0.12, 0.25],
-                  }}
-                  transition={{
-                    duration: 5.5,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                  className="w-48 sm:w-56 h-5 bg-slate-900/30 rounded-[100%] filter blur-md mt-2 pointer-events-none"
-                />
-              </motion.div>
+              </div>
             </div>
 
           </div>

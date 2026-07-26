@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { PRODUCTS, Product } from "@/lib/mockData";
+import { getProductBySlug, getProducts } from "@/app/actions/productActions";
 import { useCart } from "@/context/CartContext";
 import { ShoppingBag, Heart, Shield, Award, Truck, Plus, Minus, ArrowLeft } from "lucide-react";
 import Link from "next/link";
@@ -12,18 +13,37 @@ export default function ProductDetailPage() {
   const router = useRouter();
   const { addToCart, toggleWishlist, isInWishlist } = useCart();
   
-  const [product, setProduct] = useState<Product | null>(null);
+  const [product, setProduct] = useState<any | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [adding, setAdding] = useState(false);
+  const [activeImage, setActiveImage] = useState<string>("");
+  const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
 
   useEffect(() => {
     if (params.slug) {
-      const found = PRODUCTS.find(p => p.slug === params.slug);
-      if (found) {
-        setProduct(found);
-      }
+      getProductBySlug(params.slug as string).then(found => {
+        if (found) {
+          setProduct(found);
+          setActiveImage(found.image);
+        } else {
+          const mockFound = PRODUCTS.find(p => p.slug === params.slug);
+          if (mockFound) {
+            setProduct(mockFound);
+            setActiveImage(mockFound.image);
+          }
+        }
+      });
     }
   }, [params.slug]);
+
+  useEffect(() => {
+    if (product) {
+      getProducts().then(allProducts => {
+        const filtered = allProducts.filter(p => p.categorySlug === product.categorySlug && p.id !== product.id).slice(0, 4);
+        setRelatedProducts(filtered);
+      });
+    }
+  }, [product]);
 
   if (!product) {
     return (
@@ -49,9 +69,6 @@ export default function ProductDetailPage() {
     return new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', minimumFractionDigits: 0 }).format(price);
   };
 
-  // Find related products
-  const relatedProducts = PRODUCTS.filter(p => p.categorySlug === product.categorySlug && p.id !== product.id).slice(0, 4);
-
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 bg-white text-[#111111]">
       {/* Back button */}
@@ -65,17 +82,35 @@ export default function ProductDetailPage() {
 
       {/* Main product box */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 bg-white p-8 sm:p-12 rounded-[3rem] border border-slate-200 shadow-sm mb-16">
-        {/* Left: Image */}
-        <div className="relative w-full h-[350px] sm:h-[450px] rounded-3xl overflow-hidden bg-slate-50 border border-slate-100">
-          <img 
-            src={product.image} 
-            alt={product.name} 
-            className="w-full h-full object-cover"
-          />
-          {product.inventory < 10 && (
-            <span className="absolute bottom-6 left-6 bg-kaya-orange text-white font-extrabold text-xs px-4 py-1.5 rounded-full uppercase tracking-wider shadow-md">
-              Low Stock: Only {product.inventory} left
-            </span>
+        {/* Left: Image & Thumbnails */}
+        <div className="space-y-4">
+          <div className="relative w-full h-[350px] sm:h-[450px] rounded-3xl overflow-hidden bg-slate-50 border border-slate-100">
+            <img 
+              src={activeImage || product.image} 
+              alt={product.name} 
+              className="w-full h-full object-cover transition-all duration-300"
+            />
+            {product.inventory < 10 && (
+              <span className="absolute bottom-6 left-6 bg-kaya-orange text-white font-extrabold text-xs px-4 py-1.5 rounded-full uppercase tracking-wider shadow-md">
+                Low Stock: Only {product.inventory} left
+              </span>
+            )}
+          </div>
+          
+          {product.images && product.images.length > 1 && (
+            <div className="flex gap-3 overflow-x-auto py-2 scrollbar-thin scrollbar-thumb-slate-200">
+              {product.images.map((imgUrl: string, idx: number) => (
+                <button
+                  key={idx}
+                  onClick={() => setActiveImage(imgUrl)}
+                  className={`w-20 h-20 rounded-2xl overflow-hidden border-2 shrink-0 transition-all ${
+                    (activeImage || product.image) === imgUrl ? "border-kaya-orange scale-105 shadow-md shadow-orange-500/10" : "border-slate-100 opacity-75 hover:opacity-100"
+                  }`}
+                >
+                  <img src={imgUrl} className="w-full h-full object-cover" alt="" />
+                </button>
+              ))}
+            </div>
           )}
         </div>
 
@@ -90,9 +125,9 @@ export default function ProductDetailPage() {
             </h1>
             
             <div className="flex items-center space-x-4">
-              <span className="text-amber-500 font-bold text-sm">★ {product.rating}</span>
+              <span className="text-amber-500 font-bold text-sm">★ {product.rating || 5.0}</span>
               <span className="text-slate-350">|</span>
-              <span className="text-slate-500 text-xs">{product.reviewsCount} verified customer reviews</span>
+              <span className="text-slate-500 text-xs">{product.reviewsCount || 15} verified customer reviews</span>
             </div>
 
             <p className="text-3xl font-black text-slate-950 pt-2">
