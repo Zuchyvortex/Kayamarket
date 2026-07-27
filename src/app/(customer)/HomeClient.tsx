@@ -30,6 +30,136 @@ import {
 import { CATEGORIES, PRODUCTS, Product } from "@/lib/mockData";
 import { useCart } from "@/context/CartContext";
 
+interface OrbitRingProps {
+  radius: number;
+  speed: number;
+  clockwise: boolean;
+  items: Array<{ id: string; name: string; image: string }>;
+  isPhoneHovered: boolean;
+  scrollY: number;
+  parallaxFactor: number;
+  windowWidth: number;
+}
+
+function OrbitRing({ 
+  radius, 
+  speed, 
+  clockwise, 
+  items, 
+  isPhoneHovered, 
+  scrollY, 
+  parallaxFactor,
+  windowWidth
+}: OrbitRingProps) {
+  const isMobile = windowWidth < 640;
+  const isTablet = windowWidth >= 640 && windowWidth < 1024;
+  const radiusMultiplier = isMobile ? 0.48 : isTablet ? 0.72 : 1.0;
+  
+  const R = radius * radiusMultiplier;
+  
+  return (
+    <div 
+      className="absolute pointer-events-none"
+      style={{ 
+        width: 2 * R, 
+        height: 2 * R,
+        top: `calc(50% - ${R}px)`,
+        left: `calc(50% - ${R}px)`,
+        transform: `translateY(${scrollY * parallaxFactor}px)`,
+        transition: "transform 0.1s ease-out"
+      }}
+    >
+      {/* SVG Ring Line */}
+      <svg className="absolute inset-0 w-full h-full pointer-events-none -z-10" viewBox={`0 0 ${2*R} ${2*R}`}>
+        <defs>
+          <linearGradient id={`orange-ring-grad-${radius}`} x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#FF6A00" stopOpacity="0.22" />
+            <stop offset="50%" stopColor="#FFA000" stopOpacity="0.12" />
+            <stop offset="100%" stopColor="#FF6A00" stopOpacity="0.04" />
+          </linearGradient>
+        </defs>
+        <circle 
+          cx={R} 
+          cy={R} 
+          r={R} 
+          stroke={`url(#orange-ring-grad-${radius})`} 
+          strokeWidth="1.2" 
+          fill="none" 
+          strokeDasharray="6, 12"
+        />
+      </svg>
+
+      {/* Orbiting Items */}
+      {items.map((item, idx) => {
+        const startAngle = (idx / items.length) * 360;
+        const directionMultiplier = clockwise ? 1 : -1;
+        
+        return (
+          <motion.div
+            key={item.id}
+            className="absolute inset-0 pointer-events-none"
+            animate={{
+              rotate: [startAngle, startAngle + (360 * directionMultiplier)]
+            }}
+            transition={{
+              duration: speed,
+              repeat: Infinity,
+              ease: "linear"
+            }}
+          >
+            {/* The Item Card positioned at the top of the rotated container */}
+            <div 
+              className="absolute pointer-events-auto"
+              style={{
+                top: 0,
+                left: "50%",
+                transform: "translate(-50%, -50%)"
+              }}
+            >
+              <motion.div
+                animate={{
+                  rotate: [-startAngle, -startAngle - (360 * directionMultiplier)]
+                }}
+                transition={{
+                  duration: speed,
+                  repeat: Infinity,
+                  ease: "linear"
+                }}
+              >
+                <motion.div
+                  animate={{
+                    y: [0, -6, 0],
+                    rotate: [0, 4, -4, 0]
+                  }}
+                  transition={{
+                    duration: 3.5 + (idx % 3),
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                  whileHover={{ 
+                    scale: 1.15,
+                    boxShadow: "0 20px 30px rgba(255,106,0,0.18)",
+                    zIndex: 50
+                  }}
+                  className="relative w-14 h-14 sm:w-18 sm:h-18 rounded-full bg-white/80 backdrop-blur-md p-1 border border-white/50 flex items-center justify-center transition-all duration-300 shadow-[0_8px_24px_rgba(0,0,0,0.06)] hover:shadow-[0_16px_32px_rgba(255,106,0,0.18)] ring-2 ring-orange-500/5 hover:ring-orange-500/30 cursor-pointer overflow-hidden group"
+                  title={item.name}
+                >
+                  <img 
+                    src={item.image} 
+                    alt={item.name} 
+                    className="w-full h-full object-cover rounded-full group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-orange-500/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                </motion.div>
+              </motion.div>
+            </div>
+          </motion.div>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function HomeClient({ initialProducts, initialCategories, homepageConfig }: { initialProducts: any[], initialCategories: any[], homepageConfig: any }) {
   const router = useRouter();
   const { addToCart, toggleWishlist, isInWishlist } = useCart();
@@ -794,38 +924,6 @@ export default function HomeClient({ initialProducts, initialCategories, homepag
               {/* Soft glow / orange gradient blurs */}
               <div className="absolute w-80 h-80 bg-gradient-to-tr from-kaya-orange/12 to-amber-500/5 rounded-full filter blur-[100px] pointer-events-none -z-10 animate-pulse-slow"></div>
               
-              {/* Elegant curved SVG connecting lines with flow animation */}
-              <svg className="absolute inset-0 w-full h-full pointer-events-none -z-10" viewBox="0 0 500 500">
-                <defs>
-                  <linearGradient id="line-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#FF6A00" stopOpacity="0.25" />
-                    <stop offset="50%" stopColor="#FFA000" stopOpacity="0.15" />
-                    <stop offset="100%" stopColor="#FF6A00" stopOpacity="0.05" />
-                  </linearGradient>
-                </defs>
-                <motion.circle 
-                  cx="250" cy="250" r={135 * (windowWidth < 640 ? 0.5 : windowWidth < 1024 ? 0.75 : 1)} 
-                  stroke="url(#line-grad)" strokeWidth="1.2" fill="none" 
-                  strokeDasharray="8, 12"
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
-                />
-                <motion.circle 
-                  cx="250" cy="250" r={195 * (windowWidth < 640 ? 0.5 : windowWidth < 1024 ? 0.75 : 1)} 
-                  stroke="url(#line-grad)" strokeWidth="1.5" fill="none" 
-                  strokeDasharray="4, 8"
-                  animate={{ rotate: -360 }}
-                  transition={{ duration: 80, repeat: Infinity, ease: "linear" }}
-                />
-                <motion.circle 
-                  cx="250" cy="250" r={255 * (windowWidth < 640 ? 0.5 : windowWidth < 1024 ? 0.75 : 1)} 
-                  stroke="url(#line-grad)" strokeWidth="1.2" fill="none" 
-                  strokeDasharray="20, 30"
-                  animate={{ rotate: 180 }}
-                  transition={{ duration: 100, repeat: Infinity, ease: "linear" }}
-                />
-              </svg>
-
               {/* Tiny floating particles */}
               <div className="absolute inset-0 pointer-events-none overflow-hidden -z-10">
                 {[...Array(8)].map((_, i) => {
@@ -852,113 +950,76 @@ export default function HomeClient({ initialProducts, initialCategories, homepag
                 })}
               </div>
 
-              {/* Orbiting Food Items */}
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
-                {(() => {
-                  const activeProducts = initialProducts.filter(p => p.isActive && p.image).slice(0, 12);
-                  const fallbackProducts = [
-                    { name: "Premium Rice", image: "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=120&auto=format&fit=crop&q=60" },
-                    { name: "Fresh Tomatoes", image: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=120&auto=format&fit=crop&q=60" },
-                    { name: "Abuja Yam", image: "https://images.unsplash.com/photo-1596484552834-3a57fd8cb689?w=120&auto=format&fit=crop&q=60" },
-                    { name: "Palm Oil", image: "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=120&auto=format&fit=crop&q=60" },
-                    { name: "Fresh Peppers", image: "https://images.unsplash.com/photo-1595855759920-86582396756a?w=120&auto=format&fit=crop&q=60" },
-                    { name: "Broiler Chicken", image: "https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=120&auto=format&fit=crop&q=60" },
-                    { name: "Garri", image: "https://images.unsplash.com/photo-1542838132-92c53300491e?w=120&auto=format&fit=crop&q=60" },
-                    { name: "Fresh Vegetables", image: "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=120&auto=format&fit=crop&q=60" },
-                  ];
-                  
-                  const displayProducts = [...activeProducts];
-                  if (displayProducts.length < 8) {
-                    fallbackProducts.forEach(fp => {
-                      if (displayProducts.length < 8 && !displayProducts.some(dp => dp.name.toLowerCase() === fp.name.toLowerCase())) {
-                        displayProducts.push({
-                          id: `fallback-${fp.name}`,
-                          name: fp.name,
-                          image: fp.image,
-                          isActive: true
-                        } as any);
-                      }
-                    });
-                  }
+              {/* Orbiting Ecosystem */}
+              {(() => {
+                const getProductForOrbit = (nameQuery: string, fallbackUrl: string) => {
+                  const dbProd = initialProducts.find(p => p.isActive && p.name.toLowerCase().includes(nameQuery));
+                  return {
+                    id: dbProd?.id || `fallback-${nameQuery}`,
+                    name: dbProd?.name || nameQuery.charAt(0).toUpperCase() + nameQuery.slice(1),
+                    image: dbProd?.image || fallbackUrl
+                  };
+                };
 
-                  const isMobile = windowWidth < 640;
-                  const isTablet = windowWidth >= 640 && windowWidth < 1024;
-                  const maxItems = isMobile ? 3 : isTablet ? 5 : 8;
-                  const radiusMultiplier = isMobile ? 0.45 : isTablet ? 0.72 : 1.0;
+                const innerOrbitItems = [
+                  getProductForOrbit("tomato", "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=120&auto=format&fit=crop&q=60"),
+                  getProductForOrbit("onion", "https://images.unsplash.com/photo-1618512496248-a07fe8376604?w=120&auto=format&fit=crop&q=60"),
+                  getProductForOrbit("pepper", "https://images.unsplash.com/photo-1595855759920-86582396756a?w=120&auto=format&fit=crop&q=60")
+                ];
 
-                  const rings = [
-                    { rx: 135, ry: 135, speed: 28, clockwise: true },
-                    { rx: 195, ry: 195, speed: 40, clockwise: false },
-                    { rx: 255, ry: 255, speed: 52, clockwise: true }
-                  ];
+                const middleOrbitItems = [
+                  getProductForOrbit("rice", "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=120&auto=format&fit=crop&q=60"),
+                  getProductForOrbit("beans", "https://images.unsplash.com/photo-1547058881-aa0edd92aab3?w=120&auto=format&fit=crop&q=60"),
+                  getProductForOrbit("garri", "https://images.unsplash.com/photo-1542838132-92c53300491e?w=120&auto=format&fit=crop&q=60")
+                ];
 
-                  return displayProducts.slice(0, maxItems).map((product, idx) => {
-                    const ring = rings[idx % rings.length];
-                    const rx = ring.rx * radiusMultiplier;
-                    const ry = ring.ry * radiusMultiplier;
-                    
-                    const steps = 8;
-                    const xKeyframes = [];
-                    const yKeyframes = [];
-                    const startAngle = (idx / maxItems) * 2 * Math.PI;
-                    const dir = ring.clockwise ? 1 : -1;
-                    
-                    for (let s = 0; s <= steps; s++) {
-                      const angle = startAngle + (s / steps) * 2 * Math.PI * dir;
-                      xKeyframes.push(rx * Math.cos(angle));
-                      yKeyframes.push(ry * Math.sin(angle));
-                    }
+                const outerOrbitItems = [
+                  getProductForOrbit("chicken", "https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=120&auto=format&fit=crop&q=60"),
+                  getProductForOrbit("fish", "https://images.unsplash.com/photo-1534482421-64566f976cfa?w=120&auto=format&fit=crop&q=60"),
+                  getProductForOrbit("yam", "https://images.unsplash.com/photo-1596484552834-3a57fd8cb689?w=120&auto=format&fit=crop&q=60"),
+                  getProductForOrbit("plantain", "https://images.unsplash.com/photo-1566393028639-d108a42c46a7?w=120&auto=format&fit=crop&q=60")
+                ];
 
-                    return (
-                      <div 
-                        key={product.id}
-                        className="absolute pointer-events-auto"
-                        style={{ 
-                          transform: `translateY(${scrollY * (0.03 + (idx % 3) * 0.015)}px)`,
-                          transition: "transform 0.1s ease-out"
-                        }}
-                      >
-                        <motion.div
-                          animate={{
-                            x: xKeyframes,
-                            y: yKeyframes
-                          }}
-                          transition={{
-                            duration: ring.speed,
-                            repeat: Infinity,
-                            ease: "linear"
-                          }}
-                        >
-                          <motion.div
-                            animate={{
-                              y: [0, -6, 0],
-                              scale: isPhoneHovered ? 1.08 : 1
-                            }}
-                            transition={{
-                              duration: 3.5 + (idx % 3),
-                              repeat: Infinity,
-                              ease: "easeInOut"
-                            }}
-                            whileHover={{ 
-                              scale: 1.15,
-                              zIndex: 50
-                            }}
-                            className="relative w-14 h-14 sm:w-18 sm:h-18 rounded-full bg-white/90 backdrop-blur-md p-1 border border-white/60 flex items-center justify-center transition-all duration-300 shadow-[0_8px_20px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_28px_rgba(255,106,0,0.15)] ring-2 ring-orange-500/5 hover:ring-orange-500/35 cursor-pointer overflow-hidden group"
-                            title={product.name}
-                          >
-                            <img 
-                              src={product.image} 
-                              alt={product.name} 
-                              className="w-full h-full object-cover rounded-full group-hover:scale-105 transition-transform duration-300"
-                            />
-                            <div className="absolute inset-0 bg-orange-500/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-                          </motion.div>
-                        </motion.div>
-                      </div>
-                    );
-                  });
-                })()}
-              </div>
+                return (
+                  <>
+                    {/* Inner Orbit: 135px, 18s, Clockwise */}
+                    <OrbitRing 
+                      radius={135} 
+                      speed={18} 
+                      clockwise={true} 
+                      items={innerOrbitItems} 
+                      isPhoneHovered={isPhoneHovered} 
+                      scrollY={scrollY} 
+                      parallaxFactor={0.01}
+                      windowWidth={windowWidth}
+                    />
+
+                    {/* Middle Orbit: 195px, 24s, Counter-Clockwise */}
+                    <OrbitRing 
+                      radius={195} 
+                      speed={24} 
+                      clockwise={false} 
+                      items={middleOrbitItems} 
+                      isPhoneHovered={isPhoneHovered} 
+                      scrollY={scrollY} 
+                      parallaxFactor={0.02}
+                      windowWidth={windowWidth}
+                    />
+
+                    {/* Outer Orbit: 255px, 32s, Clockwise */}
+                    <OrbitRing 
+                      radius={255} 
+                      speed={32} 
+                      clockwise={true} 
+                      items={outerOrbitItems} 
+                      isPhoneHovered={isPhoneHovered} 
+                      scrollY={scrollY} 
+                      parallaxFactor={0.03}
+                      windowWidth={windowWidth}
+                    />
+                  </>
+                );
+              })()}
 
               {/* Phone Container */}
               <div 
@@ -981,19 +1042,23 @@ export default function HomeClient({ initialProducts, initialCategories, homepag
                   onMouseLeave={() => setIsPhoneHovered(false)}
                   className="relative flex flex-col items-center justify-center group cursor-pointer"
                 >
-                  {/* Floating Phone Container */}
+                  {/* Floating Phone Container with scale breathing */}
                   <motion.div
                     animate={{
-                      y: [0, -10, 0],
-                      rotate: [0, 0.8, -0.8, 0],
+                      y: [-8, 8, -8],
+                      scale: [1.00, 1.02, 1.00]
                     }}
                     transition={{
-                      duration: 6,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                    }}
-                    whileHover={{ 
-                      scale: 1.025,
+                      y: {
+                        duration: 4.5,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      },
+                      scale: {
+                        duration: 4.5,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }
                     }}
                     className="relative z-10 flex justify-center items-center transition-all duration-500"
                   >
@@ -1019,7 +1084,7 @@ export default function HomeClient({ initialProducts, initialCategories, homepag
                       opacity: isPhoneHovered ? [0.35, 0.22, 0.35] : [0.22, 0.12, 0.22],
                     }}
                     transition={{
-                      duration: 6,
+                      duration: 4.5,
                       repeat: Infinity,
                       ease: "easeInOut",
                     }}
