@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Truck, Lock, User, ArrowRight, ShieldCheck, Sun, Moon } from "lucide-react";
-import { getRiders } from "@/app/actions/riderActions";
+import { getRiders, authenticateRider } from "@/app/actions/riderActions";
 import { useTheme } from "@/context/ThemeContext";
 import Link from "next/link";
 
@@ -31,25 +31,14 @@ export default function RiderLoginPage() {
     setLoading(true);
 
     try {
-      const q = emailOrId.trim().toLowerCase();
-      const matched = availableRiders.find(
-        r => r.email.toLowerCase() === q || r.riderId.toLowerCase() === q || r.fullName.toLowerCase().includes(q)
-      );
-
-      if (!matched) {
-        setError("Rider account not found. Please check Rider ID or Email.");
+      const res = await authenticateRider(emailOrId, password);
+      if (!res.success) {
+        setError(res.error || "Authentication failed.");
         setLoading(false);
         return;
       }
 
-      if (matched.status === "SUSPENDED") {
-        setError("Your Rider account is currently SUSPENDED. Please contact the administrator.");
-        setLoading(false);
-        return;
-      }
-
-      // Save rider session to localStorage
-      localStorage.setItem("kayamarket_rider_session", JSON.stringify(matched));
+      localStorage.setItem("kayamarket_rider_session", JSON.stringify(res.rider));
       window.location.href = "/rider/dashboard";
     } catch (err: any) {
       setError(err.message || "An error occurred during login.");

@@ -116,12 +116,14 @@ model Rider {
   id                  String      @id @default(uuid())
   riderId             String      @unique
   fullName            String
+  username            String?
   phoneNumber         String
   email               String      @unique
   passwordHash        String?
   address             String
   vehicleType         VehicleType @default(MOTORCYCLE)
   vehicleRegistration String
+  emergencyContact    String?
   profilePhoto        String?
   status              RiderStatus @default(ACTIVE)
   notes               String?

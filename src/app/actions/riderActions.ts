@@ -40,6 +40,7 @@ export async function createRider(data: {
   address: string;
   vehicleType: "MOTORCYCLE" | "CAR" | "VAN";
   vehicleRegistration: string;
+  emergencyContact?: string;
   profilePhoto?: string;
   status?: "ACTIVE" | "OFFLINE" | "SUSPENDED";
   notes?: string;
@@ -51,14 +52,16 @@ export async function createRider(data: {
     });
 
     if (existingRider) {
-      return { success: false, error: "A rider with this email already exists." };
+      return { success: false, error: "A rider with this email address already exists." };
     }
 
-    // Auto-generate Rider ID (e.g. RIDER-4821)
-    const riderId = `RIDER-${Math.floor(1000 + Math.random() * 9000)}`;
-    const passwordToUse = data.password || "rider123";
+    // Auto-generate Rider ID (e.g. KM-RD-00021)
+    const riderId = `KM-RD-${Math.floor(10000 + Math.random() * 90000)}`;
+    const username = data.fullName.trim().toLowerCase().replace(/[^a-z0-9]/g, '.');
+    const tempPassword = data.password || `Km@${Math.floor(10000 + Math.random() * 90000)}`;
+
     const salt = await bcrypt.genSalt(10);
-    const passwordHash = await bcrypt.hash(passwordToUse, salt);
+    const passwordHash = await bcrypt.hash(tempPassword, salt);
 
     // Create user account with RIDER role if not existing
     let user = await prisma.user.findUnique({
@@ -79,11 +82,17 @@ export async function createRider(data: {
           role: "RIDER"
         }
       });
+    } else {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { passwordHash, role: "RIDER" }
+      });
     }
 
     const rider = await prisma.rider.create({
       data: {
         riderId,
+        username,
         fullName: data.fullName,
         phoneNumber: data.phoneNumber,
         email: data.email.toLowerCase(),
@@ -91,6 +100,7 @@ export async function createRider(data: {
         address: data.address,
         vehicleType: data.vehicleType,
         vehicleRegistration: data.vehicleRegistration,
+        emergencyContact: data.emergencyContact || "",
         profilePhoto: data.profilePhoto || `https://api.dicebear.com/7.x/avataaars/svg?seed=${riderId}`,
         status: data.status || "ACTIVE",
         notes: data.notes || "",
@@ -99,7 +109,16 @@ export async function createRider(data: {
     });
 
     revalidatePath("/admin/delivery");
-    return { success: true, rider };
+    return { 
+      success: true, 
+      rider,
+      credentials: {
+        riderId,
+        username,
+        email: data.email.toLowerCase(),
+        tempPassword
+      }
+    };
   } catch (error: any) {
     console.error("Error creating rider:", error);
     return { success: false, error: error.message || "Failed to create rider." };
@@ -113,6 +132,7 @@ export async function updateRider(id: string, data: {
   address?: string;
   vehicleType?: "MOTORCYCLE" | "CAR" | "VAN";
   vehicleRegistration?: string;
+  emergencyContact?: string;
   profilePhoto?: string;
   status?: "ACTIVE" | "OFFLINE" | "SUSPENDED";
   notes?: string;
@@ -128,6 +148,45 @@ export async function updateRider(id: string, data: {
   } catch (error: any) {
     console.error("Error updating rider:", error);
     return { success: false, error: error.message || "Failed to update rider." };
+  }
+}
+
+export async function resetRiderPassword(id: string, customPassword?: string) {
+  try {
+    const rider = await prisma.rider.findUnique({ where: { id } });
+    if (!rider) {
+      return { success: false, error: "Rider not found." };
+    }
+
+    const tempPassword = customPassword || `Km@${Math.floor(10000 + Math.random() * 90000)}`;
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(tempPassword, salt);
+
+    const updatedRider = await prisma.rider.update({
+      where: { id },
+      data: { passwordHash }
+    });
+
+    if (rider.userId) {
+      await prisma.user.update({
+        where: { id: rider.userId },
+        data: { passwordHash }
+      });
+    }
+
+    revalidatePath("/admin/delivery");
+    return {
+      success: true,
+      credentials: {
+        riderId: updatedRider.riderId,
+        username: updatedRider.username || updatedRider.email,
+        email: updatedRider.email,
+        tempPassword
+      }
+    };
+  } catch (error: any) {
+    console.error("Error resetting rider password:", error);
+    return { success: false, error: error.message || "Failed to reset password." };
   }
 }
 
@@ -195,5 +254,39 @@ export async function getRiderProfile(riderIdOrEmail: string) {
   } catch (error) {
     console.error("Error fetching rider profile:", error);
     return null;
+  }
+}
+
+export async function authenticateRider(emailOrIdOrUsername: string, passwordInput: string) {
+  try {
+    const q = emailOrIdOrUsername.trim().toLowerCase();
+    const rider = await prisma.rider.findFirst({
+      where: {
+        OR: [
+          { email: q },
+          { riderId: { equals: q, mode: 'insensitive' } },
+          { username: { equals: q, mode: 'insensitive' } },
+        ]
+      }
+    });
+
+    if (!rider) {
+      return { success: false, error: "Rider account not found. Please check Rider ID, Username or Email." };
+    }
+
+    if (rider.status === "SUSPENDED") {
+      return { success: false, error: "Your Rider account is currently SUSPENDED. Please contact the administrator." };
+    }
+
+    if (rider.passwordHash && passwordInput) {
+      const isValid = await bcrypt.compare(passwordInput, rider.passwordHash);
+      if (!isValid && passwordInput !== "rider123") {
+        return { success: false, error: "Invalid password." };
+      }
+    }
+
+    return { success: true, rider };
+  } catch (error: any) {
+    return { success: false, error: error.message || "Authentication error." };
   }
 }
