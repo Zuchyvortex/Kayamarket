@@ -154,7 +154,7 @@ export default async function AdminDashboardHome() {
               {orders.map((order) => (
                 <tr key={order.id} className="hover:bg-slate-50 transition-colors">
                   <td className="px-6 py-4 font-bold text-slate-900">{order.orderNumber}</td>
-                  <td className="px-6 py-4">{order.user.firstName} {order.user.lastName}</td>
+                  <td className="px-6 py-4">{order.user ? `${order.user.firstName} ${order.user.lastName}` : order.customerName}</td>
                   <td className="px-6 py-4">{new Date(order.createdAt).toLocaleDateString()}</td>
                   <td className="px-6 py-4 font-black text-slate-900">{formatPrice(Number(order.totalAmount))}</td>
                   <td className="px-6 py-4">

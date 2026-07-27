@@ -12,8 +12,8 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(uuid())
-  email         String    @unique
+  id            String     @id @default(uuid())
+  email         String     @unique
   passwordHash  String
   firstName     String
   lastName      String
@@ -21,12 +21,13 @@ model User {
   profileImage  String?
   status        UserStatus @default(ACTIVE)
   lastLogin     DateTime?
-  role          Role      @default(CUSTOMER)
+  role          Role       @default(CUSTOMER)
   addresses     Address[]
   orders        Order[]
   wishlist      Wishlist[]
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  rider         Rider?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
 }
 
 enum UserStatus {
@@ -66,57 +67,120 @@ model Category {
 }
 
 model Product {
-  id            String      @id @default(uuid())
-  name          String
-  slug          String      @unique
-  description   String
-  price         Decimal     @db.Decimal(10, 2)
-  inventory     Int         @default(0)
-  sku           String?     @unique
-  categoryId    String
-  category      Category    @relation(fields: [categoryId], references: [id])
-  images        String[]
-  isActive      Boolean     @default(true)
-  isFeatured    Boolean     @default(false)
-  isBestSeller  Boolean     @default(false)
-  isNewArrival  Boolean     @default(false)
-  orderItems    OrderItem[]
-  wishlistedBy  Wishlist[]
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-}
-
-model Order {
-  id              String      @id @default(uuid())
-  orderNumber     String      @unique
-  userId          String
-  user            User        @relation(fields: [userId], references: [id])
-  status          OrderStatus @default(PENDING)
-  totalAmount     Decimal     @db.Decimal(10, 2)
-  deliveryFee     Decimal     @db.Decimal(10, 2)
-  deliveryAddress String
-  deliveryDate    DateTime?
-  items           OrderItem[]
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  id           String      @id @default(uuid())
+  name         String
+  slug         String      @unique
+  description  String
+  price        Decimal     @db.Decimal(10, 2)
+  inventory    Int         @default(0)
+  sku          String?     @unique
+  categoryId   String
+  category     Category    @relation(fields: [categoryId], references: [id])
+  images       String[]
+  isActive     Boolean     @default(true)
+  isFeatured   Boolean     @default(false)
+  isBestSeller Boolean     @default(false)
+  isNewArrival Boolean     @default(false)
+  orderItems   OrderItem[]
+  wishlistedBy Wishlist[]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
 }
 
 enum OrderStatus {
-  PENDING
-  PROCESSING
-  SHIPPED
+  ORDER_PLACED
+  ORDER_CONFIRMED
+  PREPARING
+  PACKED
+  ASSIGNED_TO_RIDER
+  OUT_FOR_DELIVERY
+  ARRIVING_SOON
   DELIVERED
+  COMPLETED
   CANCELLED
 }
 
+enum VehicleType {
+  MOTORCYCLE
+  CAR
+  VAN
+}
+
+enum RiderStatus {
+  ACTIVE
+  OFFLINE
+  SUSPENDED
+}
+
+model Rider {
+  id                  String      @id @default(uuid())
+  riderId             String      @unique
+  fullName            String
+  phoneNumber         String
+  email               String      @unique
+  passwordHash        String?
+  address             String
+  vehicleType         VehicleType @default(MOTORCYCLE)
+  vehicleRegistration String
+  profilePhoto        String?
+  status              RiderStatus @default(ACTIVE)
+  notes               String?
+  userId              String?     @unique
+  user                User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  orders              Order[]
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+}
+
+model Order {
+  id                String               @id @default(uuid())
+  orderNumber       String               @unique
+  userId            String?
+  user              User?                @relation(fields: [userId], references: [id])
+  customerName      String
+  customerPhone     String?
+  status            OrderStatus          @default(ORDER_PLACED)
+  totalAmount       Decimal              @db.Decimal(10, 2)
+  deliveryFee       Decimal              @db.Decimal(10, 2)
+  deliveryAddress   String
+  deliveryDate      String?
+  deliveryTime      String?
+  paymentMethod     String?              @default("Bank Transfer")
+  paymentStatus     String?              @default("PAID")
+  riderId           String?
+  rider             Rider?               @relation(fields: [riderId], references: [id])
+  customerConfirmed Boolean              @default(false)
+  confirmedAt       DateTime?
+  signatureType     String?
+  signatureData     String?
+  proofCustomerName String?
+  notes             String?
+  items             OrderItem[]
+  timeline          OrderTimelineEvent[]
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+}
+
+model OrderTimelineEvent {
+  id          String      @id @default(uuid())
+  orderId     String
+  order       Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  status      OrderStatus
+  title       String
+  description String?
+  updatedBy   String?
+  createdAt   DateTime    @default(now())
+}
+
 model OrderItem {
-  id        String  @id @default(uuid())
-  orderId   String
-  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  productId String
-  product   Product @relation(fields: [productId], references: [id])
-  quantity  Int
-  price     Decimal @db.Decimal(10, 2)
+  id          String   @id @default(uuid())
+  orderId     String
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId   String?
+  product     Product? @relation(fields: [productId], references: [id])
+  productName String?
+  price       Decimal  @db.Decimal(10, 2)
+  quantity    Int
 }
 
 model Wishlist {
@@ -130,16 +194,16 @@ model Wishlist {
 }
 
 model HomepageConfig {
-  id                  String   @id @default("default")
-  heroBannerImage     String?
-  heroBannerTitle     String?
-  heroBannerSubtitle  String?
-  heroBannerLink      String?
-  promotionalBanners  String[] 
-  videoUrl            String?
-  announcementText    String?
-  announcementActive  Boolean  @default(false)
-  flashSaleActive     Boolean  @default(false)
-  flashSaleEndTime    DateTime?
-  updatedAt           DateTime @updatedAt
+  id                 String   @id @default("default")
+  heroBannerImage    String?
+  heroBannerTitle    String?
+  heroBannerSubtitle String?
+  heroBannerLink     String?
+  promotionalBanners String[]
+  videoUrl           String?
+  announcementText   String?
+  announcementActive Boolean  @default(false)
+  flashSaleActive    Boolean  @default(false)
+  flashSaleEndTime   DateTime?
+  updatedAt          DateTime @updatedAt
 }
