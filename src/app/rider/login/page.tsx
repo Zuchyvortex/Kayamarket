@@ -42,9 +42,15 @@ export default function RiderLoginPage() {
         return;
       }
 
+      if (matched.status === "SUSPENDED") {
+        setError("Your Rider account is currently SUSPENDED. Please contact the administrator.");
+        setLoading(false);
+        return;
+      }
+
       // Save rider session to localStorage
       localStorage.setItem("kayamarket_rider_session", JSON.stringify(matched));
-      router.push("/rider/dashboard");
+      window.location.href = "/rider/dashboard";
     } catch (err: any) {
       setError(err.message || "An error occurred during login.");
     } finally {
@@ -53,8 +59,12 @@ export default function RiderLoginPage() {
   };
 
   const handleQuickSelect = (rider: any) => {
+    if (rider.status === "SUSPENDED") {
+      setError("Your Rider account is currently SUSPENDED. Please contact the administrator.");
+      return;
+    }
     localStorage.setItem("kayamarket_rider_session", JSON.stringify(rider));
-    router.push("/rider/dashboard");
+    window.location.href = "/rider/dashboard";
   };
 
   return (

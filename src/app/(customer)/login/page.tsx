@@ -25,22 +25,19 @@ export default function LoginPage() {
       password
     });
     
-    setLoading(false);
-    
     if (result?.error) {
+      setLoading(false);
       setErrorMsg(result.error === "CredentialsSignin" ? "Invalid email or password" : result.error);
     } else {
       const session = await getSession();
-      router.refresh();
-      if (
-        (session?.user && (session.user as any).role === 'ADMIN') ||
-        email.toLowerCase().includes('admin') ||
-        role === 'ADMIN'
-      ) {
-        router.push("/admin");
-      } else {
-        router.push("/dashboard");
-      }
+      const userRole = (session?.user as any)?.role;
+      const urlParams = new URLSearchParams(window.location.search);
+      const callbackUrl = urlParams.get("callbackUrl") || urlParams.get("from");
+
+      const isAdmin = userRole === 'ADMIN' || email.toLowerCase().includes('admin') || role === 'ADMIN';
+      const destination = callbackUrl || (isAdmin ? "/admin" : "/dashboard");
+      
+      window.location.href = destination;
     }
   };
 
@@ -144,6 +141,11 @@ export default function LoginPage() {
         <div className="text-center text-xs text-slate-400 pt-4 border-t border-slate-100 flex flex-col gap-2 relative z-10">
           <p>
             Don't have an account? <Link href="/register" className="text-kaya-orange hover:text-orange-600 font-bold transition-colors">Sign Up</Link>
+          </p>
+          <p className="pt-1 border-t border-slate-100/60">
+            <Link href="/rider/login" className="text-[11px] text-slate-500 hover:text-kaya-orange font-bold transition-colors">
+              Dispatch Rider? Log in to Rider Portal →
+            </Link>
           </p>
           <div className="flex items-center gap-1.5 justify-center text-[10px] text-slate-450 font-medium mt-1">
             <ShieldCheck className="h-3.5 w-3.5 text-kaya-orange" />

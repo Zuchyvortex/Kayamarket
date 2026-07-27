@@ -30,6 +30,10 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Invalid email or password");
         }
 
+        if (user.role === "RIDER") {
+          throw new Error("Rider accounts must sign in through the Rider Portal at /rider/login");
+        }
+
         const isPasswordValid = await bcrypt.compare(credentials.password, user.passwordHash);
 
         if (!isPasswordValid) {
