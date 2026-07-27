@@ -422,7 +422,7 @@ export default function HomeClient({ initialProducts, initialCategories, homepag
             >
               <div className="w-20 h-20 rounded-2xl overflow-hidden mb-4 relative bg-slate-50 flex items-center justify-center border border-slate-100">
                 <img 
-                  src={category.image} 
+                  src={category.imageUrl || category.image || "/w-1.png"} 
                   alt={category.name} 
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 />

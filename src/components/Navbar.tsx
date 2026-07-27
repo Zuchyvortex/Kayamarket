@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
-import { CATEGORIES } from "@/lib/mockData";
+import { getCategories } from "@/app/actions/categoryActions";
 
 export default function Navbar() {
   const { cartCount, wishlist } = useCart();
@@ -31,7 +31,20 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
+  const [categories, setCategories] = useState<any[]>([]);
   const router = useRouter();
+
+  useEffect(() => {
+    async function loadNavbarCategories() {
+      try {
+        const data = await getCategories();
+        setCategories(data);
+      } catch (err) {
+        console.error("Failed to load Navbar categories", err);
+      }
+    }
+    loadNavbarCategories();
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -118,14 +131,14 @@ export default function Navbar() {
                   <div className="px-4 py-2 border-b border-slate-50 mb-2">
                     <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Store Categories</p>
                   </div>
-                  {CATEGORIES.slice(0, 8).map((cat) => (
+                  {categories.slice(0, 8).map((cat) => (
                     <Link
                       key={cat.id}
                       href={`/products?category=${cat.slug}`}
                       onClick={() => setCatDropdownOpen(false)}
-                      className="flex items-center space-x-3 px-4 py-2.5 text-sm font-semibold text-slate-750 hover:bg-orange-50 hover:text-kaya-orange transition-colors"
+                      className="flex items-center space-x-3 px-4 py-2.5 text-sm font-semibold text-slate-750 hover:bg-orange-55 hover:text-kaya-orange transition-colors"
                     >
-                      <img src={cat.image} className="w-6 h-6 rounded-lg object-cover" alt="" />
+                      <img src={cat.imageUrl || cat.image || "/w-1.png"} className="w-6 h-6 rounded-lg object-cover" alt="" />
                       <span>{cat.name}</span>
                     </Link>
                   ))}
