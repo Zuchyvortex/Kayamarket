@@ -8,10 +8,21 @@ import { MapPin, Calendar, CreditCard, ArrowLeft, CheckCircle, ShieldCheck, Plus
 import Link from "next/link";
 import { createOrder } from "@/app/actions/orderActions";
 
+import { getSystemSettings } from "@/app/actions/settingActions";
+
 export default function CheckoutPage() {
   const { cart, cartTotal, addresses, addAddress, clearCart } = useCart();
   const { user } = useAuth();
   const router = useRouter();
+
+  // Settings & Delivery Fee
+  const [deliveryFee, setDeliveryFee] = useState(4000);
+
+  useEffect(() => {
+    getSystemSettings().then(s => {
+      if (s && s.deliveryFee) setDeliveryFee(s.deliveryFee);
+    });
+  }, []);
 
   // Success state
   const [orderSuccess, setOrderSuccess] = useState(false);
@@ -94,8 +105,9 @@ export default function CheckoutPage() {
           price: item.price,
           quantity: item.quantity
         })),
-        totalAmount: cartTotal + 2000,
-        deliveryFee: 2000
+        subtotal: cartTotal,
+        deliveryFee,
+        totalAmount: cartTotal + deliveryFee
       });
 
       if (result.success && result.order) {
@@ -116,7 +128,6 @@ export default function CheckoutPage() {
     return new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', minimumFractionDigits: 0 }).format(price);
   };
 
-  const deliveryFee = 2000;
   const totalAmount = cartTotal + deliveryFee;
 
   if (orderSuccess && placedOrderDetails) {

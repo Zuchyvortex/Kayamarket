@@ -3,11 +3,13 @@
 import { prisma } from "@/lib/prisma";
 import { OrderStatus } from "@prisma/client";
 import { revalidatePath } from "next/cache";
+import { getSystemSettings } from "./settingActions";
 
 export async function createOrder(data: {
   userId?: string;
   customerName: string;
   customerPhone?: string;
+  customerAltPhone?: string;
   deliveryAddress: string;
   deliveryDate?: string;
   deliveryTime?: string;
@@ -19,12 +21,26 @@ export async function createOrder(data: {
     quantity: number;
   }[];
   totalAmount: number;
+  subtotal?: number;
   deliveryFee?: number;
   notes?: string;
 }) {
   try {
+    const settings = await getSystemSettings();
     const orderNumber = `KM-2026-${Math.floor(1000 + Math.random() * 9000)}`;
-    const deliveryFee = data.deliveryFee ?? 2000;
+    const deliveryFee = data.deliveryFee ?? settings.deliveryFee;
+    const riderEarnings = settings.riderEarnings;
+    const platformShare = Math.max(0, deliveryFee - riderEarnings);
+    const subtotal = data.subtotal ?? Math.max(0, data.totalAmount - deliveryFee);
+
+    // If userId provided, check if user has an alternative phone number
+    let altPhone = data.customerAltPhone || null;
+    if (data.userId && !altPhone) {
+      const userObj = await prisma.user.findUnique({ where: { id: data.userId } });
+      if (userObj?.altPhoneNumber) {
+        altPhone = userObj.altPhoneNumber;
+      }
+    }
 
     const order = await prisma.order.create({
       data: {
@@ -32,13 +48,17 @@ export async function createOrder(data: {
         userId: data.userId || null,
         customerName: data.customerName,
         customerPhone: data.customerPhone || null,
+        customerAltPhone: altPhone,
         deliveryAddress: data.deliveryAddress,
         deliveryDate: data.deliveryDate || null,
         deliveryTime: data.deliveryTime || null,
         paymentMethod: data.paymentMethod || "Bank Transfer",
         paymentStatus: "PAID",
+        subtotal,
         totalAmount: data.totalAmount,
         deliveryFee,
+        riderEarnings,
+        platformShare,
         notes: data.notes || null,
         status: "ORDER_PLACED",
         items: {
@@ -60,11 +80,13 @@ export async function createOrder(data: {
       },
       include: {
         items: true,
-        timeline: true
+        timeline: true,
+        user: true
       }
     });
 
     revalidatePath("/admin/orders");
+    revalidatePath("/admin/customers");
     revalidatePath("/dashboard");
     return { success: true, order };
   } catch (error: any) {
@@ -109,6 +131,7 @@ export async function getOrders(filters?: {
       include: {
         items: true,
         rider: true,
+        user: true,
         timeline: {
           orderBy: { createdAt: "asc" }
         }
@@ -159,11 +182,13 @@ export async function updateOrderStatus(
       include: {
         items: true,
         rider: true,
+        user: true,
         timeline: { orderBy: { createdAt: "asc" } }
       }
     });
 
     revalidatePath("/admin/orders");
+    revalidatePath("/admin/customers");
     revalidatePath("/dashboard");
     revalidatePath("/rider/dashboard");
     return { success: true, order: updated };
@@ -194,6 +219,7 @@ export async function assignRiderToOrder(orderId: string, riderId: string) {
       },
       include: {
         rider: true,
+        user: true,
         timeline: { orderBy: { createdAt: "asc" } }
       }
     });
@@ -237,12 +263,14 @@ export async function confirmDeliveryByCustomer(data: {
       include: {
         items: true,
         rider: true,
+        user: true,
         timeline: { orderBy: { createdAt: "asc" } }
       }
     });
 
     revalidatePath("/dashboard");
     revalidatePath("/admin/orders");
+    revalidatePath("/admin/customers");
     revalidatePath("/rider/dashboard");
     return { success: true, order: updated };
   } catch (error: any) {

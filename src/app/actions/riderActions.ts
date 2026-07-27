@@ -4,8 +4,13 @@ import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
 
+import { getSystemSettings } from "./settingActions";
+
 export async function getRiders() {
   try {
+    const settings = await getSystemSettings();
+    const defaultRiderEarnings = settings.riderEarnings;
+
     const riders = await prisma.rider.findMany({
       include: {
         orders: {
@@ -21,10 +26,20 @@ export async function getRiders() {
     return riders.map(r => {
       const activeOrders = r.orders.filter(o => o.status !== "COMPLETED" && o.status !== "CANCELLED");
       const completedOrders = r.orders.filter(o => o.status === "COMPLETED");
+      const cancelledOrders = r.orders.filter(o => o.status === "CANCELLED");
+
+      const totalEarnings = completedOrders.reduce((sum, o) => {
+        const orderEarn = o.riderEarnings ? Number(o.riderEarnings) : defaultRiderEarnings;
+        return sum + orderEarn;
+      }, 0);
+
       return {
         ...r,
+        totalDeliveries: r.orders.length,
         activeOrdersCount: activeOrders.length,
-        completedOrdersCount: completedOrders.length
+        completedOrdersCount: completedOrders.length,
+        cancelledOrdersCount: cancelledOrders.length,
+        totalEarnings
       };
     });
   } catch (error) {

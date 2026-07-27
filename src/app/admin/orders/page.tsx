@@ -3,10 +3,12 @@
 import React, { useState, useEffect } from "react";
 import { 
   ClipboardList, Search, Filter, Truck, User, Calendar, MapPin, 
-  CheckCircle2, Clock, ChevronRight, Phone, Eye, FileText, ArrowRight, ShieldCheck
+  CheckCircle2, Clock, ChevronRight, Phone, Eye, FileText, ArrowRight, 
+  ShieldCheck, Settings, DollarSign, Key, Save, AlertCircle
 } from "lucide-react";
 import { getOrders, updateOrderStatus, assignRiderToOrder } from "@/app/actions/orderActions";
 import { getRiders } from "@/app/actions/riderActions";
+import { getSystemSettings, updateSystemSettings } from "@/app/actions/settingActions";
 import OrderProofModal from "@/components/OrderProofModal";
 
 export default function AdminOrdersBoard() {
@@ -24,6 +26,12 @@ export default function AdminOrdersBoard() {
   // Selected Order for Proof Modal
   const [proofOrder, setProofOrder] = useState<any>(null);
 
+  // System Settings Modal State
+  const [settingsModalOpen, setSettingsModalOpen] = useState(false);
+  const [deliveryFeeSetting, setDeliveryFeeSetting] = useState(4000);
+  const [riderEarningsSetting, setRiderEarningsSetting] = useState(2000);
+  const [savingSettings, setSavingSettings] = useState(false);
+
   // Updating loader
   const [actionLoading, setActionLoading] = useState(false);
 
@@ -37,12 +45,17 @@ export default function AdminOrdersBoard() {
 
   const loadData = async () => {
     try {
-      const [fetchedOrders, fetchedRiders] = await Promise.all([
+      const [fetchedOrders, fetchedRiders, settings] = await Promise.all([
         getOrders(),
-        getRiders()
+        getRiders(),
+        getSystemSettings()
       ]);
       setOrders(fetchedOrders);
       setRiders(fetchedRiders);
+      if (settings) {
+        setDeliveryFeeSetting(settings.deliveryFee);
+        setRiderEarningsSetting(settings.riderEarnings);
+      }
     } catch (e) {
       console.error(e);
     } finally {
@@ -89,6 +102,27 @@ export default function AdminOrdersBoard() {
     }
   };
 
+  const handleSaveSettings = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavingSettings(true);
+    try {
+      const res = await updateSystemSettings({
+        deliveryFee: Number(deliveryFeeSetting),
+        riderEarnings: Number(riderEarningsSetting)
+      });
+      if (res.success) {
+        setSettingsModalOpen(false);
+        await loadData();
+      } else {
+        alert(res.error || "Failed to save system settings.");
+      }
+    } catch (err: any) {
+      alert(err.message || "Error saving settings.");
+    } finally {
+      setSavingSettings(false);
+    }
+  };
+
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', minimumFractionDigits: 0 }).format(price);
   };
@@ -100,9 +134,8 @@ export default function AdminOrdersBoard() {
     const matchesSearch = !q || 
       o.orderNumber.toLowerCase().includes(q) ||
       o.customerName.toLowerCase().includes(q) ||
-      (o.customerPhone && o.customerPhone.toLowerCase().includes(q)) ||
+      (o.customerPhone && o.customerPhone.includes(q)) ||
       o.deliveryAddress.toLowerCase().includes(q);
-
     return matchesStatus && matchesSearch;
   });
 
@@ -111,142 +144,160 @@ export default function AdminOrdersBoard() {
   return (
     <div className="space-y-8 bg-slate-50 dark:bg-slate-950 text-[#111111] dark:text-slate-100 font-sans pb-16">
       
-      {/* Header Banner */}
+      {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <span className="text-kaya-orange font-bold text-xs uppercase tracking-widest">Fulfillment & Logistics</span>
+          <span className="text-kaya-orange font-bold text-xs uppercase tracking-widest">Fulfillment Pipeline</span>
           <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight mt-1">
-            Order Management Console
+            Order Dispatch Management
           </h1>
-          <p className="text-slate-550 dark:text-slate-400 text-xs">
-            Monitor incoming client orders, manually change stage pipelines, and assign available dispatch riders.
+          <p className="text-slate-500 dark:text-slate-400 text-xs">
+            Monitor incoming customer orders, assign riders, configure delivery fees, and view proof of delivery records.
           </p>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 px-4 py-2 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-kaya-orange animate-ping"></span>
-          <span className="text-xs font-bold text-slate-800 dark:text-white">{orders.length} Total Orders</span>
-        </div>
+        <button
+          onClick={() => setSettingsModalOpen(true)}
+          className="bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 text-white font-bold px-5 py-3 rounded-2xl text-xs flex items-center gap-2 shadow-md transition-all border border-slate-700"
+        >
+          <Settings className="h-4 w-4 text-kaya-orange" />
+          <span>Delivery Fee & Commission Settings</span>
+        </button>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-[2rem] shadow-sm flex flex-col md:flex-row gap-4 justify-between items-center">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-[2rem] shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
         
-        {/* Search */}
-        <div className="relative w-full md:w-80">
+        <div className="relative w-full md:max-w-md">
           <Search className="absolute left-4 top-3 h-4 w-4 text-slate-400" />
           <input 
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search by Order ID, Name, Phone..."
+            placeholder="Search by Order #, Customer Name, Phone, Address..."
             className="w-full pl-11 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-955 border border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-kaya-orange/30"
           />
         </div>
 
-        {/* Status Filter Tabs */}
-        <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-1 md:pb-0">
-          <Filter className="h-4 w-4 text-slate-400 shrink-0 hidden sm:block" />
+        {/* Status Filter Buttons */}
+        <div className="flex items-center gap-1.5 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 text-xs">
           {[
             { id: "ALL", label: "All Orders" },
-            { id: "ORDER_PLACED", label: "New Incoming" },
-            { id: "PREPARING", label: "Preparing" },
+            { id: "ORDER_PLACED", label: "New" },
             { id: "ASSIGNED_TO_RIDER", label: "Assigned" },
-            { id: "OUT_FOR_DELIVERY", label: "En Route" },
+            { id: "OUT_FOR_DELIVERY", label: "Out for Delivery" },
             { id: "DELIVERED", label: "Delivered" },
             { id: "COMPLETED", label: "Completed" }
           ].map((tab) => (
             <button
               key={tab.id}
               onClick={() => setStatusFilter(tab.id)}
-              className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+              className={`px-3.5 py-2 rounded-xl font-bold transition-all shrink-0 ${
                 statusFilter === tab.id
-                  ? "bg-slate-900 dark:bg-kaya-orange text-white shadow-sm"
-                  : "bg-slate-50 dark:bg-slate-955 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+                  ? "bg-kaya-orange text-white shadow-sm"
+                  : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200"
               }`}
             >
               {tab.label}
             </button>
           ))}
         </div>
-
       </div>
 
       {/* Orders Table */}
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs font-medium">
-            <thead className="bg-slate-50 dark:bg-slate-955 text-slate-500 dark:text-slate-400 uppercase tracking-widest text-[10px] border-b border-slate-100 dark:border-slate-800">
+          <table className="w-full text-left text-xs font-medium min-w-[950px]">
+            <thead className="bg-slate-50 dark:bg-slate-955 text-slate-400 uppercase tracking-widest text-[10px] border-b border-slate-100 dark:border-slate-800">
               <tr>
-                <th className="px-6 py-4">Order ID & Date</th>
-                <th className="px-6 py-4">Customer Info</th>
-                <th className="px-6 py-4">Delivery Address</th>
-                <th className="px-6 py-4">Items & Amount</th>
+                <th className="px-6 py-4">Order Number</th>
+                <th className="px-6 py-4">Customer & Address</th>
+                <th className="px-6 py-4">Financials</th>
                 <th className="px-6 py-4">Assigned Rider</th>
-                <th className="px-6 py-4">Status Pipeline</th>
+                <th className="px-6 py-4 text-center">Pipeline Status</th>
                 <th className="px-6 py-4 text-center">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
-              {filteredOrders.length === 0 ? (
+              {loading ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center text-slate-400">
-                    No orders match your filter criteria.
+                  <td colSpan={6} className="px-6 py-12 text-center text-slate-400 font-bold">
+                    Loading Dispatch Pipeline Orders...
+                  </td>
+                </tr>
+              ) : filteredOrders.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-12 text-center text-slate-400 font-bold">
+                    No order records found matching query.
                   </td>
                 </tr>
               ) : (
                 filteredOrders.map((order) => (
-                  <tr key={order.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-850/50 transition-colors">
+                  <tr key={order.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
                     
-                    {/* Order ID & Date */}
-                    <td className="px-6 py-4 font-bold text-slate-900 dark:text-white">
-                      <div>{order.orderNumber}</div>
-                      <span className="text-[9px] text-slate-400 font-bold uppercase">
-                        {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : order.date}
-                      </span>
-                    </td>
-
-                    {/* Customer Info */}
+                    {/* Order Number */}
                     <td className="px-6 py-4">
-                      <div className="font-extrabold text-slate-900 dark:text-white">{order.customerName}</div>
-                      <span className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold">{order.customerPhone || "No Phone"}</span>
+                      <div className="font-black text-slate-900 dark:text-white text-sm">{order.orderNumber}</div>
+                      <div className="text-[10px] text-slate-400">{new Date(order.createdAt).toLocaleString()}</div>
                     </td>
 
-                    {/* Delivery Address */}
-                    <td className="px-6 py-4 max-w-[180px] truncate" title={order.deliveryAddress}>
-                      <span className="text-slate-600 dark:text-slate-300 font-semibold">{order.deliveryAddress}</span>
-                    </td>
-
-                    {/* Items & Total */}
+                    {/* Customer & Address */}
                     <td className="px-6 py-4">
-                      <div className="font-black text-slate-900 dark:text-white">{formatPrice(Number(order.totalAmount || order.total))}</div>
-                      <span className="text-[10px] text-slate-400 font-semibold">{order.items?.length || 1} Item(s)</span>
+                      <div className="font-bold text-slate-900 dark:text-white">{order.customerName}</div>
+                      <div className="text-[10px] text-slate-500 flex items-center gap-1 font-semibold">
+                        <Phone className="h-3 w-3 text-kaya-orange" />
+                        <span>{order.customerPhone || "No Phone"}</span>
+                        {(order.customerAltPhone || order.user?.altPhoneNumber) && (
+                          <span className="text-kaya-orange font-bold"> (Alt: {order.customerAltPhone || order.user?.altPhoneNumber})</span>
+                        )}
+                      </div>
+                      <div className="text-[10px] text-slate-400 max-w-[220px] truncate mt-0.5">{order.deliveryAddress}</div>
                     </td>
 
-                    {/* Assigned Rider Selection */}
+                    {/* Financials */}
                     <td className="px-6 py-4">
+                      <div className="font-black text-slate-900 dark:text-white">{formatPrice(Number(order.totalAmount))}</div>
+                      <div className="text-[10px] text-slate-400">
+                        Fee: {formatPrice(Number(order.deliveryFee))} • Rider: {formatPrice(Number(order.riderEarnings || 2000))}
+                      </div>
+                    </td>
+
+                    {/* Assigned Rider */}
+                    <td className="px-6 py-4">
+                      {order.rider ? (
+                        <div className="flex items-center gap-2">
+                          <img 
+                            src={order.rider.profilePhoto || `https://api.dicebear.com/7.x/avataaars/svg?seed=${order.rider.riderId}`}
+                            alt="" 
+                            className="w-7 h-7 rounded-full object-cover border border-kaya-orange"
+                          />
+                          <div>
+                            <p className="font-bold text-slate-900 dark:text-white text-xs">{order.rider.fullName}</p>
+                            <p className="text-[9px] text-kaya-orange font-mono">{order.rider.riderId}</p>
+                          </div>
+                        </div>
+                      ) : (
+                        <select
+                          value=""
+                          onChange={(e) => handleAssignRider(order.id, e.target.value)}
+                          className="px-3 py-1.5 rounded-xl bg-orange-50 dark:bg-orange-950/30 text-kaya-orange border border-orange-200 dark:border-orange-900/40 text-xs font-bold focus:outline-none"
+                        >
+                          <option value="">+ Assign Rider</option>
+                          {availableRiders.map((r) => (
+                            <option key={r.id} value={r.id}>{r.fullName} ({r.riderId})</option>
+                          ))}
+                        </select>
+                      )}
+                    </td>
+
+                    {/* Status Dropdown */}
+                    <td className="px-6 py-4 text-center">
                       <select
-                        value={order.riderId || ""}
-                        onChange={(e) => handleAssignRider(order.id, e.target.value)}
-                        className="px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-955 border border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-kaya-orange/30"
-                      >
-                        <option value="">-- Assign Rider --</option>
-                        {availableRiders.map((r) => (
-                          <option key={r.id} value={r.id}>
-                            {r.fullName} ({r.riderId})
-                          </option>
-                        ))}
-                      </select>
-                    </td>
-
-                    {/* Status Pipeline Update */}
-                    <td className="px-6 py-4">
-                      <select 
-                        value={order.status} 
-                        onChange={(e) => handleStatusChange(order.id, e.target.value as any)}
-                        className={`px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-955 border border-slate-200 dark:border-slate-800 text-xs font-black uppercase tracking-wider focus:outline-none ${
+                        value={order.status}
+                        onChange={(e) => handleStatusChange(order.id, e.target.value)}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-slate-50 dark:bg-slate-955 border border-slate-200 dark:border-slate-800 ${
                           order.status === "COMPLETED" ? "text-emerald-600 dark:text-emerald-400" :
-                          order.status === "DELIVERED" ? "text-blue-600 dark:text-blue-400" :
+                          order.status === "DELIVERED" ? "text-blue-600 dark:text-blue-400 animate-pulse" :
                           order.status === "OUT_FOR_DELIVERY" ? "text-cyan-600 dark:text-cyan-400" :
                           order.status === "CANCELLED" ? "text-rose-600 dark:text-rose-400" : "text-kaya-orange"
                         }`}
@@ -293,6 +344,65 @@ export default function AdminOrdersBoard() {
         </div>
       </div>
 
+      {/* System Settings Modal */}
+      {settingsModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-md rounded-[2.5rem] p-6 sm:p-8 shadow-2xl space-y-6">
+            
+            <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-4">
+              <div>
+                <h3 className="text-lg font-black text-slate-900 dark:text-white">Delivery Fee & Earnings Settings</h3>
+                <p className="text-xs text-slate-400">Configure global dispatch fees and rider payouts</p>
+              </div>
+              <button onClick={() => setSettingsModalOpen(false)} className="p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl">✕</button>
+            </div>
+
+            <form onSubmit={handleSaveSettings} className="space-y-4 text-xs">
+              <div className="space-y-1">
+                <label className="font-bold text-slate-400 uppercase text-[10px]">Customer Delivery Fee (₦)</label>
+                <input 
+                  type="number"
+                  required
+                  min={0}
+                  value={deliveryFeeSetting}
+                  onChange={(e) => setDeliveryFeeSetting(Number(e.target.value))}
+                  className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-955 border border-slate-200 dark:border-slate-800 font-bold text-slate-900 dark:text-white"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="font-bold text-slate-400 uppercase text-[10px]">Rider Earnings per Delivery (₦)</label>
+                <input 
+                  type="number"
+                  required
+                  min={0}
+                  value={riderEarningsSetting}
+                  onChange={(e) => setRiderEarningsSetting(Number(e.target.value))}
+                  className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-955 border border-slate-200 dark:border-slate-800 font-bold text-slate-900 dark:text-white"
+                />
+              </div>
+
+              {/* Calculated Platform Share Box */}
+              <div className="bg-orange-50 dark:bg-orange-950/40 border border-orange-200 dark:border-orange-900/40 p-4 rounded-2xl flex justify-between items-center text-xs">
+                <span className="font-bold text-slate-600 dark:text-slate-300">Platform Retains per Delivery:</span>
+                <span className="font-black text-kaya-orange text-sm">
+                  {formatPrice(Math.max(0, deliveryFeeSetting - riderEarningsSetting))}
+                </span>
+              </div>
+
+              <button
+                type="submit"
+                disabled={savingSettings}
+                className="w-full bg-kaya-orange hover:bg-orange-600 text-white font-bold py-3.5 rounded-2xl text-xs shadow-md transition-all disabled:opacity-50"
+              >
+                {savingSettings ? "Saving Settings..." : "Save Delivery Settings"}
+              </button>
+            </form>
+
+          </div>
+        </div>
+      )}
+
       {/* Order Details Modal */}
       {selectedOrder && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200">
@@ -300,7 +410,7 @@ export default function AdminOrdersBoard() {
             
             <div className="flex justify-between items-start border-b border-slate-100 dark:border-slate-800 pb-4">
               <div>
-                <span className="text-[10px] font-black uppercase text-kaya-orange tracking-widest">ORDER SPECIFICATION</span>
+                <span className="text-[10px] font-black uppercase text-kaya-orange tracking-widest">COMPLETE ORDER DETAILS</span>
                 <h3 className="text-xl font-black text-slate-900 dark:text-white">{selectedOrder.orderNumber}</h3>
               </div>
               <button 
@@ -311,27 +421,72 @@ export default function AdminOrdersBoard() {
               </button>
             </div>
 
-            {/* Grid details */}
+            {/* Customer & Delivery Box */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
               <div className="bg-slate-50 dark:bg-slate-955 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-1">
                 <p className="text-[10px] font-bold text-slate-400 uppercase">Customer Information</p>
                 <p className="font-extrabold text-slate-900 dark:text-white">{selectedOrder.customerName}</p>
-                <p className="text-slate-500">{selectedOrder.customerPhone || "No Phone"}</p>
+                <p className="text-slate-600 dark:text-slate-300">Phone: <strong>{selectedOrder.customerPhone || "No Primary Phone"}</strong></p>
+                {(selectedOrder.customerAltPhone || selectedOrder.user?.altPhoneNumber) && (
+                  <p className="text-kaya-orange font-bold">Alt Phone: {selectedOrder.customerAltPhone || selectedOrder.user?.altPhoneNumber}</p>
+                )}
+                {selectedOrder.user?.email && (
+                  <p className="text-[10px] text-slate-400">{selectedOrder.user.email}</p>
+                )}
               </div>
 
               <div className="bg-slate-50 dark:bg-slate-955 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-1">
-                <p className="text-[10px] font-bold text-slate-400 uppercase">Delivery Address</p>
+                <p className="text-[10px] font-bold text-slate-400 uppercase">Delivery Destination</p>
                 <p className="font-bold text-slate-900 dark:text-white">{selectedOrder.deliveryAddress}</p>
-                <p className="text-slate-500">{selectedOrder.deliveryDate} ({selectedOrder.deliveryTime || "Anytime"})</p>
+                <p className="text-slate-500">Scheduled: {selectedOrder.deliveryDate} ({selectedOrder.deliveryTime || "Anytime"})</p>
+                {selectedOrder.notes && (
+                  <p className="text-orange-600 dark:text-orange-400 text-[10px] font-semibold">Notes: {selectedOrder.notes}</p>
+                )}
               </div>
             </div>
 
-            {/* Rider Info */}
+            {/* Financial Breakdown (Requirement 8) */}
+            <div className="bg-slate-50 dark:bg-slate-955 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-2 text-xs">
+              <p className="text-[10px] font-black uppercase text-slate-400 tracking-wider border-b border-slate-200 dark:border-slate-800 pb-2">
+                Payment & Financial Share Breakdown
+              </p>
+              <div className="flex justify-between text-slate-600 dark:text-slate-300">
+                <span>Items Subtotal</span>
+                <span className="font-bold text-slate-900 dark:text-white">
+                  {formatPrice(Number(selectedOrder.subtotal || selectedOrder.totalAmount - selectedOrder.deliveryFee))}
+                </span>
+              </div>
+              <div className="flex justify-between text-slate-600 dark:text-slate-300">
+                <span>Customer Delivery Fee</span>
+                <span className="font-bold text-slate-900 dark:text-white">{formatPrice(Number(selectedOrder.deliveryFee))}</span>
+              </div>
+              <div className="flex justify-between font-black text-slate-900 dark:text-white text-sm border-t border-slate-200 dark:border-slate-800 pt-2">
+                <span>Grand Total Paid</span>
+                <span className="text-kaya-orange">{formatPrice(Number(selectedOrder.totalAmount))}</span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 pt-2">
+                <div className="bg-emerald-50 dark:bg-emerald-950/40 p-3 rounded-xl border border-emerald-200 text-center">
+                  <p className="text-[9px] font-bold text-slate-400 uppercase">Assigned Rider Earnings</p>
+                  <p className="font-black text-emerald-600 dark:text-emerald-400 text-sm">
+                    {formatPrice(Number(selectedOrder.riderEarnings || 2000))}
+                  </p>
+                </div>
+                <div className="bg-orange-50 dark:bg-orange-950/40 p-3 rounded-xl border border-orange-200 text-center">
+                  <p className="text-[9px] font-bold text-slate-400 uppercase">Platform Earnings Share</p>
+                  <p className="font-black text-kaya-orange text-sm">
+                    {formatPrice(Number(selectedOrder.platformShare || selectedOrder.deliveryFee - (selectedOrder.riderEarnings || 2000)))}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Rider Assignment */}
             <div className="bg-orange-50/50 dark:bg-orange-950/20 p-4 rounded-2xl border border-orange-100 dark:border-orange-900/30 flex justify-between items-center text-xs">
               <div>
                 <p className="text-[10px] font-bold text-kaya-orange uppercase">Assigned Fleet Rider</p>
                 <p className="font-extrabold text-slate-900 dark:text-white">
-                  {selectedOrder.rider ? selectedOrder.rider.fullName : "No Rider Assigned Yet"}
+                  {selectedOrder.rider ? `${selectedOrder.rider.fullName} (${selectedOrder.rider.riderId})` : "No Rider Assigned Yet"}
                 </p>
               </div>
 
@@ -340,7 +495,7 @@ export default function AdminOrdersBoard() {
                 onChange={(e) => handleAssignRider(selectedOrder.id, e.target.value)}
                 className="px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold"
               >
-                <option value="">-- Assign Rider --</option>
+                <option value="">-- Reassign Rider --</option>
                 {availableRiders.map((r) => (
                   <option key={r.id} value={r.id}>{r.fullName} ({r.riderId})</option>
                 ))}
@@ -370,10 +525,10 @@ export default function AdminOrdersBoard() {
                   setSelectedOrder(null);
                   setProofOrder(selectedOrder);
                 }}
-                className="w-full py-3 bg-emerald-600 text-white font-bold rounded-2xl text-xs flex items-center justify-center gap-2"
+                className="w-full py-3 bg-emerald-600 text-white font-bold rounded-2xl text-xs flex items-center justify-center gap-2 shadow-md"
               >
                 <ShieldCheck className="h-4 w-4" />
-                <span>View Customer Signature & Delivery Proof</span>
+                <span>View Customer Signature & Proof of Delivery</span>
               </button>
             )}
 

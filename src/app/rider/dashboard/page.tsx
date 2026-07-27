@@ -192,26 +192,52 @@ export default function RiderDashboardPage() {
                   </div>
                 </div>
 
-                {/* Customer Details & Delivery Address */}
+                {/* Customer Details & Delivery Address & Call Action Bar */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50 dark:bg-slate-955 p-5 rounded-2xl border border-slate-100 dark:border-slate-800">
-                  <div className="space-y-2">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Customer Details</p>
+                  <div className="space-y-3">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Customer Details & Quick Call</p>
                     <div className="space-y-1">
                       <p className="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
                         <User className="h-4 w-4 text-kaya-orange" />
                         <span>{order.customerName}</span>
                       </p>
-                      <p className="text-xs text-slate-600 dark:text-slate-300 flex items-center gap-2 font-semibold">
+                      <p className="text-xs text-slate-600 dark:text-slate-300 font-semibold flex items-center gap-2">
                         <Phone className="h-3.5 w-3.5 text-slate-400" />
-                        <a href={`tel:${order.customerPhone}`} className="hover:text-kaya-orange">
-                          {order.customerPhone || "Phone not provided"}
-                        </a>
+                        <span>Primary Phone: {order.customerPhone || "Not provided"}</span>
                       </p>
+                      {(order.customerAltPhone || order.user?.altPhoneNumber) && (
+                        <p className="text-xs text-kaya-orange font-bold flex items-center gap-2">
+                          <Phone className="h-3.5 w-3.5 text-kaya-orange" />
+                          <span>Alt Phone: {order.customerAltPhone || order.user?.altPhoneNumber}</span>
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Quick Call Action Buttons */}
+                    <div className="flex flex-wrap gap-2 pt-1">
+                      {order.customerPhone && (
+                        <a 
+                          href={`tel:${order.customerPhone}`}
+                          className="px-3.5 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm transition-all"
+                        >
+                          <Phone className="h-3.5 w-3.5" />
+                          <span>Call Primary Phone</span>
+                        </a>
+                      )}
+                      {(order.customerAltPhone || order.user?.altPhoneNumber) && (
+                        <a 
+                          href={`tel:${order.customerAltPhone || order.user?.altPhoneNumber}`}
+                          className="px-3.5 py-2 rounded-xl bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 text-white font-bold text-xs flex items-center gap-1.5 border border-slate-700 shadow-sm transition-all"
+                        >
+                          <Phone className="h-3.5 w-3.5 text-kaya-orange" />
+                          <span>Call Alt Phone</span>
+                        </a>
+                      )}
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Destination Address</p>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Destination Address & Notes</p>
                     <p className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-start gap-2">
                       <MapPin className="h-4 w-4 text-kaya-orange shrink-0 mt-0.5" />
                       <span>{order.deliveryAddress}</span>
@@ -221,6 +247,14 @@ export default function RiderDashboardPage() {
                         Scheduled: {order.deliveryDate} ({order.deliveryTime || "Anytime"})
                       </p>
                     )}
+                    {order.notes && (
+                      <p className="text-[11px] text-orange-600 dark:text-orange-400 font-bold pl-6">
+                        Delivery Notes: {order.notes}
+                      </p>
+                    )}
+                    <p className="text-[10px] font-bold text-slate-400 pl-6 uppercase">
+                      Payment Method: <span className="text-slate-900 dark:text-white">{order.paymentMethod || "Bank Transfer"} ({order.paymentStatus || "PAID"})</span>
+                    </p>
                   </div>
                 </div>
 
