@@ -6,6 +6,7 @@ import {
   XCircle, Phone, Mail, MapPin, Eye, FileText, Star, Search, Filter, ShieldCheck
 } from "lucide-react";
 import { getRiders, createRider, updateRider, updateRiderStatus, deleteRider } from "@/app/actions/riderActions";
+import ImageUploader from "@/components/ImageUploader";
 
 export default function AdminDeliveryDispatch() {
   const [riders, setRiders] = useState<any[]>([]);
@@ -438,13 +439,10 @@ export default function AdminDeliveryDispatch() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-bold text-slate-500 dark:text-slate-400 uppercase text-[10px]">Profile Photo URL (Optional)</label>
-                <input 
-                  type="text" 
-                  value={profilePhoto}
-                  onChange={(e) => setProfilePhoto(e.target.value)}
-                  placeholder="https://..."
-                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-955 border border-slate-200 dark:border-slate-800 font-bold text-slate-900 dark:text-white"
+                <label className="font-bold text-slate-500 dark:text-slate-400 uppercase text-[10px]">Upload Profile Picture</label>
+                <ImageUploader 
+                  onUpload={(url) => setProfilePhoto(url)} 
+                  defaultImage={profilePhoto}
                 />
               </div>
 

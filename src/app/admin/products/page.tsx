@@ -21,7 +21,7 @@ export default function AdminProductsManager() {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [inventory, setInventory] = useState("");
-  const [categorySlug, setCategorySlug] = useState("rice");
+  const [categorySlug, setCategorySlug] = useState("");
   const [weight, setWeight] = useState("");
   const [sku, setSku] = useState("");
   const [images, setImages] = useState<string[]>([]);
@@ -35,7 +35,7 @@ export default function AdminProductsManager() {
       Promise.all([getProducts(), getCategories()]).then(([prods, cats]) => {
         setProducts(prods);
         setCategories(cats);
-        if (cats.length > 0 && !categorySlug) setCategorySlug(cats[0].slug);
+        if (cats.length > 0) setCategorySlug(cats[0].slug);
         setLoading(false);
       });
     });
@@ -296,8 +296,7 @@ export default function AdminProductsManager() {
                     {categories.map(c => (
                       <option key={c.id} value={c.slug}>{c.name}</option>
                     ))}
-                    {/* Fallbacks if empty */}
-                    {categories.length === 0 && <option value="rice">Rice</option>}
+                    {categories.length === 0 && <option value="">No categories created yet</option>}
                   </select>
                 </div>
                 <div className="space-y-1.5">

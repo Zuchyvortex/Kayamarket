@@ -129,6 +129,20 @@ export async function updateProduct(id: string, data: any) {
   try {
     const productImages = Array.isArray(data.images) ? data.images : (data.images ? [data.images] : undefined);
 
+    let categoryId = undefined;
+    if (data.categorySlug) {
+      let category = await prisma.category.findUnique({ where: { slug: data.categorySlug } });
+      if (!category) {
+        category = await prisma.category.create({
+          data: {
+            name: data.categorySlug.charAt(0).toUpperCase() + data.categorySlug.slice(1).replace(/-/g, ' '),
+            slug: data.categorySlug,
+          }
+        });
+      }
+      categoryId = category.id;
+    }
+
     const product = await prisma.product.update({
       where: { id },
       data: {
@@ -137,6 +151,7 @@ export async function updateProduct(id: string, data: any) {
         price: data.price,
         inventory: data.inventory,
         sku: data.sku,
+        ...(categoryId ? { categoryId } : {}),
         isActive: data.isActive,
         isFeatured: data.isFeatured,
         isBestSeller: data.isBestSeller,
