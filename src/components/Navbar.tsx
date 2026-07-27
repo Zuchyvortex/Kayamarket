@@ -16,15 +16,19 @@ import {
   Tag, 
   Grid,
   Menu,
-  X
+  X,
+  Sun,
+  Moon
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { getCategories } from "@/app/actions/categoryActions";
+import { useTheme } from "@/context/ThemeContext";
 
 export default function Navbar() {
   const { cartCount, wishlist } = useCart();
   const { user, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [catDropdownOpen, setCatDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -171,6 +175,19 @@ export default function Navbar() {
                 <span>Orders</span>
               </Link>
             )}
+
+            {/* Theme Toggle Button */}
+            <button
+              onClick={toggleTheme}
+              className="p-2.5 rounded-xl hover:bg-slate-100 text-slate-655 hover:text-kaya-orange transition-colors focus:outline-none"
+              title={theme === "light" ? "Switch to Dark Mode" : "Switch to Light Mode"}
+            >
+              {theme === "light" ? (
+                <Moon className="h-5 w-5" />
+              ) : (
+                <Sun className="h-5 w-5 text-kaya-orange" />
+              )}
+            </button>
 
             {/* Wishlist Link */}
             <Link 
