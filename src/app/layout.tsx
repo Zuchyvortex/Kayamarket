@@ -7,7 +7,10 @@ export const metadata: Metadata = {
   description: "Experience the convenience of fresh, farm-sourced foodstuffs and reliable express delivery.",
   keywords: "KayaMarket, foodstuff delivery, fresh groceries, garri, rice, palm oil, express delivery",
   icons: {
-    icon: "/k-5.png",
+    icon: [
+      { url: "/k-5.png", type: "image/png" },
+      { url: "/icon.png", type: "image/png" }
+    ],
     shortcut: "/k-5.png",
     apple: "/k-5.png"
   }
