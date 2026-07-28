@@ -24,6 +24,7 @@ import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { getCategories } from "@/app/actions/categoryActions";
 import { useTheme } from "@/context/ThemeContext";
+import NotificationDropdown from "@/components/NotificationDropdown";
 
 export default function Navbar() {
   const { cartCount, wishlist } = useCart();
@@ -203,32 +204,10 @@ export default function Navbar() {
               )}
             </Link>
 
-            {/* Notifications */}
-            <div className="relative">
-              <button 
-                onClick={() => setNotifOpen(!notifOpen)}
-                className="relative p-2.5 rounded-xl hover:bg-slate-100 text-slate-655 hover:text-kaya-orange transition-all focus:outline-none"
-                title="Notifications"
-              >
-                <Bell className="h-5 w-5" />
-                <span className="absolute top-2 right-2 bg-kaya-orange h-2 w-2 rounded-full ring-2 ring-white"></span>
-              </button>
-
-              {notifOpen && (
-                <div className="absolute right-0 mt-3 w-80 bg-white rounded-2xl shadow-2xl border border-slate-100 py-3 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-                  <div className="px-4 py-2 border-b border-slate-50 mb-2 flex justify-between items-center">
-                    <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Alerts</p>
-                    <button onClick={() => setNotifOpen(false)} className="text-[10px] text-kaya-orange font-bold focus:outline-none">Close</button>
-                  </div>
-                  {notifications.map(n => (
-                    <div key={n.id} className="px-4 py-3 hover:bg-slate-50 border-b border-slate-55 last:border-b-0 transition-colors">
-                      <p className="text-xs font-semibold text-slate-700">{n.text}</p>
-                      <p className="text-[10px] text-slate-400 mt-1">{n.time}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+            {/* Real-time Notifications */}
+            {user && (
+              <NotificationDropdown role="CUSTOMER" targetId={user.id} />
+            )}
 
             {/* User Profile dropdown */}
             {user ? (

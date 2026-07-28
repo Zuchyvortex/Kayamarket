@@ -26,7 +26,7 @@ export async function registerUser(formData: FormData) {
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(password, salt);
 
-    await prisma.user.create({
+    const newUser = await prisma.user.create({
       data: {
         firstName,
         lastName,
@@ -35,6 +35,17 @@ export async function registerUser(formData: FormData) {
         passwordHash,
         role: "CUSTOMER",
       },
+    });
+
+    // Notify Admin of new customer registration
+    await prisma.notification.create({
+      data: {
+        targetRole: "ADMIN",
+        title: "New Customer Registration",
+        message: `${firstName} ${lastName} (${email}) has just created a new customer account.`,
+        link: "/admin/customers",
+        type: "REGISTRATION"
+      }
     });
 
     return { success: true };

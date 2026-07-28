@@ -10,6 +10,7 @@ import {
   Sun, Moon
 } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
+import NotificationDropdown from "@/components/NotificationDropdown";
 
 export default function AdminLayout({
   children,
@@ -156,6 +157,9 @@ export default function AdminLayout({
           </h2>
           
           <div className="flex items-center space-x-4 ml-auto">
+            {/* Real-time Admin Notifications */}
+            <NotificationDropdown role="ADMIN" />
+
             {/* Theme Toggle Button */}
             <button
               onClick={toggleTheme}

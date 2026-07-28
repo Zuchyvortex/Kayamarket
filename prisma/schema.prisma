@@ -12,24 +12,31 @@ datasource db {
 }
 
 model User {
-  id            String     @id @default(uuid())
-  email         String     @unique
+  id            String          @id @default(uuid())
+  email         String          @unique
   passwordHash  String
   firstName     String
   lastName      String
+  username      String?
   phoneNumber   String?
   altPhoneNumber String?
   address       String?
+  city          String?
+  state         String?
   profileImage  String?
-  status        UserStatus @default(ACTIVE)
+  status        UserStatus      @default(ACTIVE)
   lastLogin     DateTime?
-  role          Role       @default(CUSTOMER)
+  role          Role            @default(CUSTOMER)
   addresses     Address[]
   orders        Order[]
   wishlist      Wishlist[]
+  productReviews ProductReview[]
+  riderReviews   RiderReview[]
+  invoices      Invoice[]
+  notifications Notification[]
   rider         Rider?
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
 }
 
 enum UserStatus {
@@ -69,24 +76,26 @@ model Category {
 }
 
 model Product {
-  id           String      @id @default(uuid())
-  name         String
-  slug         String      @unique
-  description  String
-  price        Decimal     @db.Decimal(10, 2)
-  inventory    Int         @default(0)
-  sku          String?     @unique
-  categoryId   String
-  category     Category    @relation(fields: [categoryId], references: [id])
-  images       String[]
-  isActive     Boolean     @default(true)
-  isFeatured   Boolean     @default(false)
-  isBestSeller Boolean     @default(false)
-  isNewArrival Boolean     @default(false)
-  orderItems   OrderItem[]
-  wishlistedBy Wishlist[]
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
+  id                String          @id @default(uuid())
+  name              String
+  slug              String          @unique
+  description       String
+  price             Decimal         @db.Decimal(10, 2)
+  inventory         Int             @default(0)
+  minStockThreshold Int             @default(5)
+  sku               String?         @unique
+  categoryId        String
+  category          Category        @relation(fields: [categoryId], references: [id])
+  images            String[]
+  isActive          Boolean         @default(true)
+  isFeatured        Boolean         @default(false)
+  isBestSeller      Boolean         @default(false)
+  isNewArrival      Boolean         @default(false)
+  orderItems        OrderItem[]
+  wishlistedBy      Wishlist[]
+  reviews           ProductReview[]
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
 }
 
 enum OrderStatus {
@@ -115,25 +124,27 @@ enum RiderStatus {
 }
 
 model Rider {
-  id                  String      @id @default(uuid())
-  riderId             String      @unique
+  id                  String        @id @default(uuid())
+  riderId             String        @unique
   fullName            String
   username            String?
   phoneNumber         String
-  email               String      @unique
+  email               String        @unique
   passwordHash        String?
   address             String
-  vehicleType         VehicleType @default(MOTORCYCLE)
+  vehicleType         VehicleType   @default(MOTORCYCLE)
   vehicleRegistration String
   emergencyContact    String?
   profilePhoto        String?
-  status              RiderStatus @default(ACTIVE)
+  status              RiderStatus   @default(ACTIVE)
   notes               String?
-  userId              String?     @unique
-  user                User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId              String?       @unique
+  user                User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
   orders              Order[]
-  createdAt           DateTime    @default(now())
-  updatedAt           DateTime    @updatedAt
+  reviews             RiderReview[]
+  notifications       Notification[]
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
 }
 
 model Order {
@@ -165,6 +176,8 @@ model Order {
   notes             String?
   items             OrderItem[]
   timeline          OrderTimelineEvent[]
+  riderReview       RiderReview?
+  invoice           Invoice?
   createdAt         DateTime             @default(now())
   updatedAt         DateTime             @updatedAt
 }
@@ -189,6 +202,72 @@ model OrderItem {
   productName String?
   price       Decimal  @db.Decimal(10, 2)
   quantity    Int
+}
+
+model ProductReview {
+  id          String   @id @default(uuid())
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rating      Int      @default(5)
+  title       String?
+  comment     String
+  displayName String
+  isApproved  Boolean  @default(true)
+  createdAt   DateTime @default(now())
+}
+
+model RiderReview {
+  id                 String   @id @default(uuid())
+  riderId            String
+  rider              Rider    @relation(fields: [riderId], references: [id], onDelete: Cascade)
+  orderId            String   @unique
+  order              Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  userId             String
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rating             Int      @default(5)
+  comment            String?
+  deliveryExperience String?
+  createdAt          DateTime @default(now())
+}
+
+model Invoice {
+  id              String   @id @default(uuid())
+  invoiceNumber   String   @unique
+  orderId         String   @unique
+  order           Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  userId          String?
+  user            User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  customerName    String
+  customerEmail   String?
+  customerPhone   String?
+  customerAddress String
+  subtotal        Decimal  @db.Decimal(10, 2)
+  deliveryFee     Decimal  @db.Decimal(10, 2)
+  totalAmount     Decimal  @db.Decimal(10, 2)
+  paymentMethod   String?  @default("Bank Transfer")
+  paymentStatus   String?  @default("PAID")
+  riderName       String?
+  riderIdCode     String?
+  orderDate       DateTime
+  deliveryDate    DateTime @default(now())
+  createdAt       DateTime @default(now())
+}
+
+model Notification {
+  id         String   @id @default(uuid())
+  targetRole Role     @default(ADMIN)
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  riderId    String?
+  rider      Rider?   @relation(fields: [riderId], references: [id], onDelete: Cascade)
+  title      String
+  message    String
+  link       String?
+  type       String?  @default("SYSTEM")
+  isRead     Boolean  @default(false)
+  createdAt  DateTime @default(now())
 }
 
 model Wishlist {

@@ -1,171 +1,232 @@
 "use client";
 
-import React, { useState, useEffect, useTransition } from "react";
-import { getProducts, updateProductStock } from "@/app/actions/productActions";
-import { ShieldAlert, Plus, Minus, Loader2 } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { getInventoryMetrics, adjustInventoryStock } from "@/app/actions/inventoryActions";
+import { ShieldAlert, Plus, Minus, Loader2, PackageCheck, Clock, AlertTriangle, Layers, Save } from "lucide-react";
 
 export default function AdminInventoryManager() {
-  const [products, setProducts] = useState<any[]>([]);
+  const [inventoryList, setInventoryList] = useState<any[]>([]);
+  const [summary, setSummary] = useState<any>({
+    totalProductsCount: 0,
+    totalPhysicalUnits: 0,
+    totalReservedUnits: 0,
+    totalAvailableUnits: 0,
+    lowStockCount: 0,
+    outOfStockCount: 0
+  });
   const [manualInputs, setManualInputs] = useState<{ [key: string]: number }>({});
+  const [thresholdInputs, setThresholdInputs] = useState<{ [key: string]: number }>({});
   const [loading, setLoading] = useState(true);
-  const [isPending, startTransition] = useTransition();
 
-  const fetchProducts = () => {
-    startTransition(() => {
-      getProducts().then((data) => {
-        setProducts(data);
-        setLoading(false);
-      });
-    });
+  const fetchMetrics = async () => {
+    const res = await getInventoryMetrics();
+    if (res.success) {
+      setInventoryList(res.inventoryList);
+      setSummary(res.summary);
+    }
+    setLoading(false);
   };
 
   useEffect(() => {
-    fetchProducts();
+    fetchMetrics();
+    const interval = setInterval(fetchMetrics, 4000);
+    return () => clearInterval(interval);
   }, []);
 
-  const handleStockAdjustment = async (productId: string, amount: number) => {
-    const product = products.find(p => p.id === productId);
-    if (!product) return;
-    
-    const newStock = Math.max(0, product.inventory + amount);
-    // Optimistic update
-    setProducts(products.map(p => p.id === productId ? { ...p, inventory: newStock } : p));
-    
-    const res = await updateProductStock(productId, newStock);
+  const handleStockAdjustment = async (productId: string, currentStock: number, delta: number) => {
+    const newStock = Math.max(0, currentStock + delta);
+    setInventoryList(prev => prev.map(p => p.id === productId ? { ...p, currentStock: newStock, availableStock: Math.max(0, newStock - p.reservedStock) } : p));
+    const res = await adjustInventoryStock({ productId, newInventory: newStock });
     if (!res.success) {
-      alert("Failed to update stock");
-      fetchProducts(); // revert
+      alert("Failed to adjust stock level");
+      fetchMetrics();
     }
   };
 
-  const handleManualStockChange = (productId: string, val: string) => {
-    const num = parseInt(val);
-    if (!isNaN(num)) {
-      setManualInputs({ ...manualInputs, [productId]: num });
+  const handleSaveStock = async (productId: string) => {
+    const p = inventoryList.find(item => item.id === productId);
+    const newStock = manualInputs[productId] !== undefined ? manualInputs[productId] : p.currentStock;
+    const newThreshold = thresholdInputs[productId] !== undefined ? thresholdInputs[productId] : p.minStockThreshold;
+
+    const res = await adjustInventoryStock({
+      productId,
+      newInventory: newStock,
+      minStockThreshold: newThreshold
+    });
+
+    if (res.success) {
+      alert("Inventory and threshold updated successfully!");
+      fetchMetrics();
+    } else {
+      alert("Failed to save changes.");
     }
   };
 
-  const handleSaveManualStock = async (productId: string) => {
-    const newVal = manualInputs[productId];
-    if (newVal !== undefined) {
-      // Optimistic update
-      setProducts(products.map(p => p.id === productId ? { ...p, inventory: newVal } : p));
-      
-      const res = await updateProductStock(productId, newVal);
-      if (res.success) {
-        alert("Stock level updated successfully!");
-      } else {
-        alert("Failed to update stock");
-        fetchProducts(); // revert
-      }
-    }
-  };
-
-  const getStockBadge = (stock: number) => {
-    if (stock === 0) return <span className="bg-rose-50 text-rose-600 px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider border border-rose-100">Out of Stock</span>;
-    if (stock < 10) return <span className="bg-amber-50 text-amber-700 px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider border border-amber-100">Low Stock</span>;
-    return <span className="bg-green-50 text-kaya-green px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider border border-green-150">Healthy</span>;
+  const getStockBadge = (item: any) => {
+    if (item.isOutOfStock) return <span className="bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider border border-rose-200 dark:border-rose-900/40">Out of Stock</span>;
+    if (item.isLowStock) return <span className="bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider border border-amber-200 dark:border-amber-900/40">Low Stock Alert</span>;
+    return <span className="bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider border border-emerald-200 dark:border-emerald-900/40">Healthy</span>;
   };
 
   return (
-    <div className="space-y-10 bg-slate-50 text-[#111111]">
+    <div className="space-y-8 text-slate-900 dark:text-slate-100">
+      
+      {/* Header */}
       <div>
-        <span className="text-kaya-orange font-bold text-xs uppercase tracking-widest">Stock Console</span>
-        <h1 className="text-2xl font-black text-slate-900 tracking-tight mt-1">Inventory & Low-Stock Alerts</h1>
-        <p className="text-slate-550 text-xs">Monitor and modify stock counts in real time. Zero lag.</p>
+        <span className="text-kaya-orange font-black text-xs uppercase tracking-widest">REAL-TIME STOCK SYNC</span>
+        <h1 className="text-2xl sm:text-3xl font-black tracking-tight mt-1">Inventory & Stock Alerts</h1>
+        <p className="text-slate-500 dark:text-slate-400 text-xs">
+          Synchronized with customer orders. Reserved stock is calculated automatically.
+        </p>
       </div>
 
-      {/* Danger alerts indicator */}
-      {products.some(p => p.inventory < 10) && (
-        <div className="bg-amber-50 border border-amber-200 p-5 rounded-3xl flex items-center gap-4 text-xs text-amber-800 leading-normal font-semibold">
+      {/* Summary KPI Cards Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-1">
+          <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Total Physical Stock</span>
+          <p className="text-2xl font-black text-slate-900 dark:text-white">{summary.totalPhysicalUnits} <span className="text-xs text-slate-400 font-normal">units</span></p>
+        </div>
+
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-1">
+          <span className="text-[10px] font-black uppercase text-amber-500 tracking-wider flex items-center gap-1">
+            <Clock className="h-3 w-3" />
+            Reserved Stock
+          </span>
+          <p className="text-2xl font-black text-amber-600 dark:text-amber-400">{summary.totalReservedUnits} <span className="text-xs text-slate-400 font-normal">units</span></p>
+        </div>
+
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-1">
+          <span className="text-[10px] font-black uppercase text-emerald-500 tracking-wider flex items-center gap-1">
+            <PackageCheck className="h-3 w-3" />
+            Available Stock
+          </span>
+          <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400">{summary.totalAvailableUnits} <span className="text-xs text-slate-400 font-normal">units</span></p>
+        </div>
+
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-1">
+          <span className="text-[10px] font-black uppercase text-rose-500 tracking-wider flex items-center gap-1">
+            <AlertTriangle className="h-3 w-3" />
+            Low & Out of Stock
+          </span>
+          <p className="text-2xl font-black text-rose-600 dark:text-rose-400">{summary.lowStockCount + summary.outOfStockCount} <span className="text-xs text-slate-400 font-normal">items</span></p>
+        </div>
+      </div>
+
+      {/* Low stock warning banner */}
+      {(summary.lowStockCount > 0 || summary.outOfStockCount > 0) && (
+        <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/40 p-5 rounded-3xl flex items-center gap-4 text-xs text-amber-800 dark:text-amber-300 font-semibold">
           <ShieldAlert className="h-6 w-6 shrink-0 text-amber-500 animate-pulse" />
           <span>
-            Attention: There are <strong className="text-slate-950 font-black">{products.filter(p => p.inventory < 10).length} items</strong> currently running low on stock. Please restock or adjust levels to prevent customer ordering failures.
+            Attention: <strong className="font-black text-slate-900 dark:text-white">{summary.lowStockCount} items</strong> are running low on stock and <strong className="font-black text-rose-600 dark:text-rose-400">{summary.outOfStockCount} items</strong> are completely out of stock. Please adjust levels or re-stock.
           </span>
         </div>
       )}
 
-      {/* Stock list table */}
-      <div className="bg-white border border-slate-200 rounded-[2.5rem] overflow-hidden shadow-sm">
+      {/* Inventory table */}
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs font-medium">
-            <thead className="bg-slate-50 text-slate-500 uppercase tracking-widest text-[10px] border-b border-slate-100">
+            <thead className="bg-slate-50 dark:bg-slate-800/50 text-slate-400 uppercase tracking-widest text-[10px] border-b border-slate-100 dark:border-slate-800">
               <tr>
-                <th className="px-6 py-4">Foodstuff info</th>
-                <th className="px-6 py-4">SKU</th>
+                <th className="px-6 py-4">Product Info</th>
                 <th className="px-6 py-4">Status</th>
-                <th className="px-6 py-4">Current Stock</th>
-                <th className="px-6 py-4">Quick Tune</th>
-                <th className="px-6 py-4 text-center">Set Level</th>
+                <th className="px-6 py-4 text-center">Physical Stock</th>
+                <th className="px-6 py-4 text-center">Reserved</th>
+                <th className="px-6 py-4 text-center">Available</th>
+                <th className="px-6 py-4 text-center">Min Threshold</th>
+                <th className="px-6 py-4 text-center">Actions & Updates</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 text-slate-750">
-              {loading && (
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-800 dark:text-slate-200">
+              {loading ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center">
+                  <td colSpan={7} className="px-6 py-12 text-center">
                     <Loader2 className="w-8 h-8 text-kaya-orange animate-spin mx-auto" />
                   </td>
                 </tr>
-              )}
-              {!loading && products.map((p) => (
-                <tr key={p.id} className="hover:bg-slate-50 transition-colors">
+              ) : inventoryList.map((p) => (
+                <tr key={p.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-850/50 transition-colors">
+                  
                   <td className="px-6 py-4 flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-slate-50 overflow-hidden shrink-0 border border-slate-200">
-                      <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
+                    <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 overflow-hidden shrink-0 border border-slate-200 dark:border-slate-700">
+                      <img src={p.images?.[0] || "/w-1.png"} alt={p.name} className="w-full h-full object-cover" />
                     </div>
                     <div>
-                      <h4 className="font-extrabold text-slate-900 max-w-[200px] truncate">{p.name}</h4>
-                      <p className="text-[10px] text-slate-400 mt-0.5">{p.weight || "Pack"}</p>
+                      <h4 className="font-extrabold text-slate-900 dark:text-white max-w-[180px] truncate">{p.name}</h4>
+                      <p className="text-[10px] text-slate-400 font-mono">{p.categoryName} • {p.sku}</p>
                     </div>
                   </td>
-                  <td className="px-6 py-4 font-bold text-slate-500">{p.sku}</td>
-                  <td className="px-6 py-4">{getStockBadge(p.inventory)}</td>
-                  <td className="px-6 py-4">
-                    <span className={`text-base font-black ${p.inventory < 10 ? "text-rose-600" : "text-kaya-green"}`}>
-                      {p.inventory}
+
+                  <td className="px-6 py-4">{getStockBadge(p)}</td>
+
+                  <td className="px-6 py-4 text-center">
+                    <span className="text-base font-black text-slate-900 dark:text-white">{p.currentStock}</span>
+                  </td>
+
+                  <td className="px-6 py-4 text-center">
+                    <span className="text-sm font-bold text-amber-600 dark:text-amber-400">{p.reservedStock}</span>
+                  </td>
+
+                  <td className="px-6 py-4 text-center">
+                    <span className={`text-base font-black ${p.availableStock > 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}>
+                      {p.availableStock}
                     </span>
                   </td>
+
+                  <td className="px-6 py-4 text-center">
+                    <input 
+                      type="number"
+                      value={thresholdInputs[p.id] !== undefined ? thresholdInputs[p.id] : p.minStockThreshold}
+                      onChange={(e) => setThresholdInputs({ ...thresholdInputs, [p.id]: parseInt(e.target.value) || 1 })}
+                      className="w-14 px-2 py-1 text-center rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-bold text-xs"
+                    />
+                  </td>
+
                   <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="flex items-center gap-1">
+                        <button 
+                          onClick={() => handleStockAdjustment(p.id, p.currentStock, -5)}
+                          className="p-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg text-slate-600 dark:text-slate-300 transition-all"
+                          title="Reduce by 5"
+                        >
+                          <Minus className="h-3.5 w-3.5" />
+                        </button>
+                        
+                        <input 
+                          type="number" 
+                          placeholder={p.currentStock.toString()}
+                          value={manualInputs[p.id] !== undefined ? manualInputs[p.id] : ""}
+                          onChange={(e) => setManualInputs({ ...manualInputs, [p.id]: parseInt(e.target.value) || 0 })}
+                          className="w-16 px-2 py-1 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-center font-bold text-xs"
+                        />
+
+                        <button 
+                          onClick={() => handleStockAdjustment(p.id, p.currentStock, 5)}
+                          className="p-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg text-slate-600 dark:text-slate-300 transition-all"
+                          title="Add 5"
+                        >
+                          <Plus className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+
                       <button 
-                        onClick={() => handleStockAdjustment(p.id, -5)}
-                        className="p-2 bg-slate-50 hover:bg-slate-100 rounded-lg text-slate-500 hover:text-slate-950 transition-all border border-slate-200"
-                        title="Reduce by 5"
+                        onClick={() => handleSaveStock(p.id)}
+                        className="px-3 py-1.5 bg-kaya-orange hover:bg-orange-600 text-white rounded-xl text-[10px] font-bold transition-all shadow-sm flex items-center gap-1"
                       >
-                        <Minus className="h-3.5 w-3.5" />
-                      </button>
-                      <button 
-                        onClick={() => handleStockAdjustment(p.id, 5)}
-                        className="p-2 bg-slate-50 hover:bg-slate-100 rounded-lg text-slate-500 hover:text-slate-950 transition-all border border-slate-200"
-                        title="Add 5"
-                      >
-                        <Plus className="h-3.5 w-3.5" />
+                        <Save className="h-3 w-3" />
+                        <span>Save</span>
                       </button>
                     </div>
                   </td>
-                  <td className="px-6 py-4">
-                    <div className="flex justify-center items-center gap-2">
-                      <input 
-                        type="number" 
-                        placeholder={p.inventory.toString()}
-                        value={manualInputs[p.id] !== undefined ? manualInputs[p.id] : ""}
-                        onChange={(e) => handleManualStockChange(p.id, e.target.value)}
-                        className="w-16 px-2.5 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-center text-slate-800 focus:outline-none focus:border-kaya-orange font-bold text-xs"
-                      />
-                      <button 
-                        onClick={() => handleSaveManualStock(p.id)}
-                        className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-[9px] font-black uppercase tracking-wider transition-colors shadow-sm"
-                      >
-                        Save
-                      </button>
-                    </div>
-                  </td>
+
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       </div>
+
     </div>
   );
 }

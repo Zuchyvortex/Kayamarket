@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { Truck, LogOut, Sun, Moon, MapPin, PackageCheck, ShieldAlert, Navigation } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
+import NotificationDropdown from "@/components/NotificationDropdown";
 
 export default function RiderLayout({
   children,
@@ -92,6 +93,11 @@ export default function RiderLayout({
           </div>
 
           <div className="flex items-center space-x-3 sm:space-x-5">
+            {/* Real-time Rider Notifications */}
+            {riderSession && (
+              <NotificationDropdown role="RIDER" targetId={riderSession.id} />
+            )}
+
             {/* Theme Toggle Button */}
             <button
               onClick={toggleTheme}

@@ -9,6 +9,9 @@ export async function getCustomers() {
       where: { role: "CUSTOMER" },
       include: {
         addresses: true,
+        invoices: {
+          orderBy: { createdAt: "desc" }
+        },
         orders: {
           orderBy: { createdAt: "desc" }
         },
@@ -28,6 +31,9 @@ export async function getCustomers() {
       const addressString = u.address || (defaultAddress ? `${defaultAddress.street}, ${defaultAddress.city}, ${defaultAddress.state}` : "No address specified");
       const lastOrderDate = allOrders.length > 0 ? allOrders[0].createdAt : null;
 
+      const invoiceHistory = u.invoices || [];
+      const latestInvoice = invoiceHistory[0] || null;
+
       return {
         ...u,
         fullName: `${u.firstName} ${u.lastName}`.trim(),
@@ -38,6 +44,8 @@ export async function getCustomers() {
         activeOrdersCount: activeOrders.length,
         completedOrdersCount: completedOrders.length,
         cancelledOrdersCount: cancelledOrders.length,
+        latestInvoice,
+        invoiceHistory
       };
     });
   } catch (error) {
@@ -46,13 +54,20 @@ export async function getCustomers() {
   }
 }
 
+import bcrypt from "bcryptjs";
+
 export async function updateCustomerProfile(userId: string, data: {
   firstName: string;
   lastName: string;
   email: string;
+  username?: string;
   phoneNumber?: string;
   altPhoneNumber?: string;
   address?: string;
+  city?: string;
+  state?: string;
+  profileImage?: string;
+  password?: string;
 }) {
   try {
     const user = await prisma.user.findUnique({ where: { id: userId } });
@@ -60,20 +75,31 @@ export async function updateCustomerProfile(userId: string, data: {
       return { success: false, error: "Customer profile not found." };
     }
 
+    const updatePayload: any = {
+      firstName: data.firstName.trim(),
+      lastName: data.lastName.trim(),
+      email: data.email.trim().toLowerCase(),
+      username: data.username ? data.username.trim() : user.username,
+      phoneNumber: data.phoneNumber !== undefined ? data.phoneNumber : user.phoneNumber,
+      altPhoneNumber: data.altPhoneNumber !== undefined ? data.altPhoneNumber : user.altPhoneNumber,
+      address: data.address !== undefined ? data.address : user.address,
+      city: data.city !== undefined ? data.city : user.city,
+      state: data.state !== undefined ? data.state : user.state,
+      ...(data.profileImage ? { profileImage: data.profileImage } : {})
+    };
+
+    if (data.password && data.password.trim().length >= 6) {
+      const salt = await bcrypt.genSalt(10);
+      updatePayload.passwordHash = await bcrypt.hash(data.password.trim(), salt);
+    }
+
     const updatedUser = await prisma.user.update({
       where: { id: userId },
-      data: {
-        firstName: data.firstName.trim(),
-        lastName: data.lastName.trim(),
-        email: data.email.trim().toLowerCase(),
-        phoneNumber: data.phoneNumber || "",
-        altPhoneNumber: data.altPhoneNumber || "",
-        address: data.address || ""
-      }
+      data: updatePayload
     });
 
-    // Also update/upsert default Address if address string provided
-    if (data.address) {
+    // Also update or create default Address
+    if (data.address || data.city || data.state) {
       const defaultAddress = await prisma.address.findFirst({
         where: { userId, isDefault: true }
       });
@@ -81,20 +107,35 @@ export async function updateCustomerProfile(userId: string, data: {
       if (defaultAddress) {
         await prisma.address.update({
           where: { id: defaultAddress.id },
-          data: { street: data.address }
+          data: {
+            street: data.address || defaultAddress.street,
+            city: data.city || defaultAddress.city,
+            state: data.state || defaultAddress.state
+          }
         });
       } else {
         await prisma.address.create({
           data: {
             userId,
-            street: data.address,
-            city: "Lagos",
-            state: "Lagos",
+            street: data.address || "Main Street",
+            city: data.city || "Lagos",
+            state: data.state || "Lagos",
             isDefault: true
           }
         });
       }
     }
+
+    // Notify Admin of Customer Profile Update (Requirement 8 & 10)
+    await prisma.notification.create({
+      data: {
+        targetRole: "ADMIN",
+        title: "Customer Profile Updated",
+        message: `${updatedUser.firstName} ${updatedUser.lastName} (${updatedUser.email}) updated their profile details.`,
+        link: "/admin/customers",
+        type: "PROFILE"
+      }
+    });
 
     revalidatePath("/dashboard");
     revalidatePath("/admin/customers");
