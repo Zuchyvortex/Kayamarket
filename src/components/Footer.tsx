@@ -97,8 +97,7 @@ export default function Footer() {
           <ul className="space-y-3.5 text-sm font-semibold">
             <li><Link href="/products" className="hover:text-kaya-orange transition-colors">Help Center</Link></li>
             <li><Link href="/products" className="hover:text-kaya-orange transition-colors">Refund Policy</Link></li>
-            <li><Link href="/products" className="hover:text-kaya-orange transition-colors">Delivery Areas</Link></li>
-            <li><Link href="/rider/login" className="text-kaya-orange hover:underline font-bold transition-colors">Dispatch Rider Portal →</Link></li>
+            <li><Link href="/products" className="hover:text-kaya-orange transition-colors">Track Order</Link></li>
           </ul>
         </div>
 

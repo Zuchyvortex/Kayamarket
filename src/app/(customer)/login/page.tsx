@@ -142,11 +142,6 @@ export default function LoginPage() {
           <p>
             Don't have an account? <Link href="/register" className="text-kaya-orange hover:text-orange-600 font-bold transition-colors">Sign Up</Link>
           </p>
-          <p className="pt-1 border-t border-slate-100/60">
-            <Link href="/rider/login" className="text-[11px] text-slate-500 hover:text-kaya-orange font-bold transition-colors">
-              Dispatch Rider? Log in to Rider Portal →
-            </Link>
-          </p>
           <div className="flex items-center gap-1.5 justify-center text-[10px] text-slate-450 font-medium mt-1">
             <ShieldCheck className="h-3.5 w-3.5 text-kaya-orange" />
             <span>Secure Enterprise Authentication</span>

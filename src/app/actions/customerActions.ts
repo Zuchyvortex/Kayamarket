@@ -54,6 +54,30 @@ export async function getCustomers() {
   }
 }
 
+export async function getCustomerProfileById(userId: string) {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        addresses: true
+      }
+    });
+
+    if (!user) return { success: false, error: "Customer not found." };
+
+    return {
+      success: true,
+      user: {
+        ...user,
+        fullName: `${user.firstName} ${user.lastName}`.trim()
+      }
+    };
+  } catch (error: any) {
+    console.error("Error getting customer profile:", error);
+    return { success: false, error: error.message };
+  }
+}
+
 import bcrypt from "bcryptjs";
 
 export async function updateCustomerProfile(userId: string, data: {

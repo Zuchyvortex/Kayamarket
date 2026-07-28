@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { confirmDeliveryByCustomer } from "@/app/actions/orderActions";
-import { updateCustomerProfile } from "@/app/actions/customerActions";
+import { updateCustomerProfile, getCustomerProfileById } from "@/app/actions/customerActions";
 import DigitalSignatureModal from "@/components/DigitalSignatureModal";
 import OrderProofModal from "@/components/OrderProofModal";
 import InvoiceModal from "@/components/InvoiceModal";
@@ -50,9 +50,7 @@ export default function CustomerDashboard() {
   const [reviewRiderModal, setReviewRiderModal] = useState<{ isOpen: boolean; orderId: string; orderNumber: string; riderName: string } | null>(null);
 
   // Address state
-  const [addresses, setAddresses] = useState<any[]>([
-    { id: "addr-1", street: "12, Admiralty Way, Lekki Phase 1", city: "Lekki", state: "Lagos", isDefault: true }
-  ]);
+  const [addresses, setAddresses] = useState<any[]>([]);
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [street, setStreet] = useState("");
   const [city, setCity] = useState("");
@@ -62,17 +60,43 @@ export default function CustomerDashboard() {
     if (!user) {
       router.push("/login");
     } else {
+      loadProfileAndOrders();
+      const interval = setInterval(fetchCustomerOrders, 4000);
+      return () => clearInterval(interval);
+    }
+  }, [user]);
+
+  const loadProfileAndOrders = async () => {
+    if (!user) return;
+    fetchCustomerOrders();
+
+    const profRes = await getCustomerProfileById(user.id);
+    if (profRes.success && profRes.user) {
+      const u = profRes.user;
+      setFirstName(u.firstName || "");
+      setLastName(u.lastName || "");
+      setUsername(u.username || "");
+      setEmail(u.email || "");
+      setPhone(u.phoneNumber || user.phone || "");
+      setAltPhone(u.altPhoneNumber || "");
+      setProfileAddress(u.address || "");
+      setProfileCity(u.city || "Lagos");
+      setProfileState(u.state || "Lagos");
+      setProfileImage(u.profileImage || "");
+      
+      if (u.addresses && u.addresses.length > 0) {
+        setAddresses(u.addresses);
+      } else if (u.address) {
+        setAddresses([{ id: "addr-db", street: u.address, city: u.city || "Lagos", state: u.state || "Lagos", isDefault: true }]);
+      }
+    } else {
       const parts = (user.name || "").trim().split(/\s+/);
       setFirstName(parts[0] || "");
       setLastName(parts.slice(1).join(" ") || "");
       setEmail(user.email || "");
       setPhone(user.phone || "");
-      fetchCustomerOrders();
-
-      const interval = setInterval(fetchCustomerOrders, 4000);
-      return () => clearInterval(interval);
     }
-  }, [user]);
+  };
 
   const fetchCustomerOrders = async () => {
     if (!user) return;
