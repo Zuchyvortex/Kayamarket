@@ -15,10 +15,23 @@ export async function GET(request: Request) {
 
     let ordersWhere: any = {};
     if (role === "CUSTOMER" && userId) {
-      ordersWhere.userId = userId;
+      const customerUser = await prisma.user.findUnique({ where: { id: userId } });
+      if (customerUser) {
+        ordersWhere.OR = [
+          { userId: userId },
+          { user: { id: userId } },
+          { user: { email: customerUser.email } },
+          ...(customerUser.phoneNumber ? [{ customerPhone: customerUser.phoneNumber }] : []),
+          ...(customerUser.altPhoneNumber ? [{ customerAltPhone: customerUser.altPhoneNumber }] : [])
+        ];
+      } else {
+        ordersWhere.userId = userId;
+      }
     } else if (role === "RIDER" && riderId) {
       ordersWhere.OR = [
         { riderId: riderId },
+        { rider: { id: riderId } },
+        { rider: { riderId: riderId } },
         { rider: { email: riderId.toLowerCase() } }
       ];
     }
@@ -55,3 +68,4 @@ export async function GET(request: Request) {
     );
   }
 }
+
