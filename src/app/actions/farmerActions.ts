@@ -8,7 +8,10 @@ export async function getFarmers() {
     const farmers = await prisma.farmer.findMany({
       include: {
         products: true,
-        transactions: true
+        transactions: true,
+        procurements: {
+          include: { product: true }
+        }
       },
       orderBy: { createdAt: "desc" }
     });
@@ -25,42 +28,57 @@ export async function createOrUpdateFarmer(data: {
   phone?: string;
   email?: string;
   address?: string;
+  farmLocation?: string;
+  status?: string;
+  productsSupplied?: string[];
   commissionRate?: number;
   notes?: string;
 }) {
   try {
     let farmer;
+    const payload = {
+      name: data.name,
+      phone: data.phone || null,
+      email: data.email || null,
+      address: data.address || null,
+      farmLocation: data.farmLocation || null,
+      status: data.status || "ACTIVE",
+      productsSupplied: data.productsSupplied || [],
+      commissionRate: data.commissionRate ?? 5.0,
+      notes: data.notes || null
+    };
+
     if (data.id) {
       farmer = await prisma.farmer.update({
         where: { id: data.id },
-        data: {
-          name: data.name,
-          phone: data.phone || null,
-          email: data.email || null,
-          address: data.address || null,
-          commissionRate: data.commissionRate ?? 5.0,
-          notes: data.notes || null
-        }
+        data: payload
       });
     } else {
       farmer = await prisma.farmer.create({
-        data: {
-          name: data.name,
-          phone: data.phone || null,
-          email: data.email || null,
-          address: data.address || null,
-          commissionRate: data.commissionRate ?? 5.0,
-          notes: data.notes || null
-        }
+        data: payload
       });
     }
 
+    revalidatePath("/admin/farmers");
     revalidatePath("/admin/inventory");
+    revalidatePath("/admin/procurement");
     revalidatePath("/admin/analytics");
     return { success: true, farmer };
   } catch (error: any) {
     console.error("Error saving farmer:", error);
     return { success: false, error: error.message || "Failed to save farmer profile." };
+  }
+}
+
+export async function deleteFarmer(id: string) {
+  try {
+    await prisma.farmer.delete({ where: { id } });
+    revalidatePath("/admin/farmers");
+    revalidatePath("/admin/analytics");
+    return { success: true };
+  } catch (error: any) {
+    console.error("Error deleting farmer:", error);
+    return { success: false, error: error.message || "Failed to delete farmer profile." };
   }
 }
 
@@ -93,7 +111,6 @@ export async function createFarmerTransaction(data: {
       }
     });
 
-    // Update product costPrice and inventory if productId provided
     if (data.productId) {
       await prisma.product.update({
         where: { id: data.productId },
@@ -106,7 +123,9 @@ export async function createFarmerTransaction(data: {
       });
     }
 
+    revalidatePath("/admin/farmers");
     revalidatePath("/admin/inventory");
+    revalidatePath("/admin/procurement");
     revalidatePath("/admin/analytics");
     return { success: true, transaction: tx };
   } catch (error: any) {
@@ -130,30 +149,5 @@ export async function getFarmerTransactions(farmerId?: string) {
   } catch (error) {
     console.error("Error fetching farmer transactions:", error);
     return [];
-  }
-}
-
-export async function updateProductCostPrice(productId: string, costPrice: number, farmerId?: string) {
-  try {
-    let updateData: any = { costPrice: Number(costPrice) };
-    if (farmerId) {
-      const farmer = await prisma.farmer.findUnique({ where: { id: farmerId } });
-      if (farmer) {
-        updateData.farmerId = farmerId;
-        updateData.farmerName = farmer.name;
-      }
-    }
-
-    const updatedProduct = await prisma.product.update({
-      where: { id: productId },
-      data: updateData
-    });
-
-    revalidatePath("/admin/inventory");
-    revalidatePath("/admin/analytics");
-    return { success: true, product: updatedProduct };
-  } catch (error: any) {
-    console.error("Error updating product cost price:", error);
-    return { success: false, error: error.message || "Failed to update cost price." };
   }
 }

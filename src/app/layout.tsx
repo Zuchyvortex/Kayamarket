@@ -3,13 +3,13 @@ import "./globals.css";
 import Providers from "./providers";
 
 export const metadata: Metadata = {
-  title: "KayaMarket - Fresh Foodstuffs & Express Delivery in Nigeria",
-  description: "Experience the convenience of fresh, farm-sourced foodstuffs and reliable express delivery across Nigeria.",
-  keywords: "KayaMarket, foodstuff delivery, Lagos, Nigeria, fresh groceries, garri, rice, palm oil, express delivery",
+  title: "KayaMarket - Fresh Foodstuffs & Express Delivery",
+  description: "Experience the convenience of fresh, farm-sourced foodstuffs and reliable express delivery.",
+  keywords: "KayaMarket, foodstuff delivery, fresh groceries, garri, rice, palm oil, express delivery",
   icons: {
-    icon: "/K.png",
-    shortcut: "/K.png",
-    apple: "/K.png"
+    icon: "/k-5.png",
+    shortcut: "/k-5.png",
+    apple: "/k-5.png"
   }
 };
 

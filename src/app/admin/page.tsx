@@ -32,22 +32,22 @@ export default async function AdminDashboardHome() {
   };
 
   return (
-    <div className="space-y-10 bg-slate-50 text-[#111111]">
+    <div className="space-y-10">
       <div>
         <span className="text-kaya-orange font-bold text-xs uppercase tracking-widest">Console Home</span>
-        <h1 className="text-2xl font-black text-slate-900 tracking-tight mt-1">Overview Dashboard</h1>
-        <p className="text-slate-500 text-xs">Real-time enterprise metrics for KayaMarket grocery operations</p>
+        <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight mt-1">Overview Dashboard</h1>
+        <p className="text-slate-500 dark:text-slate-400 text-xs">Real-time enterprise metrics for KayaMarket grocery operations</p>
       </div>
 
-      {/* KPI Cards - Redesigned to be clean and light */}
+      {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {[
-          { label: "Total Revenue", val: formatPrice(totalRevenue), change: "+12.4% from last week", icon: TrendingUp, color: "text-emerald-600 bg-emerald-50" },
-          { label: "Total Orders", val: totalOrders, change: "Live from DB", icon: ShoppingCart, color: "text-kaya-orange bg-orange-50" },
-          { label: "Active Customers", val: usersCount, change: "Registered users", icon: UserCheck, color: "text-slate-950 bg-slate-100" },
-          { label: "Low-Stock Alerts", val: lowStockCount, change: `${lowStockCount} items need attention`, icon: AlertTriangle, color: "text-rose-600 bg-rose-50" }
+          { label: "Total Revenue", val: formatPrice(totalRevenue), change: "+12.4% from last week", icon: TrendingUp, color: "text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 dark:text-emerald-400" },
+          { label: "Total Orders", val: totalOrders, change: "Live from DB", icon: ShoppingCart, color: "text-kaya-orange bg-orange-50 dark:bg-orange-950/40" },
+          { label: "Active Customers", val: usersCount, change: "Registered users", icon: UserCheck, color: "text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800" },
+          { label: "Low-Stock Alerts", val: lowStockCount, change: `${lowStockCount} items need attention`, icon: AlertTriangle, color: "text-rose-600 bg-rose-50 dark:bg-rose-950/40 dark:text-rose-400" }
         ].map((kpi, idx) => (
-          <div key={idx} className="bg-white border border-slate-200 p-6 rounded-[2rem] space-y-4 shadow-sm hover:shadow-md transition-shadow">
+          <div key={idx} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-[2rem] space-y-4 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex justify-between items-start">
               <div className={`p-3 rounded-2xl ${kpi.color}`}>
                 <kpi.icon className="h-5 w-5" />
@@ -56,7 +56,7 @@ export default async function AdminDashboardHome() {
             </div>
             <div>
               <p className="text-slate-400 text-xs font-semibold uppercase tracking-wider">{kpi.label}</p>
-              <h3 className="text-2xl font-black text-slate-900 mt-1">{kpi.val}</h3>
+              <h3 className="text-2xl font-black text-slate-900 dark:text-white mt-1">{kpi.val}</h3>
             </div>
           </div>
         ))}
@@ -64,11 +64,10 @@ export default async function AdminDashboardHome() {
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Weekly sales charts mockup */}
-        <div className="lg:col-span-2 bg-white border border-slate-200 p-6 rounded-[2rem] space-y-6 shadow-sm">
+        <div className="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-[2rem] space-y-6 shadow-sm">
           <div className="flex justify-between items-center">
-            <h3 className="font-extrabold text-slate-900 text-sm uppercase tracking-wider">Weekly Revenue Stream</h3>
-            <span className="text-[10px] font-black text-kaya-green bg-green-50 px-2.5 py-1 rounded-full uppercase tracking-wider">Live</span>
+            <h3 className="font-extrabold text-slate-900 dark:text-white text-sm uppercase tracking-wider">Weekly Revenue Stream</h3>
+            <span className="text-[10px] font-black text-kaya-green bg-green-50 dark:bg-green-950/40 px-2.5 py-1 rounded-full uppercase tracking-wider">Live</span>
           </div>
 
           <div className="flex items-end justify-between h-48 pt-4">
@@ -85,7 +84,7 @@ export default async function AdminDashboardHome() {
                 <span className="text-[9px] font-black text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity">
                   {bar.label}
                 </span>
-                <div className="w-8 sm:w-10 bg-slate-100 rounded-t-lg h-36 relative overflow-hidden">
+                <div className="w-8 sm:w-10 bg-slate-100 dark:bg-slate-800 rounded-t-lg h-36 relative overflow-hidden">
                   <div 
                     className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-kaya-orange to-amber-500 rounded-t-lg transition-all duration-1000" 
                     style={{ height: `${(bar.val / 120) * 100}%` }}
@@ -97,10 +96,9 @@ export default async function AdminDashboardHome() {
           </div>
         </div>
 
-        {/* Low inventory details widget */}
-        <div className="bg-white border border-slate-200 p-6 rounded-[2rem] space-y-6 shadow-sm">
-          <div className="flex justify-between items-center border-b border-slate-100 pb-4">
-            <h3 className="font-extrabold text-slate-900 text-sm uppercase tracking-wider">Low Stock Watch</h3>
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-[2rem] space-y-6 shadow-sm">
+          <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-4">
+            <h3 className="font-extrabold text-slate-900 dark:text-white text-sm uppercase tracking-wider">Low Stock Watch</h3>
             <Link href="/admin/inventory" className="text-[10px] text-kaya-orange font-bold hover:underline uppercase tracking-wider">View All</Link>
           </div>
 
@@ -108,31 +106,31 @@ export default async function AdminDashboardHome() {
             {products.map((p) => (
               <div key={p.id} className="flex justify-between items-center">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-slate-50 overflow-hidden shrink-0 border border-slate-100">
+                  <div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-800 overflow-hidden shrink-0 border border-slate-100 dark:border-slate-700">
                     <img src={p.images?.[0] || "/w-1.png"} alt={p.name} className="w-full h-full object-cover" />
                   </div>
                   <div>
-                    <h4 className="text-xs font-bold text-slate-800 truncate max-w-[120px]">{p.name}</h4>
+                    <h4 className="text-xs font-bold text-slate-800 dark:text-white truncate max-w-[120px]">{p.name}</h4>
                     <p className="text-[10px] text-slate-400 mt-0.5">{p.sku}</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-xs font-black text-rose-600">{p.inventory} left</p>
-                  <span className="text-[9px] bg-rose-50 text-rose-600 px-2 py-0.5 rounded-full font-bold">Alert</span>
+                  <p className="text-xs font-black text-rose-600 dark:text-rose-400">{p.inventory} left</p>
+                  <span className="text-[9px] bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 px-2 py-0.5 rounded-full font-bold">Alert</span>
                 </div>
               </div>
             ))}
             {products.length === 0 && (
-              <p className="text-xs text-slate-500 text-center py-4">All products are adequately stocked.</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 text-center py-4">All products are adequately stocked.</p>
             )}
           </div>
         </div>
       </div>
 
       {/* Recent Orders Board */}
-      <div className="bg-white border border-slate-200 rounded-[2.5rem] overflow-hidden shadow-sm">
-        <div className="p-6 border-b border-slate-100 flex justify-between items-center">
-          <h3 className="font-extrabold text-slate-900 text-sm uppercase tracking-wider">Recent Orders Board</h3>
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] overflow-hidden shadow-sm">
+        <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+          <h3 className="font-extrabold text-slate-900 dark:text-white text-sm uppercase tracking-wider">Recent Orders Board</h3>
           <Link href="/admin/orders" className="text-xs text-kaya-orange font-bold hover:underline flex items-center gap-0.5 tracking-wider uppercase">
             <span>Manage Board</span>
             <ArrowUpRight className="h-4 w-4" />
@@ -141,7 +139,7 @@ export default async function AdminDashboardHome() {
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs font-medium">
-            <thead className="bg-slate-50 text-slate-500 uppercase tracking-widest text-[10px] border-b border-slate-100">
+            <thead className="bg-slate-50 dark:bg-slate-955 text-slate-500 dark:text-slate-400 uppercase tracking-widest text-[10px] border-b border-slate-100 dark:border-slate-800">
               <tr>
                 <th className="px-6 py-4">Order Ref</th>
                 <th className="px-6 py-4">Customer</th>
@@ -150,16 +148,16 @@ export default async function AdminDashboardHome() {
                 <th className="px-6 py-4">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 text-slate-700">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
               {orders.map((order) => (
-                <tr key={order.id} className="hover:bg-slate-50 transition-colors">
-                  <td className="px-6 py-4 font-bold text-slate-900">{order.orderNumber}</td>
+                <tr key={order.id} className="hover:bg-slate-50 dark:hover:bg-slate-850/50 transition-colors">
+                  <td className="px-6 py-4 font-bold text-slate-900 dark:text-white">{order.orderNumber}</td>
                   <td className="px-6 py-4">{order.user ? `${order.user.firstName} ${order.user.lastName}` : order.customerName}</td>
                   <td className="px-6 py-4">{new Date(order.createdAt).toLocaleDateString()}</td>
-                  <td className="px-6 py-4 font-black text-slate-900">{formatPrice(Number(order.totalAmount))}</td>
+                  <td className="px-6 py-4 font-black text-slate-900 dark:text-white">{formatPrice(Number(order.totalAmount))}</td>
                   <td className="px-6 py-4">
                     <span className={`inline-block px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider ${
-                      order.status === "DELIVERED" ? "bg-green-50 text-kaya-green border border-green-150" : "bg-amber-50 text-amber-700 border border-amber-100"
+                      order.status === "DELIVERED" ? "bg-green-50 dark:bg-green-950/40 text-kaya-green border border-green-150" : "bg-amber-50 dark:bg-amber-950/40 text-amber-600 border border-amber-100"
                     }`}>
                       {order.status}
                     </span>
@@ -168,7 +166,7 @@ export default async function AdminDashboardHome() {
               ))}
               {orders.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center text-slate-500">No orders found.</td>
+                  <td colSpan={5} className="px-6 py-8 text-center text-slate-500 dark:text-slate-400">No orders found.</td>
                 </tr>
               )}
             </tbody>

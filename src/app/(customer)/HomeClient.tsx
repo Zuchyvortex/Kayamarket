@@ -29,7 +29,8 @@ import {
   PackageCheck,
   Zap,
   Shield,
-  Headphones
+  Headphones,
+  ShoppingBag
 } from "lucide-react";
 import { Product } from "@/lib/mockData";
 import { useCart } from "@/context/CartContext";
@@ -464,27 +465,92 @@ export default function HomeClient({
 
       </section>
 
-      {/* 5. KAYAMARKET LOGISTICS SHOWCASE (Requirement 2 - Replaces old Kaya Mall) */}
+      {/* 5. KAYAMARKET LOGISTICS SHOWCASE (Requirement 3 - Premium Express Logistics Visual Storytelling) */}
       <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="bg-white dark:bg-slate-900 rounded-[3.5rem] p-8 sm:p-14 border border-slate-200 dark:border-slate-800 shadow-xl space-y-14 relative overflow-hidden">
+        <div className="bg-white dark:bg-slate-900 rounded-[3.5rem] p-8 sm:p-14 border border-slate-200 dark:border-slate-800 shadow-xl space-y-16 relative overflow-hidden">
           
-          <div className="text-center max-w-3xl mx-auto space-y-4">
-            <div className="inline-flex items-center space-x-2 bg-orange-50 dark:bg-orange-950/40 text-kaya-orange px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest border border-orange-100 dark:border-orange-900/40">
-              <Truck className="h-4 w-4" />
-              <span>KayaMarket Express Logistics</span>
+          {/* Header Banner & Visual Split Layout with logis-1.png */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            
+            <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
+              <div className="inline-flex items-center space-x-2 bg-orange-50 dark:bg-orange-950/40 text-kaya-orange px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest border border-orange-100 dark:border-orange-900/40">
+                <Truck className="h-4 w-4" />
+                <span>KayaMarket Express Logistics</span>
+              </div>
+              
+              <h2 className="text-3xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
+                Direct Farm to Doorstep <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-kaya-orange to-amber-500">Express Delivery Fleet.</span>
+              </h2>
+              
+              <p className="text-slate-600 dark:text-slate-300 text-sm sm:text-base leading-relaxed max-w-xl font-light">
+                We bridge local agricultural farms directly to your kitchen. We own and operate a temperature-checked warehouse and dedicated dispatch fleet with live GPS order tracking.
+              </p>
+
+              {/* Call-to-action button */}
+              <div className="pt-2 flex flex-wrap justify-center lg:justify-start gap-4">
+                <Link
+                  href="/products"
+                  className="bg-gradient-to-r from-kaya-orange to-orange-500 hover:from-orange-500 hover:to-kaya-orange text-white font-bold px-8 py-4 rounded-2xl shadow-xl hover:shadow-orange-500/25 transition-all text-xs flex items-center gap-2"
+                >
+                  <ShoppingBag className="h-4 w-4" />
+                  <span>Shop Fresh Foodstuffs</span>
+                </Link>
+                <Link
+                  href="/dashboard"
+                  className="bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-white font-bold px-8 py-4 rounded-2xl border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all text-xs flex items-center gap-2"
+                >
+                  <Navigation className="h-4 w-4 text-kaya-orange" />
+                  <span>Track Active Delivery</span>
+                </Link>
+              </div>
             </div>
-            
-            <h2 className="text-3xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight">
-              Enterprise Fleet & Express Delivery
-            </h2>
-            
-            <p className="text-slate-600 dark:text-slate-300 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto">
-              We own and operate an in-house dispatch network with dedicated delivery riders, temperature-checked handling, and live GPS order tracking.
-            </p>
+
+            {/* Split layout illustration asset logis-1.png */}
+            <div className="lg:col-span-5 relative flex justify-center">
+              <div className="relative rounded-[2.5rem] overflow-hidden border border-slate-200 dark:border-slate-800 shadow-2xl group bg-slate-50 dark:bg-slate-955 p-3">
+                <img 
+                  src="/logis-1.png" 
+                  alt="KayaMarket Visual Express Logistics Pipeline" 
+                  className="w-full h-auto rounded-[2rem] object-cover group-hover:scale-105 transition-transform duration-700" 
+                />
+                <div className="absolute inset-0 rounded-[2rem] ring-1 ring-inset ring-black/10 pointer-events-none"></div>
+              </div>
+            </div>
+
+          </div>
+
+          {/* Visual Storytelling Pipeline Steps: Farm -> Warehouse -> Quality Check -> Dispatch Rider -> Customer */}
+          <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+            <div className="text-center space-y-1">
+              <span className="text-[10px] font-black text-kaya-orange uppercase tracking-widest">TRANSPARENT SUPPLY CHAIN</span>
+              <h3 className="text-xl font-black text-slate-900 dark:text-white">Our 5-Step Farm-to-Customer Pipeline</h3>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 pt-4">
+              {[
+                { step: "01", label: "Farm Partner Harvest", desc: "Sourced directly from verified local grain & produce farms", icon: "🌾" },
+                { step: "02", label: "Kaya Warehouse", desc: "Received at central temperature-controlled distribution hub", icon: "🏬" },
+                { step: "03", label: "Quality Inspection", desc: "Machine sorted, destoned, cleaned & hygienically sealed", icon: "🔬" },
+                { step: "04", label: "Dispatch Rider", desc: "Handed to vetted rider with live GPS location tracking", icon: "🛵" },
+                { step: "05", label: "Customer Doorstep", desc: "Hygienic delivery with digital signature handover", icon: "🏠" }
+              ].map((p, idx) => (
+                <div key={idx} className="bg-slate-50 dark:bg-slate-955 p-5 rounded-3xl border border-slate-200 dark:border-slate-800 space-y-2 hover:border-kaya-orange/50 transition-colors group">
+                  <div className="flex justify-between items-center">
+                    <span className="text-2xl">{p.icon}</span>
+                    <span className="text-kaya-orange text-[10px] font-black bg-orange-50 dark:bg-orange-950/40 px-2.5 py-0.5 rounded-full border border-orange-100 dark:border-orange-900/40">
+                      Step {p.step}
+                    </span>
+                  </div>
+                  <h4 className="font-extrabold text-sm text-slate-900 dark:text-white group-hover:text-kaya-orange transition-colors">{p.label}</h4>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed font-medium">{p.desc}</p>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Logistics Feature Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-4">
             {[
               {
                 icon: Zap,
@@ -540,38 +606,6 @@ export default function HomeClient({
                 <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{item.desc}</p>
               </div>
             ))}
-          </div>
-
-          {/* Interactive Live Tracking Pipeline Banner */}
-          <div className="bg-slate-900 dark:bg-slate-955 p-8 sm:p-10 rounded-[3rem] text-white border border-slate-800 space-y-6">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <div>
-                <span className="text-[10px] font-black text-kaya-orange uppercase tracking-widest">DISPATCH STATUS ENGINE</span>
-                <h3 className="text-xl font-black mt-0.5">End-to-End Delivery Pipeline</h3>
-              </div>
-              <Link 
-                href="/dashboard"
-                className="bg-kaya-orange hover:bg-orange-600 text-white font-bold px-6 py-2.5 rounded-full text-xs flex items-center gap-2 transition-colors"
-              >
-                <span>Track Active Order</span>
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
-
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-2">
-              {[
-                { step: "01", label: "Order Received", sub: "Warehouse Sorting" },
-                { step: "02", label: "Hygienic Packing", sub: "Weight & Seal Verified" },
-                { step: "03", label: "Rider Dispatched", sub: "GPS Live Tracking" },
-                { step: "04", label: "Doorstep Delivery", sub: "Signature Handover" }
-              ].map((s, idx) => (
-                <div key={idx} className="bg-slate-800/80 p-4 rounded-2xl border border-slate-700 space-y-1">
-                  <span className="text-kaya-orange text-xs font-black">{s.step}</span>
-                  <p className="text-xs font-bold text-white">{s.label}</p>
-                  <p className="text-[10px] text-slate-400">{s.sub}</p>
-                </div>
-              ))}
-            </div>
           </div>
 
         </div>

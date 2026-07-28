@@ -76,17 +76,22 @@ model Category {
 }
 
 model Farmer {
-  id             String              @id @default(uuid())
-  name           String
-  phone          String?
-  email          String?
-  address        String?
-  commissionRate Decimal             @default(5.00) @db.Decimal(5, 2)
-  notes          String?
-  products       Product[]
-  transactions   FarmerTransaction[]
-  createdAt      DateTime            @default(now())
-  updatedAt      DateTime            @updatedAt
+  id               String              @id @default(uuid())
+  name             String
+  phone            String?
+  email            String?
+  address          String?
+  farmLocation     String?
+  productsSupplied String[]            @default([])
+  status           String              @default("ACTIVE")
+  dateJoined       DateTime            @default(now())
+  commissionRate   Decimal             @default(5.00) @db.Decimal(5, 2)
+  notes            String?
+  products         Product[]
+  transactions     FarmerTransaction[]
+  procurements     Procurement[]
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
 }
 
 model Product {
@@ -105,6 +110,7 @@ model Product {
   farmer            Farmer?             @relation(fields: [farmerId], references: [id], onDelete: SetNull)
   farmerName        String?
   farmerTransactions FarmerTransaction[]
+  procurements      Procurement[]
   images            String[]
   isActive          Boolean             @default(true)
   isFeatured        Boolean             @default(false)
@@ -190,6 +196,21 @@ model FarmerTransaction {
   commission   Decimal  @default(0) @db.Decimal(10, 2)
   notes        String?
   createdAt    DateTime @default(now())
+}
+
+model Procurement {
+  id            String   @id @default(uuid())
+  farmerId      String
+  farmer        Farmer   @relation(fields: [farmerId], references: [id], onDelete: Cascade)
+  productId     String
+  product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  quantity      Int
+  unitPrice     Decimal  @db.Decimal(10, 2)
+  totalAmount   Decimal  @db.Decimal(10, 2)
+  date          DateTime @default(now())
+  supplierNotes String?
+  createdBy     String   @default("Admin")
+  createdAt     DateTime @default(now())
 }
 
 model Order {

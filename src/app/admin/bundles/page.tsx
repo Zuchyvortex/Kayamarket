@@ -377,16 +377,60 @@ export default function AdminBundlesPage() {
                 </div>
               </div>
 
-              <div className="space-y-1">
-                <label className="font-bold text-slate-400 uppercase text-[10px]">Image URL</label>
-                <input 
-                  type="text" 
-                  required
-                  placeholder="https://images.unsplash.com/..."
-                  value={image}
-                  onChange={(e) => setImage(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-955 border border-slate-200 dark:border-slate-800 font-semibold text-slate-900 dark:text-white"
-                />
+              <div className="space-y-2">
+                <label className="font-bold text-slate-400 uppercase text-[10px] block">Bundle Image Upload & Preview</label>
+                <div className="flex flex-col sm:flex-row items-center gap-4 p-4 bg-slate-50 dark:bg-slate-955 rounded-2xl border border-slate-200 dark:border-slate-800">
+                  {image ? (
+                    <div className="relative h-24 w-32 rounded-xl overflow-hidden shrink-0 border border-slate-200 dark:border-slate-700">
+                      <img src={image} alt="Bundle Preview" className="w-full h-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => setImage("")}
+                        className="absolute top-1 right-1 p-1 bg-rose-600 text-white rounded-full hover:bg-rose-700 transition-colors"
+                        title="Delete image"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="h-24 w-32 rounded-xl bg-slate-200 dark:bg-slate-800 flex flex-col items-center justify-center text-slate-400 shrink-0 border border-dashed border-slate-300 dark:border-slate-700">
+                      <ImageIcon className="h-6 w-6 mb-1" />
+                      <span className="text-[10px]">No image</span>
+                    </div>
+                  )}
+
+                  <div className="space-y-2 flex-1 w-full">
+                    <label className="cursor-pointer inline-flex items-center gap-2 bg-slate-900 dark:bg-kaya-orange hover:bg-kaya-orange text-white px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm">
+                      <ImageIcon className="h-3.5 w-3.5" />
+                      <span>{image ? "Change Image File" : "Upload Image File"}</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onloadend = () => {
+                              if (typeof reader.result === "string") {
+                                setImage(reader.result);
+                              }
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                      />
+                    </label>
+                    
+                    <input 
+                      type="text" 
+                      placeholder="Or paste image URL (https://...)"
+                      value={image}
+                      onChange={(e) => setImage(e.target.value)}
+                      className="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[11px] font-semibold text-slate-900 dark:text-white"
+                    />
+                  </div>
+                </div>
               </div>
 
               <div className="space-y-1">

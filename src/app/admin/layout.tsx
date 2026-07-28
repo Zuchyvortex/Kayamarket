@@ -78,16 +78,19 @@ export default function AdminLayout({
 
   const sidebarLinks = [
     { href: "/admin", label: "Overview", icon: LayoutDashboard },
-    { href: "/admin/invoices", label: "Permanent Invoices", icon: FileText },
-    { href: "/admin/analytics", label: "Financial Analytics", icon: BarChart3 },
-    { href: "/admin/bundles", label: "Combo Bundles", icon: Layers },
+    { href: "/admin/products", label: "Products", icon: ShoppingBag },
+    { href: "/admin/categories", label: "Categories", icon: FolderTree },
+    { href: "/admin/inventory", label: "Inventory", icon: AlertTriangle },
+    { href: "/admin/procurement", label: "Procurement", icon: ShoppingBag },
+    { href: "/admin/farmers", label: "Farmers & Partners", icon: Users },
+    { href: "/admin/orders", label: "Orders", icon: ClipboardList },
+    { href: "/admin/customers", label: "Customers", icon: Users },
+    { href: "/admin/delivery", label: "Dispatch", icon: Truck },
+    { href: "/admin/analytics", label: "Analytics", icon: BarChart3 },
+    { href: "/admin/financials", label: "Financial Reports", icon: BarChart3 },
+    { href: "/admin/invoices", label: "Invoices", icon: FileText },
     { href: "/admin/homepage", label: "Homepage Manager", icon: Layout },
-    { href: "/admin/customers", label: "Customer Manager", icon: Users },
-    { href: "/admin/products", label: "Products Manager", icon: ShoppingBag },
-    { href: "/admin/categories", label: "Category Manager", icon: FolderTree },
-    { href: "/admin/inventory", label: "Inventory & Alerts", icon: AlertTriangle },
-    { href: "/admin/orders", label: "Orders Board", icon: ClipboardList },
-    { href: "/admin/delivery", label: "Riders & Dispatch", icon: Truck }
+    { href: "/admin/bundles", label: "Bundle Manager", icon: Layers }
   ];
 
   return (
