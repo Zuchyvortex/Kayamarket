@@ -7,7 +7,7 @@ import Link from "next/link";
 import { 
   LayoutDashboard, ShoppingBag, FolderTree, AlertTriangle, ClipboardList, 
   Truck, BarChart3, LogOut, ArrowLeft, ShieldAlert, Menu, X, Layout, Users,
-  Sun, Moon
+  Sun, Moon, FileText
 } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import NotificationDropdown from "@/components/NotificationDropdown";
@@ -74,20 +74,21 @@ export default function AdminLayout({
 
   const sidebarLinks = [
     { href: "/admin", label: "Overview", icon: LayoutDashboard },
+    { href: "/admin/invoices", label: "Permanent Invoices", icon: FileText },
+    { href: "/admin/analytics", label: "Financial Analytics", icon: BarChart3 },
     { href: "/admin/homepage", label: "Homepage Manager", icon: Layout },
     { href: "/admin/customers", label: "Customer Manager", icon: Users },
     { href: "/admin/products", label: "Products Manager", icon: ShoppingBag },
     { href: "/admin/categories", label: "Category Manager", icon: FolderTree },
     { href: "/admin/inventory", label: "Inventory & Alerts", icon: AlertTriangle },
     { href: "/admin/orders", label: "Orders Board", icon: ClipboardList },
-    { href: "/admin/delivery", label: "Riders & Dispatch", icon: Truck },
-    { href: "/admin/analytics", label: "Sales Analytics", icon: BarChart3 }
+    { href: "/admin/delivery", label: "Riders & Dispatch", icon: Truck }
   ];
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-[#111111] dark:text-slate-100 flex font-sans">
       
-      {/* Sidebar Panel - Redesigned to be clean and light */}
+      {/* Sidebar Panel */}
       <aside className="w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 shrink-0 hidden md:flex flex-col justify-between p-6">
         <div className="space-y-8">
           {/* Brand Logo */}
@@ -108,7 +109,7 @@ export default function AdminLayout({
                 <Link 
                   key={link.href}
                   href={link.href}
-                  className={`w-full flex items-center space-x-3 px-4.5 py-3.5 rounded-2xl text-xs font-bold transition-all ${
+                  className={`w-full flex items-center space-x-3 px-4.5 py-3 rounded-2xl text-xs font-bold transition-all ${
                     active 
                       ? "bg-slate-900 dark:bg-kaya-orange text-white shadow-md" 
                       : "text-slate-650 dark:text-slate-350 hover:bg-slate-50 dark:hover:bg-slate-800/40"
@@ -141,7 +142,7 @@ export default function AdminLayout({
       {/* Main Panel Box */}
       <div className="flex-1 flex flex-col min-w-0">
         
-        {/* Header bar - White, clean border */}
+        {/* Header bar */}
         <header className="h-20 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 sm:px-8 flex justify-between items-center shrink-0">
           {/* Mobile hamburger menu toggle */}
           <button 
@@ -192,15 +193,12 @@ export default function AdminLayout({
       {/* Mobile Sidebar Overlay */}
       {mobileSidebarOpen && (
         <div className="fixed inset-0 z-50 flex md:hidden">
-          {/* Backdrop overlay */}
           <div 
             className="fixed inset-0 bg-slate-900/40 dark:bg-slate-950/60 backdrop-blur-sm transition-opacity"
             onClick={() => setMobileSidebarOpen(false)}
           ></div>
 
-          {/* Drawer container */}
           <div className="relative flex w-full max-w-xs flex-1 flex-col bg-white dark:bg-slate-900 p-6 shadow-2xl animate-in slide-in-from-left duration-300">
-            {/* Close button */}
             <div className="flex justify-between items-center pb-6 border-b border-slate-105 dark:border-slate-800 mb-6">
               <Link href="/admin" className="flex items-center space-x-2" onClick={() => setMobileSidebarOpen(false)}>
                 <img 
@@ -218,7 +216,6 @@ export default function AdminLayout({
               </button>
             </div>
 
-            {/* Links list */}
             <nav className="flex-1 space-y-1 overflow-y-auto">
               {sidebarLinks.map((link) => {
                 const active = pathname === link.href;
@@ -227,7 +224,7 @@ export default function AdminLayout({
                     key={link.href}
                     href={link.href}
                     onClick={() => setMobileSidebarOpen(false)}
-                    className={`w-full flex items-center space-x-3 px-4.5 py-3.5 rounded-2xl text-xs font-bold transition-all ${
+                    className={`w-full flex items-center space-x-3 px-4.5 py-3 rounded-2xl text-xs font-bold transition-all ${
                       active 
                         ? "bg-slate-900 dark:bg-kaya-orange text-white shadow-md" 
                         : "text-slate-650 dark:text-slate-350 hover:bg-slate-50 dark:hover:bg-slate-800/40"
@@ -240,7 +237,6 @@ export default function AdminLayout({
               })}
             </nav>
 
-            {/* Drawer footer options */}
             <div className="space-y-4 pt-6 border-t border-slate-100 dark:border-slate-800">
               <Link href="/" className="flex items-center space-x-3 px-4 py-2.5 rounded-2xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/40">
                 <ArrowLeft className="h-4 w-4" />
@@ -263,4 +259,3 @@ export default function AdminLayout({
     </div>
   );
 }
-

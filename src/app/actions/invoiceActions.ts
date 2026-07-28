@@ -63,6 +63,7 @@ export async function createOrGetInvoice(orderId: string) {
       }
     });
 
+    revalidatePath("/admin/invoices");
     return { success: true, invoice };
   } catch (error: any) {
     console.error("Error generating invoice:", error);
@@ -70,8 +71,29 @@ export async function createOrGetInvoice(orderId: string) {
   }
 }
 
+export async function syncAllCompletedOrderInvoices() {
+  try {
+    const orders = await prisma.order.findMany({
+      where: {
+        invoice: { is: null }
+      },
+      include: { items: true, rider: true, user: true }
+    });
+
+    for (const order of orders) {
+      await createOrGetInvoice(order.id);
+    }
+    return { success: true, count: orders.length };
+  } catch (e: any) {
+    console.error("Error syncing completed order invoices:", e);
+    return { success: false, error: e.message };
+  }
+}
+
 export async function getCustomerInvoices(userId: string) {
   try {
+    await syncAllCompletedOrderInvoices();
+
     const invoices = await prisma.invoice.findMany({
       where: { userId },
       include: {
@@ -89,9 +111,34 @@ export async function getCustomerInvoices(userId: string) {
   }
 }
 
-export async function getAllInvoices() {
+export async function getAllInvoices(filters?: {
+  query?: string;
+  startDate?: string;
+  endDate?: string;
+}) {
   try {
+    await syncAllCompletedOrderInvoices();
+
+    let where: any = {};
+    if (filters?.query) {
+      const q = filters.query.trim().toLowerCase();
+      where.OR = [
+        { invoiceNumber: { contains: q, mode: 'insensitive' } },
+        { customerName: { contains: q, mode: 'insensitive' } },
+        { customerPhone: { contains: q, mode: 'insensitive' } },
+        { order: { orderNumber: { contains: q, mode: 'insensitive' } } },
+        { riderName: { contains: q, mode: 'insensitive' } }
+      ];
+    }
+
+    if (filters?.startDate || filters?.endDate) {
+      where.orderDate = {};
+      if (filters.startDate) where.orderDate.gte = new Date(filters.startDate);
+      if (filters.endDate) where.orderDate.lte = new Date(filters.endDate + 'T23:59:59.999Z');
+    }
+
     const invoices = await prisma.invoice.findMany({
+      where,
       include: {
         order: {
           include: { items: true, rider: true }

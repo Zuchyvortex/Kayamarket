@@ -16,6 +16,7 @@ import OrderProofModal from "@/components/OrderProofModal";
 import InvoiceModal from "@/components/InvoiceModal";
 import ProductReviewModal from "@/components/ProductReviewModal";
 import RiderReviewModal from "@/components/RiderReviewModal";
+import MultiProductReviewModal from "@/components/MultiProductReviewModal";
 
 export default function CustomerDashboard() {
   const { user, logout } = useAuth();
@@ -48,6 +49,7 @@ export default function CustomerDashboard() {
   const [invoiceOrder, setInvoiceOrder] = useState<any>(null);
   const [reviewProductModal, setReviewProductModal] = useState<{ isOpen: boolean; productId: string; productName: string } | null>(null);
   const [reviewRiderModal, setReviewRiderModal] = useState<{ isOpen: boolean; orderId: string; orderNumber: string; riderName: string } | null>(null);
+  const [multiReviewOrder, setMultiReviewOrder] = useState<any>(null);
 
   // Address state
   const [addresses, setAddresses] = useState<any[]>([]);
@@ -387,17 +389,13 @@ export default function CustomerDashboard() {
                                 </button>
                               )}
 
-                              {order.items?.[0]?.productId && (
+                              {order.items && order.items.length > 0 && (
                                 <button
-                                  onClick={() => setReviewProductModal({
-                                    isOpen: true,
-                                    productId: order.items[0].productId,
-                                    productName: order.items[0].productName
-                                  })}
+                                  onClick={() => setMultiReviewOrder(order)}
                                   className="bg-kaya-orange text-white font-bold px-3 py-1.5 rounded-xl text-[10px] flex items-center gap-1 hover:bg-orange-600 transition-colors shadow-sm"
                                 >
                                   <Star className="h-3 w-3 fill-white text-white" />
-                                  <span>Rate Product</span>
+                                  <span>Rate Products ({order.items.length})</span>
                                 </button>
                               )}
                             </div>
@@ -805,6 +803,17 @@ export default function CustomerDashboard() {
           orderNumber={reviewRiderModal.orderNumber}
           riderName={reviewRiderModal.riderName}
           userId={user.id}
+        />
+      )}
+
+      {/* Multi Product Review Modal */}
+      {multiReviewOrder && (
+        <MultiProductReviewModal
+          isOpen={!!multiReviewOrder}
+          onClose={() => setMultiReviewOrder(null)}
+          order={multiReviewOrder}
+          user={user}
+          onSuccess={loadProfileAndOrders}
         />
       )}
 

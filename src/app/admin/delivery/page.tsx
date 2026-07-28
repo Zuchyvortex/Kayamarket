@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { 
   Truck, User, Plus, Edit2, Trash2, ShieldAlert, CheckCircle2, 
   XCircle, Phone, Mail, MapPin, Eye, FileText, Star, Search, Filter, 
-  ShieldCheck, Copy, Printer, RefreshCw, Key, AlertCircle
+  ShieldCheck, Copy, Printer, RefreshCw, Key, AlertCircle, Award
 } from "lucide-react";
 import { 
   getRiders, 
@@ -15,6 +15,7 @@ import {
   resetRiderPassword 
 } from "@/app/actions/riderActions";
 import ImageUploader from "@/components/ImageUploader";
+import RiderPerformanceModal from "@/components/RiderPerformanceModal";
 
 export default function AdminDeliveryDispatch() {
   const [riders, setRiders] = useState<any[]>([]);
@@ -43,8 +44,9 @@ export default function AdminDeliveryDispatch() {
   const [copySuccess, setCopySuccess] = useState(false);
   const [regenerating, setRegenerating] = useState(false);
 
-  // Profile View Modal
+  // Profile View & Performance Modals
   const [viewRider, setViewRider] = useState<any>(null);
+  const [performanceRider, setPerformanceRider] = useState<any>(null);
 
   useEffect(() => {
     fetchRiders();
@@ -281,7 +283,7 @@ Portal URL: ${window.location.origin}/rider/login`;
             Riders & Dispatch Management
           </h1>
           <p className="text-slate-550 dark:text-slate-400 text-xs">
-            Admin management console for creating riders, generating secure login dispatches, and monitoring dispatches.
+            Admin management console for creating riders, generating secure login dispatches, and auditing performance ratings.
           </p>
         </div>
 
@@ -385,33 +387,16 @@ Portal URL: ${window.location.origin}/rider/login`;
                     </span>
                     <span className="font-bold text-slate-900 dark:text-white">{r.phoneNumber}</span>
                   </div>
-                  {r.emergencyContact && (
-                    <div className="flex items-center justify-between text-slate-600 dark:text-slate-300">
-                      <span className="flex items-center gap-1.5 text-slate-400 font-bold uppercase text-[10px]">
-                        <ShieldAlert className="h-3.5 w-3.5 text-rose-500" /> Emergency
-                      </span>
-                      <span className="font-bold text-slate-900 dark:text-white">{r.emergencyContact}</span>
-                    </div>
-                  )}
-                  <div className="flex items-center justify-between text-slate-600 dark:text-slate-300">
-                    <span className="flex items-center gap-1.5 text-slate-400 font-bold uppercase text-[10px]">
-                      <Mail className="h-3.5 w-3.5 text-kaya-orange" /> Email
-                    </span>
-                    <span className="font-bold text-slate-900 dark:text-white truncate max-w-[160px]">{r.email}</span>
-                  </div>
                 </div>
 
-                {/* Delivery Metrics */}
-                <div className="grid grid-cols-2 gap-3 text-center">
-                  <div className="bg-orange-50/50 dark:bg-orange-950/20 p-2.5 rounded-xl border border-orange-100 dark:border-orange-900/30">
-                    <p className="text-[9px] font-bold text-slate-400 uppercase">Active Dispatches</p>
-                    <p className="text-lg font-black text-kaya-orange">{r.activeOrdersCount || 0}</p>
-                  </div>
-                  <div className="bg-emerald-50/50 dark:bg-emerald-950/20 p-2.5 rounded-xl border border-emerald-100 dark:border-emerald-900/30">
-                    <p className="text-[9px] font-bold text-slate-400 uppercase">Completed</p>
-                    <p className="text-lg font-black text-emerald-600 dark:text-emerald-400">{r.completedOrdersCount || 0}</p>
-                  </div>
-                </div>
+                {/* Performance Rating Trigger Button */}
+                <button
+                  onClick={() => setPerformanceRider(r)}
+                  className="w-full bg-orange-50 dark:bg-orange-950/30 hover:bg-orange-100 text-kaya-orange border border-orange-200 dark:border-orange-900/40 font-bold py-2.5 rounded-2xl text-xs flex items-center justify-center gap-2 transition-all shadow-xs"
+                >
+                  <Award className="h-4 w-4" />
+                  <span>Audit Performance & Admin Remarks</span>
+                </button>
               </div>
 
               {/* Action Buttons */}
@@ -419,13 +404,13 @@ Portal URL: ${window.location.origin}/rider/login`;
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     onClick={() => setViewRider(r)}
-                    className="bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-200 font-bold py-2 rounded-xl text-xs flex items-center justify-center gap-1.5 transition-colors"
+                    className="bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold py-2 rounded-xl text-xs flex items-center justify-center gap-1.5 transition-colors"
                   >
                     <Eye className="h-3.5 w-3.5" /> Profile
                   </button>
                   <button
                     onClick={() => openEditForm(r)}
-                    className="bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-200 font-bold py-2 rounded-xl text-xs flex items-center justify-center gap-1.5 transition-colors"
+                    className="bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold py-2 rounded-xl text-xs flex items-center justify-center gap-1.5 transition-colors"
                   >
                     <Edit2 className="h-3.5 w-3.5" /> Edit
                   </button>
@@ -467,6 +452,15 @@ Portal URL: ${window.location.origin}/rider/login`;
             </div>
           ))}
         </div>
+      )}
+
+      {/* Rider Performance Audit Modal */}
+      {performanceRider && (
+        <RiderPerformanceModal
+          isOpen={!!performanceRider}
+          onClose={() => setPerformanceRider(null)}
+          rider={performanceRider}
+        />
       )}
 
       {/* Add / Edit Rider Form Modal */}
@@ -742,26 +736,6 @@ Portal URL: ${window.location.origin}/rider/login`;
                 <p className="text-[9px] font-bold text-slate-400 uppercase">Total Completed</p>
                 <p className="font-black text-emerald-600">{viewRider.orders?.filter((o: any) => o.status === "COMPLETED").length || 0}</p>
               </div>
-            </div>
-
-            {/* Delivery History */}
-            <div className="space-y-3">
-              <p className="text-xs font-black uppercase text-slate-400">Rider Delivery History</p>
-              {viewRider.orders?.length === 0 ? (
-                <p className="text-xs text-slate-400 italic">No assigned dispatches recorded for this rider.</p>
-              ) : (
-                <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
-                  {viewRider.orders?.map((o: any) => (
-                    <div key={o.id} className="flex justify-between items-center bg-slate-50 dark:bg-slate-955 p-3 rounded-xl text-xs border border-slate-100 dark:border-slate-800">
-                      <div>
-                        <p className="font-bold text-slate-900 dark:text-white">{o.orderNumber} ({o.customerName})</p>
-                        <p className="text-[10px] text-slate-400">{o.deliveryAddress}</p>
-                      </div>
-                      <span className="font-black uppercase text-[10px] text-kaya-orange">{o.status}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
 
             <button

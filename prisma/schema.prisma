@@ -75,27 +75,46 @@ model Category {
   updatedAt   DateTime  @updatedAt
 }
 
+model Farmer {
+  id             String              @id @default(uuid())
+  name           String
+  phone          String?
+  email          String?
+  address        String?
+  commissionRate Decimal             @default(5.00) @db.Decimal(5, 2)
+  notes          String?
+  products       Product[]
+  transactions   FarmerTransaction[]
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+}
+
 model Product {
-  id                String          @id @default(uuid())
+  id                String              @id @default(uuid())
   name              String
-  slug              String          @unique
+  slug              String              @unique
   description       String
-  price             Decimal         @db.Decimal(10, 2)
-  inventory         Int             @default(0)
-  minStockThreshold Int             @default(5)
-  sku               String?         @unique
+  price             Decimal             @db.Decimal(10, 2)
+  costPrice         Decimal             @default(0) @db.Decimal(10, 2)
+  inventory         Int                 @default(0)
+  minStockThreshold Int                 @default(5)
+  sku               String?             @unique
   categoryId        String
-  category          Category        @relation(fields: [categoryId], references: [id])
+  category          Category            @relation(fields: [categoryId], references: [id])
+  farmerId          String?
+  farmer            Farmer?             @relation(fields: [farmerId], references: [id], onDelete: SetNull)
+  farmerName        String?
+  farmerTransactions FarmerTransaction[]
   images            String[]
-  isActive          Boolean         @default(true)
-  isFeatured        Boolean         @default(false)
-  isBestSeller      Boolean         @default(false)
-  isNewArrival      Boolean         @default(false)
+  isActive          Boolean             @default(true)
+  isFeatured        Boolean             @default(false)
+  isBestSeller      Boolean             @default(false)
+  isNewArrival      Boolean             @default(false)
   orderItems        OrderItem[]
   wishlistedBy      Wishlist[]
   reviews           ProductReview[]
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
 }
 
 enum OrderStatus {
@@ -142,9 +161,35 @@ model Rider {
   user                User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
   orders              Order[]
   reviews             RiderReview[]
+  remarks             RiderRemark[]
   notifications       Notification[]
   createdAt           DateTime      @default(now())
   updatedAt           DateTime      @updatedAt
+}
+
+model RiderRemark {
+  id        String   @id @default(uuid())
+  riderId   String
+  rider     Rider    @relation(fields: [riderId], references: [id], onDelete: Cascade)
+  type      String   // "COMMENDATION" | "IMPROVEMENT" | "NOTE"
+  content   String
+  createdBy String   @default("Admin")
+  createdAt DateTime @default(now())
+}
+
+model FarmerTransaction {
+  id           String   @id @default(uuid())
+  farmerId     String
+  farmer       Farmer   @relation(fields: [farmerId], references: [id], onDelete: Cascade)
+  productId    String?
+  product      Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  productName  String
+  quantity     Int
+  unitCost     Decimal  @db.Decimal(10, 2)
+  totalCost    Decimal  @db.Decimal(10, 2)
+  commission   Decimal  @default(0) @db.Decimal(10, 2)
+  notes        String?
+  createdAt    DateTime @default(now())
 }
 
 model Order {
@@ -177,6 +222,7 @@ model Order {
   items             OrderItem[]
   timeline          OrderTimelineEvent[]
   riderReview       RiderReview?
+  productReviews    ProductReview[]
   invoice           Invoice?
   createdAt         DateTime             @default(now())
   updatedAt         DateTime             @updatedAt
@@ -208,6 +254,8 @@ model ProductReview {
   id          String   @id @default(uuid())
   productId   String
   product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  orderId     String?
+  order       Order?   @relation(fields: [orderId], references: [id], onDelete: SetNull)
   userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   rating      Int      @default(5)
@@ -281,7 +329,7 @@ model Wishlist {
 }
 
 model HomepageConfig {
-  id                 String   @id @default("default")
+  id                 String    @id @default("default")
   heroBannerImage    String?
   heroBannerTitle    String?
   heroBannerSubtitle String?
@@ -289,15 +337,16 @@ model HomepageConfig {
   promotionalBanners String[]
   videoUrl           String?
   announcementText   String?
-  announcementActive Boolean  @default(false)
-  flashSaleActive    Boolean  @default(false)
+  announcementActive Boolean   @default(false)
+  flashSaleActive    Boolean   @default(false)
   flashSaleEndTime   DateTime?
-  updatedAt          DateTime @updatedAt
+  updatedAt          DateTime  @updatedAt
 }
 
 model SystemSetting {
-  id            String   @id @default("default")
-  deliveryFee   Decimal  @default(4000) @db.Decimal(10, 2)
-  riderEarnings Decimal  @default(2000) @db.Decimal(10, 2)
-  updatedAt     DateTime @updatedAt
+  id                    String   @id @default("default")
+  deliveryFee           Decimal  @default(4000) @db.Decimal(10, 2)
+  riderEarnings         Decimal  @default(2000) @db.Decimal(10, 2)
+  farmerCommissionRate  Decimal  @default(5.00) @db.Decimal(5, 2)
+  updatedAt             DateTime @updatedAt
 }

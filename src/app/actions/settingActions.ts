@@ -14,7 +14,8 @@ export async function getSystemSettings() {
         data: {
           id: "default",
           deliveryFee: 4000,
-          riderEarnings: 2000
+          riderEarnings: 2000,
+          farmerCommissionRate: 5.00
         }
       });
     }
@@ -22,11 +23,13 @@ export async function getSystemSettings() {
     const deliveryFeeNum = Number(settings.deliveryFee);
     const riderEarningsNum = Number(settings.riderEarnings);
     const platformShareNum = Math.max(0, deliveryFeeNum - riderEarningsNum);
+    const farmerCommissionRateNum = Number(settings.farmerCommissionRate || 5.00);
 
     return {
       deliveryFee: deliveryFeeNum,
       riderEarnings: riderEarningsNum,
       platformShare: platformShareNum,
+      farmerCommissionRate: farmerCommissionRateNum,
       updatedAt: settings.updatedAt
     };
   } catch (error) {
@@ -35,6 +38,7 @@ export async function getSystemSettings() {
       deliveryFee: 4000,
       riderEarnings: 2000,
       platformShare: 2000,
+      farmerCommissionRate: 5.00,
       updatedAt: new Date()
     };
   }
@@ -43,23 +47,27 @@ export async function getSystemSettings() {
 export async function updateSystemSettings(data: {
   deliveryFee: number;
   riderEarnings: number;
+  farmerCommissionRate?: number;
 }) {
   try {
     const updated = await prisma.systemSetting.upsert({
       where: { id: "default" },
       update: {
         deliveryFee: data.deliveryFee,
-        riderEarnings: data.riderEarnings
+        riderEarnings: data.riderEarnings,
+        farmerCommissionRate: data.farmerCommissionRate ?? 5.00
       },
       create: {
         id: "default",
         deliveryFee: data.deliveryFee,
-        riderEarnings: data.riderEarnings
+        riderEarnings: data.riderEarnings,
+        farmerCommissionRate: data.farmerCommissionRate ?? 5.00
       }
     });
 
     revalidatePath("/admin/delivery");
     revalidatePath("/admin/orders");
+    revalidatePath("/admin/analytics");
     revalidatePath("/checkout");
     
     return { 
@@ -67,7 +75,8 @@ export async function updateSystemSettings(data: {
       settings: {
         deliveryFee: Number(updated.deliveryFee),
         riderEarnings: Number(updated.riderEarnings),
-        platformShare: Math.max(0, Number(updated.deliveryFee) - Number(updated.riderEarnings))
+        platformShare: Math.max(0, Number(updated.deliveryFee) - Number(updated.riderEarnings)),
+        farmerCommissionRate: Number(updated.farmerCommissionRate || 5.00)
       } 
     };
   } catch (error: any) {

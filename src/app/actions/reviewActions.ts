@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 // PRODUCT REVIEWS
 export async function createProductReview(data: {
   productId: string;
+  orderId?: string;
   userId: string;
   rating: number;
   title?: string;
@@ -34,6 +35,7 @@ export async function createProductReview(data: {
     const review = await prisma.productReview.create({
       data: {
         productId: data.productId,
+        orderId: data.orderId || verifiedOrder.id,
         userId: data.userId,
         rating: Math.min(5, Math.max(1, data.rating)),
         title: data.title || null,
@@ -66,6 +68,61 @@ export async function createProductReview(data: {
   }
 }
 
+export async function createBatchOrderProductReviews(data: {
+  orderId: string;
+  userId: string;
+  displayName: string;
+  reviews: Array<{
+    productId: string;
+    rating: number;
+    comment?: string;
+  }>;
+}) {
+  try {
+    const order = await prisma.order.findFirst({
+      where: {
+        id: data.orderId,
+        status: { in: ["DELIVERED", "COMPLETED"] }
+      },
+      include: { items: true }
+    });
+
+    if (!order) {
+      return { success: false, error: "Order not found or not yet delivered." };
+    }
+
+    const createdReviews = [];
+    for (const itemReview of data.reviews) {
+      if (!itemReview.productId) continue;
+      
+      const product = await prisma.product.findUnique({ where: { id: itemReview.productId } });
+      if (!product) continue;
+
+      const review = await prisma.productReview.create({
+        data: {
+          productId: itemReview.productId,
+          orderId: data.orderId,
+          userId: data.userId,
+          rating: Math.min(5, Math.max(1, itemReview.rating)),
+          comment: itemReview.comment || `Rated ${itemReview.rating} stars for purchase in Order #${order.orderNumber}`,
+          displayName: data.displayName,
+          isApproved: true
+        }
+      });
+      createdReviews.push(review);
+      revalidatePath(`/products/${product.slug}`);
+    }
+
+    revalidatePath("/products");
+    revalidatePath("/dashboard");
+
+    return { success: true, count: createdReviews.length };
+  } catch (error: any) {
+    console.error("Error creating batch product reviews:", error);
+    return { success: false, error: error.message || "Failed to submit product reviews." };
+  }
+}
+
 export async function getProductReviews(productId: string) {
   try {
     const reviews = await prisma.productReview.findMany({
@@ -92,7 +149,7 @@ export async function getProductReviews(productId: string) {
   }
 }
 
-// RIDER REVIEWS
+// RIDER REVIEWS & REMARKS
 export async function createRiderReview(data: {
   orderId: string;
   userId: string;
@@ -166,9 +223,51 @@ export async function getRiderReviews(riderId: string) {
     const totalRatingSum = reviews.reduce((sum, r) => sum + r.rating, 0);
     const averageRating = totalReviews > 0 ? Number((totalRatingSum / totalReviews).toFixed(1)) : 5.0;
 
-    return { reviews, totalReviews, averageRating };
+    let performanceBadge = "New Rider";
+    if (totalReviews > 0) {
+      if (averageRating >= 5.0) performanceBadge = "Outstanding Rider ⭐⭐⭐⭐⭐";
+      else if (averageRating >= 4.5) performanceBadge = "Excellent Rider ⭐⭐⭐⭐☆";
+      else if (averageRating >= 4.0) performanceBadge = "Reliable Rider ⭐⭐⭐⭐";
+      else if (averageRating >= 3.5) performanceBadge = "Good Performer ⭐⭐⭐☆";
+      else if (averageRating >= 3.0) performanceBadge = "Needs Improvement ⭐⭐⭐";
+      else performanceBadge = "Performance Review Required ⚠️";
+    }
+
+    return { reviews, totalReviews, averageRating, performanceBadge };
   } catch (error) {
     console.error("Error fetching rider reviews:", error);
-    return { reviews: [], totalReviews: 0, averageRating: 5.0 };
+    return { reviews: [], totalReviews: 0, averageRating: 5.0, performanceBadge: "Reliable Rider ⭐⭐⭐⭐" };
+  }
+}
+
+export async function addRiderRemark(riderId: string, type: "COMMENDATION" | "IMPROVEMENT" | "NOTE", content: string) {
+  try {
+    const remark = await prisma.riderRemark.create({
+      data: {
+        riderId,
+        type,
+        content,
+        createdBy: "Admin"
+      }
+    });
+
+    revalidatePath("/admin/delivery");
+    return { success: true, remark };
+  } catch (error: any) {
+    console.error("Error adding rider remark:", error);
+    return { success: false, error: error.message || "Failed to add remark." };
+  }
+}
+
+export async function getRiderRemarks(riderId: string) {
+  try {
+    const remarks = await prisma.riderRemark.findMany({
+      where: { riderId },
+      orderBy: { createdAt: "desc" }
+    });
+    return remarks;
+  } catch (error) {
+    console.error("Error fetching rider remarks:", error);
+    return [];
   }
 }
