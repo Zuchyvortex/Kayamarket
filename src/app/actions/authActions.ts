@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 
 export async function registerUser(formData: FormData) {
   try {
@@ -52,5 +53,88 @@ export async function registerUser(formData: FormData) {
   } catch (error) {
     console.error("Registration error:", error);
     return { success: false, error: "An unexpected error occurred" };
+  }
+}
+
+export async function requestPasswordReset(email: string) {
+  try {
+    const cleanEmail = email.trim().toLowerCase();
+    const user = await prisma.user.findUnique({
+      where: { email: cleanEmail }
+    });
+
+    if (!user) {
+      // Return success even if email not found for security, or indicate sent
+      return { success: true, message: "If an account exists with this email, recovery instructions have been dispatched." };
+    }
+
+    // Generate secure token
+    const token = crypto.randomBytes(32).toString("hex");
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour token expiration
+
+    // Clear old tokens for this email
+    await prisma.passwordResetToken.deleteMany({
+      where: { email: cleanEmail }
+    });
+
+    await prisma.passwordResetToken.create({
+      data: {
+        email: cleanEmail,
+        token,
+        expiresAt
+      }
+    });
+
+    const resetUrl = `/reset-password?token=${token}&email=${encodeURIComponent(cleanEmail)}`;
+
+    return {
+      success: true,
+      resetUrl,
+      message: "Reset token generated successfully."
+    };
+  } catch (error: any) {
+    console.error("requestPasswordReset error:", error);
+    return { success: false, error: error.message || "Failed to process password reset request." };
+  }
+}
+
+export async function resetPasswordWithToken(data: { token: string; email: string; newPassword: string }) {
+  try {
+    const { token, email, newPassword } = data;
+    const cleanEmail = email.trim().toLowerCase();
+
+    if (!newPassword || newPassword.length < 6) {
+      return { success: false, error: "Password must be at least 6 characters long." };
+    }
+
+    const resetRecord = await prisma.passwordResetToken.findFirst({
+      where: {
+        token,
+        email: cleanEmail,
+        expiresAt: { gt: new Date() }
+      }
+    });
+
+    if (!resetRecord) {
+      return { success: false, error: "Invalid or expired reset token. Please request a new password reset link." };
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(newPassword, salt);
+
+    await prisma.user.update({
+      where: { email: cleanEmail },
+      data: { passwordHash }
+    });
+
+    // Delete token after successful update
+    await prisma.passwordResetToken.delete({
+      where: { id: resetRecord.id }
+    });
+
+    return { success: true };
+  } catch (error: any) {
+    console.error("resetPasswordWithToken error:", error);
+    return { success: false, error: error.message || "Failed to reset password." };
   }
 }

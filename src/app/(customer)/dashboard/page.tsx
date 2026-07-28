@@ -254,7 +254,7 @@ export default function CustomerDashboard() {
           {[
             { id: "orders", label: "My Orders & Tracking", icon: ShoppingBag },
             { id: "invoices", label: "My PDF Invoices", icon: FileText },
-            { id: "profile", label: "Profile & Photo Upload", icon: User },
+            { id: "profile", label: "Profile & Account Details", icon: User },
             { id: "addresses", label: "Saved Delivery Address", icon: MapPin },
             { id: "wishlist", label: "Saved Wishlist", icon: Heart }
           ].map((tab) => (
@@ -502,35 +502,16 @@ export default function CustomerDashboard() {
             </div>
           )}
 
-          {/* PROFILE EDIT TAB (Requirement 2 & 10) */}
+          {/* PROFILE EDIT TAB (Requirement 8) */}
           {activeTab === "profile" && (
             <div className="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 space-y-8 shadow-sm">
               <div>
-                <span className="text-kaya-orange font-black text-xs uppercase tracking-widest">SELF-SERVICE EDITING</span>
-                <h2 className="text-xl font-black text-slate-900 dark:text-white mt-1">Manage Profile & Image</h2>
-                <p className="text-xs text-slate-500 dark:text-slate-400">Update personal details, upload photo, or change password.</p>
+                <span className="text-kaya-orange font-black text-xs uppercase tracking-widest">ACCOUNT SETTINGS</span>
+                <h2 className="text-xl font-black text-slate-900 dark:text-white mt-1">Manage Profile Details</h2>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Update personal information, contact phone numbers, delivery address, or password.</p>
               </div>
 
               <form onSubmit={handleSaveProfile} className="space-y-6 text-xs">
-                
-                {/* Profile Photo Upload */}
-                <div className="flex items-center gap-6 p-4 bg-slate-50 dark:bg-slate-955 rounded-3xl border border-slate-100 dark:border-slate-800">
-                  <div className="relative group">
-                    <img 
-                      src={profileImage || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`} 
-                      alt="Avatar" 
-                      className="w-20 h-20 rounded-full object-cover border-2 border-kaya-orange shadow-md"
-                    />
-                    <label className="absolute bottom-0 right-0 bg-slate-900 text-white p-1.5 rounded-full cursor-pointer hover:scale-110 transition-transform">
-                      <Camera className="h-3.5 w-3.5" />
-                      <input type="file" accept="image/*" className="hidden" onChange={handleProfileImageUpload} />
-                    </label>
-                  </div>
-                  <div>
-                    <h4 className="font-extrabold text-sm text-slate-900 dark:text-white">Profile Photo</h4>
-                    <p className="text-[11px] text-slate-500">Upload JPEG, PNG or SVG file for your customer avatar.</p>
-                  </div>
-                </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1">

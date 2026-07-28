@@ -305,3 +305,65 @@ export async function authenticateRider(emailOrIdOrUsername: string, passwordInp
     return { success: false, error: error.message || "Authentication error." };
   }
 }
+
+export async function getRiderFeedbackAndRemarks(riderId: string) {
+  try {
+    const [rider, reviews, remarks] = await Promise.all([
+      prisma.rider.findFirst({
+        where: {
+          OR: [
+            { id: riderId },
+            { riderId: riderId },
+            { email: riderId.toLowerCase() }
+          ]
+        }
+      }),
+      prisma.riderReview.findMany({
+        where: {
+          OR: [
+            { riderId },
+            { rider: { riderId } },
+            { rider: { email: riderId.toLowerCase() } }
+          ]
+        },
+        include: {
+          user: { select: { firstName: true, lastName: true, email: true } },
+          order: { select: { orderNumber: true } }
+        },
+        orderBy: { createdAt: "desc" }
+      }),
+      prisma.riderRemark.findMany({
+        where: {
+          OR: [
+            { riderId },
+            { rider: { riderId } },
+            { rider: { email: riderId.toLowerCase() } }
+          ]
+        },
+        orderBy: { createdAt: "desc" }
+      })
+    ]);
+
+    const totalScore = reviews.reduce((sum, r) => sum + r.rating, 0);
+    const avgRating = reviews.length > 0 ? Number((totalScore / reviews.length).toFixed(1)) : 5.0;
+
+    let performanceBadge = "Reliable Rider";
+    if (avgRating >= 4.8) performanceBadge = "Outstanding Rider ⭐⭐⭐⭐⭐";
+    else if (avgRating >= 4.4) performanceBadge = "Excellent Performance ⭐⭐⭐⭐☆";
+    else if (avgRating >= 3.8) performanceBadge = "Reliable Rider ⭐⭐⭐⭐";
+    else performanceBadge = "Needs Improvement ⚠️";
+
+    return {
+      success: true,
+      rider,
+      avgRating,
+      totalReviews: reviews.length,
+      reviews,
+      remarks,
+      performanceBadge
+    };
+  } catch (error: any) {
+    console.error("Error fetching rider feedback:", error);
+    return { success: false, error: error.message || "Failed to fetch feedback." };
+  }
+}

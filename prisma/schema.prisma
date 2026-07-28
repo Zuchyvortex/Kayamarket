@@ -350,3 +350,27 @@ model SystemSetting {
   farmerCommissionRate  Decimal  @default(5.00) @db.Decimal(5, 2)
   updatedAt             DateTime @updatedAt
 }
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model ComboBundle {
+  id                 String   @id @default(uuid())
+  name               String
+  slug               String   @unique
+  description        String
+  price              Decimal  @db.Decimal(10, 2)
+  originalPrice      Decimal? @db.Decimal(10, 2)
+  discountPercentage Int      @default(0)
+  image              String
+  includedProducts   String[] @default([])
+  displayOrder       Int      @default(0)
+  isVisible          Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}

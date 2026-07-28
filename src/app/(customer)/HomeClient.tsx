@@ -22,173 +22,58 @@ import {
   ArrowRight,
   Percent,
   Smartphone,
-  Tv,
-  Shirt,
-  Sparkle,
-  Home as HomeIcon
+  Truck,
+  CheckCircle2,
+  Navigation,
+  UserCheck,
+  PackageCheck,
+  Zap,
+  Shield,
+  Headphones
 } from "lucide-react";
-import { CATEGORIES, PRODUCTS, Product } from "@/lib/mockData";
+import { Product } from "@/lib/mockData";
 import { useCart } from "@/context/CartContext";
+import { getPublicComboBundles } from "@/app/actions/bundleActions";
 
-interface OrbitRingProps {
-  radius: number;
-  speed: number;
-  clockwise: boolean;
-  items: Array<{ id: string; name: string; image: string }>;
-  isPhoneHovered: boolean;
-  scrollY: number;
-  parallaxFactor: number;
-  windowWidth: number;
-}
-
-function OrbitRing({ 
-  radius, 
-  speed, 
-  clockwise, 
-  items, 
-  isPhoneHovered, 
-  scrollY, 
-  parallaxFactor,
-  windowWidth
-}: OrbitRingProps) {
-  const isMobile = windowWidth < 640;
-  const isTablet = windowWidth >= 640 && windowWidth < 1024;
-  const radiusMultiplier = isMobile ? 0.48 : isTablet ? 0.72 : 1.0;
-  
-  const R = radius * radiusMultiplier;
-  
-  return (
-    <div 
-      className="absolute pointer-events-none"
-      style={{ 
-        width: 2 * R, 
-        height: 2 * R,
-        top: `calc(50% - ${R}px)`,
-        left: `calc(50% - ${R}px)`,
-        transform: `translateY(${scrollY * parallaxFactor}px)`,
-        transition: "transform 0.1s ease-out"
-      }}
-    >
-      {/* SVG Ring Line */}
-      <svg className="absolute inset-0 w-full h-full pointer-events-none -z-10" viewBox={`0 0 ${2*R} ${2*R}`}>
-        <defs>
-          <linearGradient id={`orange-ring-grad-${radius}`} x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#FF6A00" stopOpacity="0.22" />
-            <stop offset="50%" stopColor="#FFA000" stopOpacity="0.12" />
-            <stop offset="100%" stopColor="#FF6A00" stopOpacity="0.04" />
-          </linearGradient>
-        </defs>
-        <circle 
-          cx={R} 
-          cy={R} 
-          r={R} 
-          stroke={`url(#orange-ring-grad-${radius})`} 
-          strokeWidth="1.2" 
-          fill="none" 
-          strokeDasharray="6, 12"
-        />
-      </svg>
-
-      {/* Orbiting Items */}
-      {items.map((item, idx) => {
-        const startAngle = (idx / items.length) * 360;
-        const directionMultiplier = clockwise ? 1 : -1;
-        
-        return (
-          <motion.div
-            key={item.id}
-            className="absolute inset-0 pointer-events-none"
-            animate={{
-              rotate: [startAngle, startAngle + (360 * directionMultiplier)]
-            }}
-            transition={{
-              duration: speed,
-              repeat: Infinity,
-              ease: "linear"
-            }}
-          >
-            {/* The Item Card positioned at the top of the rotated container */}
-            <div 
-              className="absolute pointer-events-auto"
-              style={{
-                top: 0,
-                left: "50%",
-                transform: "translate(-50%, -50%)"
-              }}
-            >
-              <motion.div
-                animate={{
-                  rotate: [-startAngle, -startAngle - (360 * directionMultiplier)]
-                }}
-                transition={{
-                  duration: speed,
-                  repeat: Infinity,
-                  ease: "linear"
-                }}
-              >
-                <motion.div
-                  animate={{
-                    y: [0, -6, 0],
-                    rotate: [0, 4, -4, 0]
-                  }}
-                  transition={{
-                    duration: 3.5 + (idx % 3),
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                  }}
-                  whileHover={{ 
-                    scale: 1.15,
-                    boxShadow: "0 20px 30px rgba(255,106,0,0.18)",
-                    zIndex: 50
-                  }}
-                  className="relative w-14 h-14 sm:w-18 sm:h-18 rounded-full bg-white/80 backdrop-blur-md p-1 border border-white/50 flex items-center justify-center transition-all duration-300 shadow-[0_8px_24px_rgba(0,0,0,0.06)] hover:shadow-[0_16px_32px_rgba(255,106,0,0.18)] ring-2 ring-orange-500/5 hover:ring-orange-500/30 cursor-pointer overflow-hidden group"
-                  title={item.name}
-                >
-                  <img 
-                    src={item.image} 
-                    alt={item.name} 
-                    className="w-full h-full object-cover rounded-full group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute inset-0 bg-orange-500/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-                </motion.div>
-              </motion.div>
-            </div>
-          </motion.div>
-        );
-      })}
-    </div>
-  );
-}
-
-export default function HomeClient({ initialProducts, initialCategories, homepageConfig }: { initialProducts: any[], initialCategories: any[], homepageConfig: any }) {
+export default function HomeClient({ 
+  initialProducts, 
+  initialCategories, 
+  homepageConfig 
+}: { 
+  initialProducts: any[], 
+  initialCategories: any[], 
+  homepageConfig: any 
+}) {
   const router = useRouter();
   const { addToCart, toggleWishlist, isInWishlist } = useCart();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
   const [faqOpen, setFaqOpen] = useState<number | null>(null);
+  const [publicBundles, setPublicBundles] = useState<any[]>([]);
   
   // Custom states for visual effects
-  const [activeMallTab, setActiveMallTab] = useState("electronics");
   const [timeLeft, setTimeLeft] = useState({ hours: 14, minutes: 32, seconds: 45 });
   const [scrollY, setScrollY] = useState(0);
-  const [windowWidth, setWindowWidth] = useState(1200);
   const [isPhoneHovered, setIsPhoneHovered] = useState(false);
 
-  // Parallax scroll position tracker & resize listener
+  // Parallax scroll position tracker
   useEffect(() => {
-    setWindowWidth(window.innerWidth);
     const handleScroll = () => {
       setScrollY(window.scrollY);
     };
-    const handleResize = () => {
-      setWindowWidth(window.innerWidth);
-    };
     window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("resize", handleResize);
     return () => {
       window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("resize", handleResize);
     };
+  }, []);
+
+  // Fetch dynamic public combo bundles
+  useEffect(() => {
+    getPublicComboBundles().then(data => {
+      if (data && data.length > 0) {
+        setPublicBundles(data);
+      }
+    }).catch(console.error);
   }, []);
 
   // Countdown timer simulation
@@ -206,10 +91,7 @@ export default function HomeClient({ initialProducts, initialCategories, homepag
 
   // Filter products for Display
   const featuredProducts = initialProducts.filter(p => p.isFeatured);
-  const bestSellers = initialProducts.filter(p => p.isBestSeller).slice(0, 4);
-  const trendingProducts = initialProducts.filter(p => p.isNewArrival).slice(0, 8);
-  const recommendedProducts = initialProducts.slice(0, 4);
-
+  
   // Filtered browse section
   const filteredProducts = activeCategory === "all" 
     ? initialProducts.slice(0, 8) 
@@ -226,43 +108,23 @@ export default function HomeClient({ initialProducts, initialCategories, homepag
     return new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', minimumFractionDigits: 0 }).format(price);
   };
 
-  // Mall Categories & Mock Data
-  const mallCollections = {
-    electronics: [
-      { id: "m-e1", name: "Premium Blender & Food Processor", price: 45000, rating: 4.8, image: "https://images.unsplash.com/photo-1570222034659-c8249fc436a4?w=500&auto=format&fit=crop&q=60", desc: "High-speed 1500W kitchen motor, perfect for pepper & beans blend" },
-      { id: "m-e2", name: "Digital Air Fryer (5.5L)", price: 68000, rating: 4.9, image: "https://images.unsplash.com/photo-1621972750749-0fbb1abb7736?w=500&auto=format&fit=crop&q=60", desc: "Healthy oil-free cooking, digital control timer panel" }
-    ],
-    fashion: [
-      { id: "m-f1", name: "Premium Ankara Summer Kimono", price: 18000, rating: 4.7, image: "https://images.unsplash.com/photo-1544441893-675973e31985?w=500&auto=format&fit=crop&q=60", desc: "100% cotton wax print, elegant relaxed streetwear style" },
-      { id: "m-f2", name: "Kaya Branded Unisex Tote Bag", price: 7500, rating: 5.0, image: "https://images.unsplash.com/photo-1544816155-12df9643f363?w=500&auto=format&fit=crop&q=60", desc: "Heavy canvas material, double stitched handles for market grocery load" }
-    ],
-    beauty: [
-      { id: "m-b1", name: "Pure Organic Shea Butter (Raw)", price: 4500, rating: 4.9, image: "https://images.unsplash.com/photo-1608248597481-496100c8c836?w=500&auto=format&fit=crop&q=60", desc: "Handcrafted unrefined shea, direct from local producers" },
-      { id: "m-b2", name: "Natural African Black Soap Gel", price: 3200, rating: 4.8, image: "https://images.unsplash.com/photo-1601049676099-e7ed07d825b0?w=500&auto=format&fit=crop&q=60", desc: "Infused with organic honey, tea tree oil, and skin aloe extracts" }
-    ],
-    household: [
-      { id: "m-h1", name: "Premium Kitchen Organizer Rack", price: 16500, rating: 4.6, image: "https://images.unsplash.com/photo-1595428774223-ef52624120d2?w=500&auto=format&fit=crop&q=60", desc: "Stainless steel rust-free double rack counter organizer" },
-      { id: "m-h2", name: "Kaya Luxury Fragrance Reed Diffuser", price: 12000, rating: 4.7, image: "https://images.unsplash.com/photo-1547887538-e3a2f32cb1cc?w=500&auto=format&fit=crop&q=60", desc: "Fresh lavender & lemon peel essential oils, high absorption reeds" }
-    ]
-  };
-
-  const foodBaskets = [
+  const fallbackFoodBaskets = [
     {
-      id: "b1",
-      name: "Kaya Standard Stew Basket",
-      description: "Tomatoes (1 basket), Rodo (half paint), Tatashe (half paint), Onions (10 pieces), Garlic & Ginger, Palm Oil (2L).",
-      price: 24500,
+      id: "bsk-starter",
+      name: "Kaya Starter Basket",
+      description: "Nigerian Parboiled Rice (5kg), Pure Palm Oil (2L), Groundnut Oil (2L), Tubers of Yam (1 large).",
+      price: 25000,
+      image: "https://images.unsplash.com/photo-1542838132-92c53300491e?w=500&auto=format&fit=crop&q=60"
+    },
+    {
+      id: "bsk-soup",
+      name: "Kaya Soup & Spice Basket",
+      description: "Basket of Fresh Roma Tomatoes, Fresh Shombo & Tatashe Peppers, Red Onions (5kg), Crayfish (1 paint).",
+      price: 18500,
       image: "https://images.unsplash.com/photo-1595855759920-86582396756a?w=500&auto=format&fit=crop&q=60"
     },
     {
-      id: "b2",
-      name: "Kaya Premium Soup Basket",
-      description: "Fresh Ugu vegetables (3 bundles), Egusi (1 custard cup), Stockfish (2 pieces), Smoked Catfish (2 large), Crayfish (1 bag), Palm Oil (1L).",
-      price: 18000,
-      image: "https://images.unsplash.com/photo-1534604973900-c43ab4c2e0ab?w=500&auto=format&fit=crop&q=60"
-    },
-    {
-      id: "b3",
+      id: "bsk-family",
       name: "Kaya Family Food Basket",
       description: "Nigerian Rice (10kg), Oloyin Beans (5kg), Ijebu Garri (5kg), Tubers of Yam (2 large), Groundnut Oil (3L).",
       price: 45000,
@@ -270,52 +132,54 @@ export default function HomeClient({ initialProducts, initialCategories, homepag
     }
   ];
 
+  const activeBundlesList = publicBundles.length > 0 ? publicBundles : fallbackFoodBaskets;
+
   return (
-    <div className="bg-white text-[#111111] min-h-screen font-sans selection:bg-kaya-orange selection:text-white overflow-hidden">
+    <div className="bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen font-sans selection:bg-kaya-orange selection:text-white overflow-hidden transition-colors">
       
-      {/* 1. HERO SECTION - PREMIUM FULL-WIDTH BACKGROUND */}
-      <section className="relative overflow-hidden text-[#111111] pt-16 pb-20 md:pt-24 md:pb-28 px-4 sm:px-6 lg:px-8 border-b border-slate-100 min-h-[500px]">
+      {/* 1. HERO SECTION */}
+      <section className="relative overflow-hidden text-slate-900 dark:text-white pt-16 pb-20 md:pt-24 md:pb-28 px-4 sm:px-6 lg:px-8 border-b border-slate-100 dark:border-slate-800/60 min-h-[500px]">
         
-        {/* Background Image Container with Slow Zoom and Parallax Scroll */}
+        {/* Background Image Container with Slow Zoom */}
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
           <div 
-            className="absolute inset-0 bg-cover bg-center hero-bg-zoom transition-transform duration-75 ease-out"
+            className="absolute inset-0 bg-cover bg-center transition-transform duration-75 ease-out"
             style={{ 
               backgroundImage: `url('${homepageConfig?.heroBannerImage || "/w-1.png"}')`,
               transform: `translateY(${scrollY * 0.12}px) scale(1.02)`,
             }}
           />
-          {/* Subtle Premium White Overlay (75-92% opacity) to keep typography extremely readable */}
-          <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/90 to-white/75 lg:bg-gradient-to-r lg:from-white/93 lg:via-white/88 lg:to-white/68"></div>
+          {/* Subtle Overlay to keep typography crisp across light/dark mode */}
+          <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/90 to-white/75 dark:from-slate-950/95 dark:via-slate-950/90 dark:to-slate-950/75"></div>
         </div>
 
-        {/* Glow ambient background lights */}
-        <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-kaya-orange/8 rounded-full filter blur-[120px] animate-pulse-slow z-10 pointer-events-none"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-kaya-orange/5 rounded-full filter blur-[120px] animate-pulse-slow z-10 pointer-events-none"></div>
+        {/* Ambient background lights */}
+        <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-kaya-orange/10 dark:bg-kaya-orange/15 rounded-full filter blur-[120px] pointer-events-none"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-amber-500/10 rounded-full filter blur-[120px] pointer-events-none"></div>
         
         <div className="max-w-7xl mx-auto relative z-20 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
           {/* Hero left text panel */}
           <div className="lg:col-span-7 space-y-8 text-center lg:text-left">
-            <div className="inline-flex items-center space-x-2 bg-orange-50 text-kaya-orange px-4.5 py-2 rounded-full text-xs font-bold uppercase tracking-widest border border-orange-100 animate-fade-in-up">
+            <div className="inline-flex items-center space-x-2 bg-orange-50 dark:bg-orange-950/40 text-kaya-orange px-4.5 py-2 rounded-full text-xs font-bold uppercase tracking-widest border border-orange-100 dark:border-orange-900/40">
               <Leaf className="h-3.5 w-3.5" />
               <span>Africa's Premium Marketplace</span>
             </div>
             
-            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black leading-tight tracking-tight text-[#111111] animate-fade-in-up">
+            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black leading-tight tracking-tight text-slate-900 dark:text-white">
               {homepageConfig?.heroBannerTitle || "Fresh Foodstuff,"}<br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-kaya-orange via-orange-500 to-amber-500">
                 {homepageConfig?.heroBannerSubtitle || "Delivered Fast & Fresh."}
               </span>
             </h1>
             
-            <p className="text-base sm:text-lg text-slate-600 max-w-xl mx-auto lg:mx-0 font-normal leading-relaxed">
+            <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-xl mx-auto lg:mx-0 font-normal leading-relaxed">
               We source organic foodstuffs directly from trusted African farmers to bring you high-end, clean groceries. Enjoy prompt delivery, hygienic handling, and zero supplier risk.
             </p>
 
-            {/* In-Hero Search - Styled to stand out on light background */}
+            {/* In-Hero Search */}
             <form onSubmit={handleSearch} className="max-w-xl mx-auto lg:mx-0">
-              <div className="flex flex-col sm:flex-row gap-2 bg-white p-2.5 rounded-3xl sm:rounded-full border border-slate-200 backdrop-blur-xl shadow-xl">
+              <div className="flex flex-col sm:flex-row gap-2 bg-white dark:bg-slate-900 p-2.5 rounded-3xl sm:rounded-full border border-slate-200 dark:border-slate-800 shadow-xl backdrop-blur-xl">
                 <div className="relative flex-1">
                   <Search className="absolute left-4.5 top-4 h-5 w-5 text-kaya-orange" />
                   <input
@@ -323,75 +187,49 @@ export default function HomeClient({ initialProducts, initialCategories, homepag
                     placeholder="Search fresh tomatoes, yam, parboiled rice..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-13 pr-4 py-3.5 rounded-full bg-transparent text-[#111111] placeholder-slate-400 focus:outline-none text-sm font-semibold"
+                    className="w-full pl-13 pr-4 py-3.5 rounded-full bg-transparent text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none text-sm font-semibold"
                   />
                 </div>
-                <button type="submit" className="bg-gradient-to-r from-kaya-orange to-orange-500 hover:from-orange-500 hover:to-kaya-orange text-white px-8 py-3.5 rounded-full font-bold transition-all duration-300 transform scale-100 hover:scale-105 hover:-translate-y-0.5 hover:shadow-[0_0_25px_rgba(255,122,26,0.25)] text-sm shrink-0 shadow-lg relative overflow-hidden group">
+                <button type="submit" className="bg-gradient-to-r from-kaya-orange to-orange-500 hover:from-orange-500 hover:to-kaya-orange text-white px-8 py-3.5 rounded-full font-bold transition-all duration-300 transform scale-100 hover:scale-105 hover:-translate-y-0.5 shadow-lg text-sm shrink-0 relative overflow-hidden group">
                   <span className="relative z-10 flex items-center gap-1.5 justify-center">
                     <span>Search Market</span>
                     <ArrowRight className="h-4 w-4" />
                   </span>
-                  <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                 </button>
               </div>
             </form>
 
             {/* Hero Stats */}
-            <div className="grid grid-cols-3 gap-4 pt-4 border-t border-slate-200 max-w-lg mx-auto lg:mx-0">
+            <div className="grid grid-cols-3 gap-4 pt-4 border-t border-slate-200 dark:border-slate-800 max-w-lg mx-auto lg:mx-0">
               <div>
-                <p className="text-2xl font-black text-[#111111]">50k+</p>
-                <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Happy Users</p>
+                <p className="text-2xl font-black text-slate-900 dark:text-white">50k+</p>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-widest font-bold">Happy Users</p>
               </div>
               <div>
                 <p className="text-2xl font-black text-kaya-orange">100%</p>
-                <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Farm Certified</p>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-widest font-bold">Farm Certified</p>
               </div>
               <div>
                 <p className="text-2xl font-black text-kaya-orange">&lt; 24h</p>
-                <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Fast Dispatch</p>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-widest font-bold">Fast Dispatch</p>
               </div>
             </div>
           </div>
 
-          {/* Hero right side graphic - floating product cards */}
+          {/* Hero right side graphic */}
           <div className="lg:col-span-5 relative flex justify-center lg:justify-end mt-12 lg:mt-0">
-            {/* Main Centerpiece Card - Redesigned as clean premium light card */}
-            <div className="relative w-80 h-80 sm:w-96 sm:h-96 rounded-[3.5rem] bg-gradient-to-tr from-kaya-orange to-[#111111] p-1 rotate-3 shadow-2xl overflow-hidden hover:rotate-0 transition-all duration-500 group">
-              <div className="w-full h-full bg-white rounded-[3.3rem] flex flex-col justify-center items-center p-8 text-center border border-slate-100 relative overflow-hidden">
+            <div className="relative w-80 h-80 sm:w-96 sm:h-96 rounded-[3.5rem] bg-gradient-to-tr from-kaya-orange to-amber-500 p-1 rotate-3 shadow-2xl overflow-hidden hover:rotate-0 transition-all duration-500 group">
+              <div className="w-full h-full bg-white dark:bg-slate-900 rounded-[3.3rem] flex flex-col justify-center items-center p-8 text-center border border-slate-100 dark:border-slate-800 relative overflow-hidden">
                 <img src="/k-1.png" alt="KayaMarket Logo" className="h-16 w-auto mb-6 object-contain group-hover:scale-105 transition-transform duration-500" />
-                <h3 className="text-2xl font-black text-[#111111]">Handcrafted Foodstuff</h3>
-                <p className="text-xs text-slate-500 mt-2 max-w-xs leading-relaxed">
+                <h3 className="text-2xl font-black text-slate-900 dark:text-white">Handcrafted Foodstuff</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 max-w-xs leading-relaxed">
                   Carefully handpicked, stone-free grain selection, clean packaging, and direct home delivery.
                 </p>
-                <div className="mt-8 flex gap-3 text-[10px] bg-slate-50 px-5 py-2.5 rounded-full border border-slate-150">
+                <div className="mt-8 flex gap-3 text-[10px] bg-slate-50 dark:bg-slate-800 px-5 py-2.5 rounded-full border border-slate-150 dark:border-slate-700">
                   <span className="font-bold text-kaya-orange">Hygienic Sort</span>
-                  <span className="text-slate-200">|</span>
+                  <span className="text-slate-300 dark:text-slate-600">|</span>
                   <span className="font-bold text-kaya-orange">Wholesale Rate</span>
                 </div>
-              </div>
-            </div>
-
-            {/* Floating Card 1 */}
-            <div className="absolute -top-6 -left-6 bg-white p-4 rounded-3xl shadow-2xl border border-slate-100 flex items-center space-x-3 animate-float max-w-[200px]">
-              <div className="w-12 h-12 rounded-xl bg-orange-50 overflow-hidden shrink-0">
-                <img src="https://images.unsplash.com/photo-1595855759920-86582396756a?w=100&auto=format&fit=crop&q=60" className="w-full h-full object-cover" alt="" />
-              </div>
-              <div>
-                <p className="text-[10px] font-bold text-slate-400 uppercase">Roma Tomato</p>
-                <p className="text-xs font-black text-slate-800">Fresh Basket</p>
-                <p className="text-[10px] font-bold text-kaya-orange mt-0.5">In Stock</p>
-              </div>
-            </div>
-
-            {/* Floating Card 2 */}
-            <div className="absolute -bottom-8 right-6 bg-white p-4 rounded-3xl shadow-2xl border border-slate-100 flex items-center space-x-3 animate-float [animation-delay:2s] max-w-[200px]">
-              <div className="w-12 h-12 rounded-xl bg-orange-50 overflow-hidden shrink-0">
-                <img src="https://images.unsplash.com/photo-1586201375761-83865001e31c?w=100&auto=format&fit=crop&q=60" className="w-full h-full object-cover" alt="" />
-              </div>
-              <div>
-                <p className="text-[10px] font-bold text-slate-400 uppercase">Premium Rice</p>
-                <p className="text-xs font-black text-slate-800">Stone Free 50kg</p>
-                <p className="text-xs font-bold text-kaya-orange mt-0.5">Best Offer</p>
               </div>
             </div>
           </div>
@@ -399,15 +237,15 @@ export default function HomeClient({ initialProducts, initialCategories, homepag
         </div>
       </section>
 
-      {/* 2. FEATURED CATEGORIES SECTION - Clean White Canvas */}
+      {/* 2. FEATURED CATEGORIES SECTION */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="flex justify-between items-end mb-12">
           <div>
             <span className="text-kaya-orange font-bold text-xs uppercase tracking-widest">Store Departments</span>
-            <h2 className="text-3xl font-black text-[#111111] tracking-tight mt-1">Featured Categories</h2>
-            <p className="text-sm text-slate-500 mt-1">Find organic local ingredients sorted by category</p>
+            <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight mt-1">Featured Categories</h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Find organic local ingredients sorted by category</p>
           </div>
-          <Link href="/products" className="text-kaya-orange hover:text-orange-655 font-bold text-sm flex items-center space-x-1 group transition-colors">
+          <Link href="/products" className="text-kaya-orange hover:text-orange-600 font-bold text-sm flex items-center space-x-1 group transition-colors">
             <span>Browse All</span>
             <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </Link>
@@ -418,30 +256,26 @@ export default function HomeClient({ initialProducts, initialCategories, homepag
             <Link 
               key={category.id} 
               href={`/products?category=${category.slug}`}
-              className="bg-white p-6 rounded-3xl text-center shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] hover:-translate-y-1.5 transition-all border border-slate-200 group flex flex-col items-center"
+              className="bg-white dark:bg-slate-900 p-6 rounded-3xl text-center shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all border border-slate-200 dark:border-slate-800 group flex flex-col items-center"
             >
-              <div className="w-20 h-20 rounded-2xl overflow-hidden mb-4 relative bg-slate-50 flex items-center justify-center border border-slate-100">
+              <div className="w-20 h-20 rounded-2xl overflow-hidden mb-4 relative bg-slate-50 dark:bg-slate-800 flex items-center justify-center border border-slate-100 dark:border-slate-700">
                 <img 
                   src={category.imageUrl || category.image || "/w-1.png"} 
                   alt={category.name} 
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 />
               </div>
-              <h3 className="text-sm font-bold text-slate-805 group-hover:text-kaya-orange transition-colors">{category.name}</h3>
-              <p className="text-[10px] text-slate-400 mt-1 line-clamp-1">{category.description}</p>
+              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 group-hover:text-kaya-orange transition-colors">{category.name}</h3>
+              <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1 line-clamp-1">{category.description}</p>
             </Link>
           ))}
         </div>
       </section>
 
-      {/* 3. FLASH SALES SECTION - Styled with clean light backgrounds */}
+      {/* 3. FLASH SALES SECTION */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="bg-gradient-to-r from-kaya-orange to-amber-500 rounded-[3rem] p-8 md:p-12 text-white relative overflow-hidden shadow-xl shadow-orange-500/10">
+        <div className="bg-gradient-to-r from-kaya-orange to-amber-500 rounded-[3rem] p-8 md:p-12 text-white relative overflow-hidden shadow-xl">
           
-          {/* Ambient Glows */}
-          <div className="absolute -right-24 -bottom-24 w-96 h-96 bg-white/10 rounded-full filter blur-2xl"></div>
-          <div className="absolute top-4 left-1/3 w-48 h-48 bg-amber-400/20 rounded-full filter blur-xl animate-pulse-slow"></div>
-
           <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             
             {/* Flash Info Panel */}
@@ -461,15 +295,15 @@ export default function HomeClient({ initialProducts, initialCategories, homepag
 
               {/* Countdown Ticker */}
               <div className="flex justify-center lg:justify-start gap-3 text-center">
-                <div className="bg-[#111111]/90 text-white p-3 rounded-2xl w-16 border border-white/10">
+                <div className="bg-slate-950/90 text-white p-3 rounded-2xl w-16 border border-white/10">
                   <span className="block text-lg font-black">{timeLeft.hours.toString().padStart(2, '0')}</span>
                   <span className="text-[9px] uppercase font-bold text-slate-400">Hrs</span>
                 </div>
-                <div className="bg-[#111111]/90 text-white p-3 rounded-2xl w-16 border border-white/10">
+                <div className="bg-slate-950/90 text-white p-3 rounded-2xl w-16 border border-white/10">
                   <span className="block text-lg font-black">{timeLeft.minutes.toString().padStart(2, '0')}</span>
                   <span className="text-[9px] uppercase font-bold text-slate-400">Min</span>
                 </div>
-                <div className="bg-[#111111]/90 text-white p-3 rounded-2xl w-16 border border-white/10">
+                <div className="bg-slate-950/90 text-white p-3 rounded-2xl w-16 border border-white/10">
                   <span className="block text-lg font-black text-kaya-orange">{timeLeft.seconds.toString().padStart(2, '0')}</span>
                   <span className="text-[9px] uppercase font-bold text-slate-400">Sec</span>
                 </div>
@@ -481,19 +315,16 @@ export default function HomeClient({ initialProducts, initialCategories, homepag
               {featuredProducts.slice(0, 2).map((product) => (
                 <div 
                   key={product.id}
-                  className="bg-white p-5 rounded-3xl text-[#111111] shadow-lg border border-slate-100 relative group/flash overflow-hidden hover:-translate-y-1.5 transition-all duration-300"
+                  className="bg-white dark:bg-slate-900 p-5 rounded-3xl text-slate-900 dark:text-white shadow-lg border border-slate-100 dark:border-slate-800 relative group/flash overflow-hidden hover:-translate-y-1.5 transition-all duration-300"
                 >
                   <span className="absolute top-4 left-4 bg-rose-500 text-white text-[9px] font-black uppercase px-2.5 py-1 rounded-full z-10 shadow-sm">
                     Save 15%
                   </span>
                   
-                  {/* Image wrapper */}
-                  <div className="relative h-44 rounded-2xl overflow-hidden bg-slate-50">
+                  <div className="relative h-44 rounded-2xl overflow-hidden bg-slate-50 dark:bg-slate-800">
                     <img src={product.image} className="w-full h-full object-cover group-hover/flash:scale-105 transition-transform duration-500" alt="" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
                   </div>
 
-                  {/* Rating / Title */}
                   <div className="mt-4 space-y-1">
                     <div className="flex justify-between items-center">
                       <span className="text-[10px] font-black text-kaya-orange uppercase tracking-widest">{product.categorySlug}</span>
@@ -503,18 +334,17 @@ export default function HomeClient({ initialProducts, initialCategories, homepag
                       </span>
                     </div>
                     
-                    <h4 className="font-bold text-base truncate text-slate-900 hover:text-kaya-orange transition-colors">
+                    <h4 className="font-bold text-base truncate text-slate-900 dark:text-white hover:text-kaya-orange transition-colors">
                       <Link href={`/products/${product.slug}`}>{product.name}</Link>
                     </h4>
                     
                     <p className="text-[10px] text-slate-400">Weight: {product.weight || "Pack"}</p>
                   </div>
 
-                  {/* Price and Add button */}
-                  <div className="mt-5 pt-3 border-t border-slate-100 flex justify-between items-center">
+                  <div className="mt-5 pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
                     <div>
                       <p className="text-xs text-slate-400 line-through">{formatPrice(product.price * 1.15)}</p>
-                      <p className="text-lg font-black text-slate-900">{formatPrice(product.price)}</p>
+                      <p className="text-lg font-black text-slate-900 dark:text-white">{formatPrice(product.price)}</p>
                     </div>
                     
                     <button 
@@ -532,24 +362,23 @@ export default function HomeClient({ initialProducts, initialCategories, homepag
         </div>
       </section>
 
-      {/* 4. MAIN FRESH GROCERIES DIRECTORY - Separated by Light Gray Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto bg-[#F8FAFC] rounded-[3.5rem] shadow-[0_4px_30px_rgba(0,0,0,0.01)] border border-slate-205">
+      {/* 4. MAIN FRESH GROCERIES DIRECTORY */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto bg-slate-50 dark:bg-slate-900/60 rounded-[3.5rem] border border-slate-200 dark:border-slate-800">
         
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12 border-b border-slate-200 pb-8">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12 border-b border-slate-200 dark:border-slate-800 pb-8">
           <div>
             <span className="text-kaya-orange font-bold text-xs uppercase tracking-widest">Fresh Farm Market</span>
-            <h2 className="text-3xl font-black text-[#111111] tracking-tight mt-1">Shop Fresh Foodstuffs</h2>
-            <p className="text-sm text-slate-500">100% stone-free, hygienic, packaged and clean local food products</p>
+            <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight mt-1">Shop Fresh Foodstuffs</h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400">100% stone-free, hygienic, packaged and clean local food products</p>
           </div>
 
-          {/* Categories Tab selector */}
           <div className="flex flex-wrap gap-2">
             <button 
               onClick={() => setActiveCategory("all")} 
               className={`px-5 py-2.5 rounded-full text-xs font-bold transition-all ${
                 activeCategory === "all" 
-                  ? "bg-kaya-orange text-white shadow-md shadow-orange-500/10" 
-                  : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"
+                  ? "bg-kaya-orange text-white shadow-md" 
+                  : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700"
               }`}
             >
               All Products
@@ -560,8 +389,8 @@ export default function HomeClient({ initialProducts, initialCategories, homepag
                 onClick={() => setActiveCategory(c.slug)} 
                 className={`px-5 py-2.5 rounded-full text-xs font-bold transition-all ${
                   activeCategory === c.slug 
-                    ? "bg-kaya-orange text-white shadow-md shadow-orange-500/10" 
-                    : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"
+                    ? "bg-kaya-orange text-white shadow-md" 
+                    : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700"
                 }`}
               >
                 {c.name}
@@ -575,31 +404,28 @@ export default function HomeClient({ initialProducts, initialCategories, homepag
           {filteredProducts.map((product) => (
             <div 
               key={product.id} 
-              className="group relative bg-white rounded-[2.2rem] border border-slate-200 p-4 shadow-sm hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] transition-all duration-500 flex flex-col justify-between overflow-hidden hover:-translate-y-2"
+              className="group relative bg-white dark:bg-slate-900 rounded-[2.2rem] border border-slate-200 dark:border-slate-800 p-4 shadow-sm hover:shadow-xl transition-all duration-500 flex flex-col justify-between overflow-hidden hover:-translate-y-2"
             >
-              {/* Wishlist toggle action */}
               <div className="absolute top-6 right-6 z-10 flex flex-col gap-2">
                 <button 
                   onClick={() => toggleWishlist(product)}
-                  className={`p-2.5 rounded-full shadow-lg border border-slate-150 backdrop-blur-md transition-all duration-300 hover:scale-110 ${
+                  className={`p-2.5 rounded-full shadow-lg border backdrop-blur-md transition-all duration-300 hover:scale-110 ${
                     isInWishlist(product.id) 
-                      ? "bg-rose-50 text-rose-500 shadow-rose-100 border-rose-100" 
-                      : "bg-white/90 text-slate-400 hover:text-rose-500"
+                      ? "bg-rose-50 text-rose-500 border-rose-100" 
+                      : "bg-white/90 dark:bg-slate-800/90 text-slate-400 hover:text-rose-500 border-slate-200 dark:border-slate-700"
                   }`}
                 >
-                  <Heart className={`h-4.5 w-4.5 transition-transform ${isInWishlist(product.id) ? "fill-rose-500 scale-115" : ""}`} />
+                  <Heart className={`h-4.5 w-4.5 transition-transform ${isInWishlist(product.id) ? "fill-rose-500 scale-110" : ""}`} />
                 </button>
               </div>
 
               <div>
-                {/* Image panel */}
-                <Link href={`/products/${product.slug}`} className="block relative w-full h-56 rounded-2xl overflow-hidden bg-slate-50 mb-5 border border-slate-155">
+                <Link href={`/products/${product.slug}`} className="block relative w-full h-56 rounded-2xl overflow-hidden bg-slate-50 dark:bg-slate-800 mb-5 border border-slate-100 dark:border-slate-800">
                   <img 
                     src={product.image} 
                     alt={product.name} 
-                    className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-700 ease-out"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   {product.inventory < 10 && (
                     <span className="absolute bottom-3 left-3 bg-kaya-orange text-white font-black text-[9px] px-3 py-1.5 rounded-full uppercase tracking-widest shadow-md">
                       Low Stock
@@ -607,31 +433,28 @@ export default function HomeClient({ initialProducts, initialCategories, homepag
                   )}
                 </Link>
 
-                {/* Rating & reviews */}
-                <span className="inline-flex items-center space-x-1 text-[10px] bg-slate-50 text-slate-650 px-3 py-1.5 rounded-full font-bold border border-slate-200">
+                <span className="inline-flex items-center space-x-1 text-[10px] bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-3 py-1.5 rounded-full font-bold border border-slate-200 dark:border-slate-700">
                   <span className="text-yellow-500 font-black">★</span> 
-                  <span className="font-extrabold text-slate-800">{product.rating}</span>
+                  <span className="font-extrabold text-slate-800 dark:text-white">{product.rating}</span>
                   <span className="text-slate-400 font-medium">({product.reviewsCount})</span>
                 </span>
 
-                {/* Details */}
-                <h3 className="font-extrabold text-[#111111] mt-4 text-lg line-clamp-1 group-hover:text-kaya-orange transition-colors">
+                <h3 className="font-extrabold text-slate-900 dark:text-white mt-4 text-lg line-clamp-1 group-hover:text-kaya-orange transition-colors">
                   <Link href={`/products/${product.slug}`}>{product.name}</Link>
                 </h3>
-                <p className="text-xs text-slate-450 mt-1">Weight: {product.weight || "pack"}</p>
+                <p className="text-xs text-slate-400 mt-1">Weight: {product.weight || "pack"}</p>
               </div>
 
-              {/* Price footer bar */}
-              <div className="flex justify-between items-center mt-6 pt-4 border-t border-slate-100">
+              <div className="flex justify-between items-center mt-6 pt-4 border-t border-slate-100 dark:border-slate-800">
                 <div>
                   <p className="text-[9px] text-slate-400 uppercase tracking-widest font-black">Our Price</p>
-                  <span className="text-xl font-black text-slate-900">{formatPrice(product.price)}</span>
+                  <span className="text-xl font-black text-slate-900 dark:text-white">{formatPrice(product.price)}</span>
                 </div>
                 <button 
                   onClick={() => addToCart(product)}
-                  className="bg-slate-900 hover:bg-kaya-orange text-white p-3.5 rounded-2xl shadow-md hover:shadow-orange-500/20 transition-all duration-300 transform hover:scale-108 hover:-translate-y-0.5 relative overflow-hidden group/btn focus:outline-none"
+                  className="bg-slate-900 dark:bg-kaya-orange hover:bg-kaya-orange text-white p-3.5 rounded-2xl shadow-md transition-all duration-300 transform hover:scale-105 focus:outline-none"
                 >
-                  <ShoppingCart className="h-4.5 w-4.5 relative z-10" />
+                  <ShoppingCart className="h-4.5 w-4.5" />
                 </button>
               </div>
 
@@ -641,111 +464,134 @@ export default function HomeClient({ initialProducts, initialCategories, homepag
 
       </section>
 
-      {/* 5. EXTENDED MARKET COLLECTIONS: tech, fashion, beauty, home */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="text-center max-w-2xl mx-auto mb-12">
-          <span className="text-kaya-orange font-bold text-xs uppercase tracking-widest px-4 py-1.5 bg-orange-50 rounded-full border border-orange-100">Kaya Mall Collections</span>
-          <h2 className="text-3xl sm:text-4xl font-black tracking-tight mt-3">Extended Marketplace Catalog</h2>
-          <p className="text-slate-500 mt-2 text-sm">
-            Beyond foodstuff, discover our curated collections of premium home essentials, kitchenwares, cosmetics, and African fashion styles.
-          </p>
-        </div>
-
-        {/* Mall Tabs Selector */}
-        <div className="flex justify-center gap-2 mb-10 overflow-x-auto pb-2">
-          {[
-            { id: "electronics", label: "Tech & Kitchen", icon: Tv },
-            { id: "fashion", label: "Ankara & Wear", icon: Shirt },
-            { id: "beauty", label: "Shea & Cosmetics", icon: Sparkle },
-            { id: "household", label: "Home Essentials", icon: HomeIcon }
-          ].map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveMallTab(tab.id)}
-              className={`flex items-center space-x-2 px-5 py-3 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
-                activeMallTab === tab.id
-                  ? "bg-slate-900 text-white shadow-lg"
-                  : "bg-white text-slate-650 hover:bg-slate-100 border border-slate-200"
-              }`}
-            >
-              <tab.icon className={`h-4.5 w-4.5 ${activeMallTab === tab.id ? "text-kaya-orange" : "text-slate-400"}`} />
-              <span>{tab.label}</span>
-            </button>
-          ))}
-        </div>
-
-        {/* Selected Mall tab products list */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {mallCollections[activeMallTab as keyof typeof mallCollections].map((item, index) => (
-            <div 
-              key={item.id} 
-              className="bg-white rounded-[2.5rem] p-6 border border-slate-200 shadow-sm hover:shadow-[0_20px_40px_rgba(0,0,0,0.04)] transition-all flex flex-col sm:flex-row gap-6 group"
-            >
-              <div className="w-full sm:w-44 h-44 rounded-2xl overflow-hidden bg-slate-50 shrink-0 border border-slate-100">
-                <img src={item.image} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="" />
-              </div>
-              
-              <div className="flex flex-col justify-between flex-1 py-1">
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-[9px] font-black text-kaya-orange uppercase tracking-widest">Premium Mall</span>
-                    <span className="text-xs text-amber-500 font-bold flex items-center gap-0.5">
-                      <Star className="h-3 w-3 fill-amber-500 text-amber-500" />
-                      {item.rating}
-                    </span>
-                  </div>
-                  <h3 className="font-extrabold text-[#111111] text-lg line-clamp-1 group-hover:text-kaya-orange transition-colors">{item.name}</h3>
-                  <p className="text-xs text-slate-500 leading-relaxed font-light">{item.desc}</p>
-                </div>
-                
-                <div className="flex justify-between items-center mt-6 pt-3 border-t border-slate-100">
-                  <span className="text-xl font-black text-slate-900">{formatPrice(item.price)}</span>
-                  <button 
-                    onClick={() => {
-                      const mappedProduct: Product = {
-                        id: item.id,
-                        name: item.name,
-                        slug: item.id,
-                        description: item.desc,
-                        price: item.price,
-                        categorySlug: activeMallTab,
-                        image: item.image,
-                        inventory: 10,
-                        sku: `MALL-${item.id}`,
-                        rating: item.rating,
-                        reviewsCount: 15
-                      };
-                      addToCart(mappedProduct);
-                      alert(`${item.name} added to cart!`);
-                    }}
-                    className="bg-kaya-orange hover:bg-orange-600 text-white font-bold px-5 py-2.5 rounded-xl text-xs flex items-center gap-1.5 transition-colors shadow-md hover:shadow-orange-500/10 focus:outline-none"
-                  >
-                    <ShoppingCart className="h-3.5 w-3.5" />
-                    <span>Add Item</span>
-                  </button>
-                </div>
-              </div>
+      {/* 5. KAYAMARKET LOGISTICS SHOWCASE (Requirement 2 - Replaces old Kaya Mall) */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="bg-white dark:bg-slate-900 rounded-[3.5rem] p-8 sm:p-14 border border-slate-200 dark:border-slate-800 shadow-xl space-y-14 relative overflow-hidden">
+          
+          <div className="text-center max-w-3xl mx-auto space-y-4">
+            <div className="inline-flex items-center space-x-2 bg-orange-50 dark:bg-orange-950/40 text-kaya-orange px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest border border-orange-100 dark:border-orange-900/40">
+              <Truck className="h-4 w-4" />
+              <span>KayaMarket Express Logistics</span>
             </div>
-          ))}
-        </div>
+            
+            <h2 className="text-3xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight">
+              Enterprise Fleet & Express Delivery
+            </h2>
+            
+            <p className="text-slate-600 dark:text-slate-300 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto">
+              We own and operate an in-house dispatch network with dedicated delivery riders, temperature-checked handling, and live GPS order tracking.
+            </p>
+          </div>
 
+          {/* Logistics Feature Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                icon: Zap,
+                title: "Fast Express Delivery",
+                desc: "Same-day and under 24-hour express fulfillment across major cities with morning & evening delivery slots.",
+                badge: "Under 24 Hours"
+              },
+              {
+                icon: UserCheck,
+                title: "Verified Dispatch Riders",
+                desc: "Background-checked, trained logistics personnel with digital identity credentials and rider safety ratings.",
+                badge: "100% Vetted Fleet"
+              },
+              {
+                icon: Navigation,
+                title: "Live GPS Order Tracking",
+                desc: "Track your dispatch rider step-by-step from warehouse dispatch to your doorstep with real-time status updates.",
+                badge: "Real-Time GPS"
+              },
+              {
+                icon: ShieldCheck,
+                title: "Hygienic Sealed Handling",
+                desc: "Every grocery item is sorted, destoned, washed, and hermetically sealed in heavy-duty food-grade packaging.",
+                badge: "Zero Contamination"
+              },
+              {
+                icon: PackageCheck,
+                title: "Digital Proof of Delivery",
+                desc: "Secure customer signature capture and unique delivery confirmation codes upon physical handover.",
+                badge: "Signature Security"
+              },
+              {
+                icon: Headphones,
+                title: "24/7 Priority Support",
+                desc: "Direct support line with active fleet managers to resolve any dispatch inquiries or schedule adjustments instantly.",
+                badge: "Dedicated Helpline"
+              }
+            ].map((item, index) => (
+              <div 
+                key={index}
+                className="bg-slate-50 dark:bg-slate-955 p-8 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 space-y-4 hover:-translate-y-1.5 transition-all group shadow-sm"
+              >
+                <div className="flex justify-between items-start">
+                  <div className="w-12 h-12 rounded-2xl bg-orange-50 dark:bg-orange-950/40 text-kaya-orange border border-orange-100 dark:border-orange-900/40 flex items-center justify-center group-hover:bg-kaya-orange group-hover:text-white transition-colors duration-300">
+                    <item.icon className="h-6 w-6" />
+                  </div>
+                  <span className="text-[10px] font-black uppercase text-kaya-orange bg-orange-50 dark:bg-orange-950/40 px-3 py-1 rounded-full border border-orange-100 dark:border-orange-900/40">
+                    {item.badge}
+                  </span>
+                </div>
+
+                <h3 className="font-extrabold text-lg text-slate-900 dark:text-white">{item.title}</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Interactive Live Tracking Pipeline Banner */}
+          <div className="bg-slate-900 dark:bg-slate-955 p-8 sm:p-10 rounded-[3rem] text-white border border-slate-800 space-y-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div>
+                <span className="text-[10px] font-black text-kaya-orange uppercase tracking-widest">DISPATCH STATUS ENGINE</span>
+                <h3 className="text-xl font-black mt-0.5">End-to-End Delivery Pipeline</h3>
+              </div>
+              <Link 
+                href="/dashboard"
+                className="bg-kaya-orange hover:bg-orange-600 text-white font-bold px-6 py-2.5 rounded-full text-xs flex items-center gap-2 transition-colors"
+              >
+                <span>Track Active Order</span>
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-2">
+              {[
+                { step: "01", label: "Order Received", sub: "Warehouse Sorting" },
+                { step: "02", label: "Hygienic Packing", sub: "Weight & Seal Verified" },
+                { step: "03", label: "Rider Dispatched", sub: "GPS Live Tracking" },
+                { step: "04", label: "Doorstep Delivery", sub: "Signature Handover" }
+              ].map((s, idx) => (
+                <div key={idx} className="bg-slate-800/80 p-4 rounded-2xl border border-slate-700 space-y-1">
+                  <span className="text-kaya-orange text-xs font-black">{s.step}</span>
+                  <p className="text-xs font-bold text-white">{s.label}</p>
+                  <p className="text-[10px] text-slate-400">{s.sub}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+        </div>
       </section>
 
-      {/* 6. WEEKLY/MONTHLY FOOD BASKETS (Bundles) */}
+      {/* 6. WEEKLY/MONTHLY FOOD BASKETS (Requirement 5 - Dynamic Combo Bundles) */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="text-center max-w-xl mx-auto mb-16">
-          <span className="text-kaya-orange font-bold text-xs uppercase tracking-widest bg-orange-50 px-4 py-1.5 rounded-full border border-orange-100">Kaya Combo Bundles</span>
-          <h2 className="text-3xl sm:text-4xl font-black text-[#111111] mt-3 tracking-tight">Kaya Food Baskets</h2>
-          <p className="text-slate-500 mt-2 text-sm leading-relaxed">
+        <div className="text-center max-w-xl mx-auto mb-16 space-y-2">
+          <span className="text-kaya-orange font-bold text-xs uppercase tracking-widest bg-orange-50 dark:bg-orange-950/40 px-4 py-1.5 rounded-full border border-orange-100 dark:border-orange-900/40">Kaya Combo Bundles</span>
+          <h2 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">Kaya Food Baskets</h2>
+          <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
             Curated combos of essential local cooking ingredients to save you time and money. Fill your pantry in a single click.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-          {foodBaskets.map((basket, i) => (
-            <div key={i} className="bg-white rounded-[2.5rem] border border-slate-200 overflow-hidden shadow-sm hover:shadow-[0_25px_50px_rgba(0,0,0,0.06)] transition-all duration-300 group flex flex-col justify-between">
+          {activeBundlesList.map((basket: any, i: number) => (
+            <div key={i} className="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group flex flex-col justify-between">
               <div>
-                <div className="relative w-full h-56 bg-slate-100 overflow-hidden">
+                <div className="relative w-full h-56 bg-slate-100 dark:bg-slate-800 overflow-hidden">
                   <img src={basket.image} alt={basket.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent"></div>
                   <div className="absolute bottom-6 left-6">
@@ -754,17 +600,27 @@ export default function HomeClient({ initialProducts, initialCategories, homepag
                   </div>
                 </div>
                 
-                <div className="p-8">
-                  <p className="text-slate-600 text-sm leading-relaxed italic">
+                <div className="p-8 space-y-4">
+                  <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed italic">
                     "{basket.description}"
                   </p>
+
+                  {Array.isArray(basket.includedProducts) && basket.includedProducts.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 pt-2">
+                      {basket.includedProducts.map((p: string, idx: number) => (
+                        <span key={idx} className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[10px] font-bold px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700">
+                          {p}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 
-              <div className="p-8 pt-0 flex justify-between items-center border-t border-slate-100">
+              <div className="p-8 pt-0 flex justify-between items-center border-t border-slate-100 dark:border-slate-800">
                 <div>
                   <p className="text-[10px] text-slate-400 uppercase tracking-widest font-black">Bundle Price</p>
-                  <span className="text-2xl font-black text-slate-900">{formatPrice(basket.price)}</span>
+                  <span className="text-2xl font-black text-slate-900 dark:text-white">{formatPrice(basket.price)}</span>
                 </div>
                 
                 <button 
@@ -772,7 +628,7 @@ export default function HomeClient({ initialProducts, initialCategories, homepag
                     const basketProduct: Product = {
                       id: basket.id,
                       name: basket.name,
-                      slug: basket.id,
+                      slug: basket.slug || basket.id,
                       description: basket.description,
                       price: basket.price,
                       categorySlug: "rice",
@@ -784,7 +640,7 @@ export default function HomeClient({ initialProducts, initialCategories, homepag
                     };
                     addToCart(basketProduct);
                   }}
-                  className="bg-kaya-orange hover:bg-orange-600 text-white font-bold px-6 py-3.5 rounded-2xl shadow-md hover:shadow-orange-500/20 transition-all text-xs flex items-center space-x-2 focus:outline-none"
+                  className="bg-kaya-orange hover:bg-orange-600 text-white font-bold px-6 py-3.5 rounded-2xl shadow-md transition-all text-xs flex items-center space-x-2 focus:outline-none"
                 >
                   <ShoppingCart className="h-4 w-4" />
                   <span>Add Basket</span>
@@ -795,18 +651,15 @@ export default function HomeClient({ initialProducts, initialCategories, homepag
         </div>
       </section>
 
-      {/* 7. WHY CHOOSE KAYAMARKET - Redesigned as clean premium light gray container with high-contrast text */}
-      <section className="py-20 bg-[#F8FAFC] text-[#111111] rounded-[4rem] mx-4 sm:mx-6 lg:mx-8 px-8 sm:px-12 relative overflow-hidden border border-slate-200 shadow-sm">
-        <div className="absolute right-0 bottom-0 w-96 h-96 bg-kaya-orange/5 rounded-full filter blur-3xl opacity-50"></div>
-        <div className="absolute left-0 top-0 w-96 h-96 bg-kaya-orange/5 rounded-full filter blur-3xl opacity-50"></div>
-        
+      {/* 7. WHY CHOOSE KAYAMARKET */}
+      <section className="py-20 bg-slate-50 dark:bg-slate-900/70 text-slate-900 dark:text-white rounded-[4rem] mx-4 sm:mx-6 lg:mx-8 px-8 sm:px-12 relative overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center relative z-10">
           
           <div className="space-y-8">
             <div>
               <span className="text-kaya-orange font-bold text-xs uppercase tracking-widest">Our Direct Promise</span>
-              <h2 className="text-3xl sm:text-4xl font-black mt-3 tracking-tight text-[#111111]">The Kaya Guarantee</h2>
-              <p className="text-slate-600 mt-4 leading-relaxed font-light">
+              <h2 className="text-3xl sm:text-4xl font-black mt-3 tracking-tight text-slate-900 dark:text-white">The Kaya Guarantee</h2>
+              <p className="text-slate-600 dark:text-slate-300 mt-4 leading-relaxed font-light">
                 We've combined the efficiency and pricing structure of a traditional open market with a premium, reliable delivery infrastructure.
               </p>
             </div>
@@ -818,12 +671,12 @@ export default function HomeClient({ initialProducts, initialCategories, homepag
                 { icon: Clock, title: "Flexible Delivery Scheduling", desc: "Select your preferred delivery date and morning/afternoon time slots at checkout to fit your schedule." }
               ].map((item, i) => (
                 <div key={i} className="flex gap-4 group">
-                  <div className="w-12 h-12 rounded-2xl bg-white border border-slate-200 text-kaya-orange flex items-center justify-center shrink-0 group-hover:bg-kaya-orange group-hover:text-white transition-colors duration-300 shadow-sm">
+                  <div className="w-12 h-12 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-kaya-orange flex items-center justify-center shrink-0 group-hover:bg-kaya-orange group-hover:text-white transition-colors duration-300 shadow-sm">
                     <item.icon className="h-5 w-5" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-slate-900 text-lg">{item.title}</h3>
-                    <p className="text-sm text-slate-500 mt-1 leading-relaxed">{item.desc}</p>
+                    <h3 className="font-bold text-slate-900 dark:text-white text-lg">{item.title}</h3>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">{item.desc}</p>
                   </div>
                 </div>
               ))}
@@ -831,9 +684,9 @@ export default function HomeClient({ initialProducts, initialCategories, homepag
           </div>
 
           {/* Testimonial Panel */}
-          <div className="bg-white border border-slate-200 p-8 sm:p-12 rounded-[3rem] space-y-6 shadow-sm">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 sm:p-12 rounded-[3rem] space-y-6 shadow-sm">
             <span className="text-xs font-bold text-kaya-orange uppercase tracking-widest">Happy Customers</span>
-            <h3 className="text-2xl font-black text-[#111111]">What Users Say</h3>
+            <h3 className="text-2xl font-black text-slate-900 dark:text-white">What Users Say</h3>
             
             <div className="space-y-8">
               {[
@@ -841,11 +694,11 @@ export default function HomeClient({ initialProducts, initialCategories, homepag
                 { name: "Dr. Tunde Alao", role: "Lekki Resident", text: "Very prompt delivery slots. I scheduled afternoon delivery and got my fresh tomatoes basket right on time. Highly recommended." }
               ].map((t, idx) => (
                 <div key={idx} className="border-l-2 border-kaya-orange pl-5 space-y-2">
-                  <p className="text-slate-600 italic text-sm leading-relaxed">
+                  <p className="text-slate-600 dark:text-slate-300 italic text-sm leading-relaxed">
                     "{t.text}"
                   </p>
                   <div>
-                    <p className="text-xs font-bold text-slate-900">{t.name}</p>
+                    <p className="text-xs font-bold text-slate-900 dark:text-white">{t.name}</p>
                     <p className="text-[10px] text-slate-400 font-bold uppercase">{t.role}</p>
                   </div>
                 </div>
@@ -856,27 +709,25 @@ export default function HomeClient({ initialProducts, initialCategories, homepag
         </div>
       </section>
 
-      {/* 8. MOBILE APP DOWNLOAD SECTION - Redesigned to stand out on light background */}
+      {/* 8. MOBILE APP DOWNLOAD SECTION (Requirement 3 - Cleaned Up Mobile Showcase) */}
       <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="bg-white rounded-[3.5rem] p-10 md:p-16 border border-slate-200 text-[#111111] relative overflow-hidden shadow-2xl">
-          <div className="absolute right-0 top-0 w-96 h-96 bg-kaya-orange/5 rounded-full filter blur-[100px] animate-pulse"></div>
-          <div className="absolute left-1/4 bottom-0 w-72 h-72 bg-orange-50/5 rounded-full filter blur-[80px]"></div>
-
+        <div className="bg-white dark:bg-slate-900 rounded-[3.5rem] p-10 md:p-16 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white relative overflow-hidden shadow-2xl">
+          
           <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             
             {/* Download Text panel */}
             <div className="lg:col-span-7 space-y-8 text-center lg:text-left">
-              <div className="inline-flex items-center space-x-2 bg-slate-50 px-4 py-1.5 rounded-full text-xs font-bold text-kaya-orange border border-slate-200 uppercase tracking-widest">
+              <div className="inline-flex items-center space-x-2 bg-slate-50 dark:bg-slate-800 px-4 py-1.5 rounded-full text-xs font-bold text-kaya-orange border border-slate-200 dark:border-slate-700 uppercase tracking-widest">
                 <Smartphone className="h-4 w-4" />
                 <span>KayaMobile App</span>
               </div>
               
-              <h2 className="text-3xl sm:text-5xl font-black leading-tight tracking-tight text-[#111111]">
+              <h2 className="text-3xl sm:text-5xl font-black leading-tight tracking-tight text-slate-900 dark:text-white">
                 Order Fresh Foodstuffs <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-kaya-orange to-amber-500">Direct From Your Mobile.</span>
               </h2>
               
-              <p className="text-slate-600 text-sm max-w-lg mx-auto lg:mx-0 leading-relaxed font-light">
+              <p className="text-slate-600 dark:text-slate-300 text-sm max-w-lg mx-auto lg:mx-0 leading-relaxed font-light">
                 Download the official KayaMarket mobile application today. Experience faster loading speeds, quick checkout, real-time dispatch tracking, and notifications on fresh harvest arrivals.
               </p>
 
@@ -886,11 +737,11 @@ export default function HomeClient({ initialProducts, initialCategories, homepag
                   href="https://apple.com" 
                   target="_blank" 
                   rel="noreferrer"
-                  className="bg-slate-900 hover:bg-slate-800 text-white px-6 py-3 rounded-2xl font-bold text-xs flex items-center gap-2.5 transition-all shadow-lg hover:-translate-y-0.5"
+                  className="bg-slate-900 dark:bg-kaya-orange hover:bg-slate-800 text-white px-6 py-3 rounded-2xl font-bold text-xs flex items-center gap-2.5 transition-all shadow-lg hover:-translate-y-0.5"
                 >
-                  <img src="https://upload.wikimedia.org/wikipedia/commons/3/31/Apple_logo_white.svg" className="h-5 w-5 invert" alt="" />
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/3/31/Apple_logo_white.svg" className="h-5 w-5 invert dark:invert-0" alt="" />
                   <div className="text-left">
-                    <p className="text-[8px] uppercase text-slate-400 font-bold leading-none">Download on the</p>
+                    <p className="text-[8px] uppercase text-slate-400 dark:text-white/80 font-bold leading-none">Download on the</p>
                     <p className="text-sm font-black leading-tight">App Store</p>
                   </div>
                 </a>
@@ -898,130 +749,20 @@ export default function HomeClient({ initialProducts, initialCategories, homepag
                   href="https://google.com" 
                   target="_blank" 
                   rel="noreferrer"
-                  className="bg-white hover:bg-slate-50 text-slate-900 px-6 py-3 rounded-2xl font-bold text-xs flex items-center gap-2.5 transition-all border border-slate-200 shadow-lg hover:-translate-y-0.5"
+                  className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white px-6 py-3 rounded-2xl font-bold text-xs flex items-center gap-2.5 transition-all border border-slate-200 dark:border-slate-700 shadow-lg hover:-translate-y-0.5"
                 >
                   <img src="https://upload.wikimedia.org/wikipedia/commons/d/d7/Google_Play_Store_badge_EN.svg" className="h-5 w-5" alt="" />
                   <div className="text-left">
-                    <p className="text-[8px] uppercase text-slate-550 font-bold leading-none">Get it on</p>
+                    <p className="text-[8px] uppercase text-slate-400 font-bold leading-none">Get it on</p>
                     <p className="text-sm font-black leading-tight">Google Play</p>
                   </div>
                 </a>
               </div>
             </div>
 
-            {/* Graphic Mockup Panel */}
-            <div className="lg:col-span-5 relative flex justify-center items-center py-12 min-h-[520px] md:min-h-[580px]">
+            {/* Graphic Mockup Panel (Cleaned Up - NO floating objects/rings) */}
+            <div className="lg:col-span-5 relative flex justify-center items-center py-12 min-h-[480px]">
               
-              {/* Dotted Grid Background */}
-              <div 
-                className="absolute inset-0 opacity-[0.06] pointer-events-none rounded-[3rem]"
-                style={{
-                  backgroundImage: "radial-gradient(#FF6A00 1.5px, transparent 1.5px)",
-                  backgroundSize: "20px 20px"
-                }}
-              />
-              
-              {/* Soft glow / orange gradient blurs */}
-              <div className="absolute w-80 h-80 bg-gradient-to-tr from-kaya-orange/12 to-amber-500/5 rounded-full filter blur-[100px] pointer-events-none -z-10 animate-pulse-slow"></div>
-              
-              {/* Tiny floating particles */}
-              <div className="absolute inset-0 pointer-events-none overflow-hidden -z-10">
-                {[...Array(8)].map((_, i) => {
-                  const randomX = Math.sin(i) * 150 + 250;
-                  const randomY = Math.cos(i) * 150 + 250;
-                  return (
-                    <motion.div
-                      key={i}
-                      className="absolute w-1.5 h-1.5 bg-kaya-orange/30 rounded-full"
-                      style={{ left: randomX, top: randomY }}
-                      animate={{
-                        y: [0, -30, 0],
-                        x: [0, Math.sin(i) * 20, 0],
-                        opacity: [0.3, 0.7, 0.3]
-                      }}
-                      transition={{
-                        duration: 5 + (i % 4),
-                        repeat: Infinity,
-                        ease: "easeInOut",
-                        delay: i * 0.5
-                      }}
-                    />
-                  );
-                })}
-              </div>
-
-              {/* Orbiting Ecosystem */}
-              {(() => {
-                const getProductForOrbit = (nameQuery: string, fallbackUrl: string) => {
-                  const dbProd = initialProducts.find(p => p.isActive && p.name.toLowerCase().includes(nameQuery));
-                  return {
-                    id: dbProd?.id || `fallback-${nameQuery}`,
-                    name: dbProd?.name || nameQuery.charAt(0).toUpperCase() + nameQuery.slice(1),
-                    image: dbProd?.image || fallbackUrl
-                  };
-                };
-
-                const innerOrbitItems = [
-                  getProductForOrbit("tomato", "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=120&auto=format&fit=crop&q=60"),
-                  getProductForOrbit("onion", "https://images.unsplash.com/photo-1618512496248-a07fe8376604?w=120&auto=format&fit=crop&q=60"),
-                  getProductForOrbit("pepper", "https://images.unsplash.com/photo-1595855759920-86582396756a?w=120&auto=format&fit=crop&q=60")
-                ];
-
-                const middleOrbitItems = [
-                  getProductForOrbit("rice", "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=120&auto=format&fit=crop&q=60"),
-                  getProductForOrbit("beans", "https://images.unsplash.com/photo-1547058881-aa0edd92aab3?w=120&auto=format&fit=crop&q=60"),
-                  getProductForOrbit("garri", "https://images.unsplash.com/photo-1542838132-92c53300491e?w=120&auto=format&fit=crop&q=60")
-                ];
-
-                const outerOrbitItems = [
-                  getProductForOrbit("chicken", "https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=120&auto=format&fit=crop&q=60"),
-                  getProductForOrbit("fish", "https://images.unsplash.com/photo-1534482421-64566f976cfa?w=120&auto=format&fit=crop&q=60"),
-                  getProductForOrbit("yam", "https://images.unsplash.com/photo-1596484552834-3a57fd8cb689?w=120&auto=format&fit=crop&q=60"),
-                  getProductForOrbit("plantain", "https://images.unsplash.com/photo-1566393028639-d108a42c46a7?w=120&auto=format&fit=crop&q=60")
-                ];
-
-                return (
-                  <>
-                    {/* Inner Orbit: 135px, 18s, Clockwise */}
-                    <OrbitRing 
-                      radius={135} 
-                      speed={18} 
-                      clockwise={true} 
-                      items={innerOrbitItems} 
-                      isPhoneHovered={isPhoneHovered} 
-                      scrollY={scrollY} 
-                      parallaxFactor={0.01}
-                      windowWidth={windowWidth}
-                    />
-
-                    {/* Middle Orbit: 195px, 24s, Counter-Clockwise */}
-                    <OrbitRing 
-                      radius={195} 
-                      speed={24} 
-                      clockwise={false} 
-                      items={middleOrbitItems} 
-                      isPhoneHovered={isPhoneHovered} 
-                      scrollY={scrollY} 
-                      parallaxFactor={0.02}
-                      windowWidth={windowWidth}
-                    />
-
-                    {/* Outer Orbit: 255px, 32s, Clockwise */}
-                    <OrbitRing 
-                      radius={255} 
-                      speed={32} 
-                      clockwise={true} 
-                      items={outerOrbitItems} 
-                      isPhoneHovered={isPhoneHovered} 
-                      scrollY={scrollY} 
-                      parallaxFactor={0.03}
-                      windowWidth={windowWidth}
-                    />
-                  </>
-                );
-              })()}
-
-              {/* Phone Container */}
               <div 
                 style={{ 
                   transform: `translateY(${scrollY * 0.015}px)`,
@@ -1029,36 +770,23 @@ export default function HomeClient({ initialProducts, initialCategories, homepag
                 }}
                 className="z-10 relative"
               >
-                {/* Outer Entrance Scroll Container */}
                 <motion.div
-                  initial={{ opacity: 0, x: 50, scale: 0.9, rotate: 3 }}
-                  whileInView={{ opacity: 1, x: 0, scale: 1, rotate: 0 }}
+                  initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
                   viewport={{ once: true, amount: 0.3 }}
-                  transition={{
-                    duration: 1.1,
-                    ease: [0.16, 1, 0.3, 1],
-                  }}
+                  transition={{ duration: 0.8, ease: "easeOut" }}
                   onMouseEnter={() => setIsPhoneHovered(true)}
                   onMouseLeave={() => setIsPhoneHovered(false)}
                   className="relative flex flex-col items-center justify-center group cursor-pointer"
                 >
-                  {/* Floating Phone Container with scale breathing */}
                   <motion.div
                     animate={{
-                      y: [-8, 8, -8],
-                      scale: [1.00, 1.02, 1.00]
+                      y: [-6, 6, -6],
                     }}
                     transition={{
-                      y: {
-                        duration: 4.5,
-                        repeat: Infinity,
-                        ease: "easeInOut"
-                      },
-                      scale: {
-                        duration: 4.5,
-                        repeat: Infinity,
-                        ease: "easeInOut"
-                      }
+                      duration: 4.5,
+                      repeat: Infinity,
+                      ease: "easeInOut"
                     }}
                     className="relative z-10 flex justify-center items-center transition-all duration-500"
                   >
@@ -1071,13 +799,12 @@ export default function HomeClient({ initialProducts, initialCategories, homepag
                       priority={false}
                       className={`w-auto h-[460px] sm:h-[500px] lg:h-[540px] max-w-full object-contain transition-all duration-500 ${
                         isPhoneHovered 
-                          ? "filter drop-shadow-[0_28px_45px_rgba(255,106,0,0.22)]" 
+                          ? "filter drop-shadow-[0_28px_45px_rgba(255,106,0,0.25)]" 
                           : "filter drop-shadow-[0_20px_35px_rgba(0,0,0,0.14)]"
                       }`}
                     />
                   </motion.div>
 
-                  {/* Soft Realistic Floating Shadow Beneath Phone */}
                   <motion.div
                     animate={{
                       scale: [1, 0.86, 1],
@@ -1100,10 +827,10 @@ export default function HomeClient({ initialProducts, initialCategories, homepag
 
       {/* 9. FAQ SECTION */}
       <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
-        <div className="text-center mb-16">
+        <div className="text-center mb-16 space-y-2">
           <HelpCircle className="h-10 w-10 text-kaya-orange mx-auto mb-4" />
-          <h2 className="text-3xl font-black text-[#111111] tracking-tight">Got Questions?</h2>
-          <p className="text-slate-500 mt-2 text-sm">Everything you need to know about purchasing foodstuffs on KayaMarket</p>
+          <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Got Questions?</h2>
+          <p className="text-slate-500 dark:text-slate-400 text-sm">Everything you need to know about purchasing foodstuffs on KayaMarket</p>
         </div>
 
         <div className="space-y-4">
@@ -1113,16 +840,16 @@ export default function HomeClient({ initialProducts, initialCategories, homepag
             { q: "Are the foodstuffs stone-free and clean?", a: "Yes, 100%. Our rice, beans, and grains are thoroughly sorted, washed, and cleaned using modern processing systems before packaging, saving you hours of sorting." },
             { q: "Can I return items if I'm not satisfied?", a: "Customer satisfaction is our priority. If an item is damaged or does not meet quality expectations, you can return it to our dispatch rider immediately at the point of delivery for a replacement or refund." }
           ].map((faq, i) => (
-            <div key={i} className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+            <div key={i} className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
               <button 
                 onClick={() => setFaqOpen(faqOpen === i ? null : i)}
-                className="w-full px-6 py-5 text-left font-bold text-slate-800 hover:text-kaya-orange flex justify-between items-center transition-colors focus:outline-none"
+                className="w-full px-6 py-5 text-left font-bold text-slate-800 dark:text-white hover:text-kaya-orange flex justify-between items-center transition-colors focus:outline-none"
               >
                 <span>{faq.q}</span>
                 <span className="text-kaya-orange text-lg font-black">{faqOpen === i ? "−" : "+"}</span>
               </button>
               {faqOpen === i && (
-                <div className="px-6 pb-6 text-sm text-slate-650 leading-relaxed border-t border-slate-100 pt-4 font-semibold bg-slate-50">
+                <div className="px-6 pb-6 text-sm text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-100 dark:border-slate-800 pt-4 font-semibold bg-slate-50 dark:bg-slate-955">
                   {faq.a}
                 </div>
               )}
@@ -1132,15 +859,15 @@ export default function HomeClient({ initialProducts, initialCategories, homepag
       </section>
 
       {/* 10. CONTACT SECTION */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-slate-200">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-slate-200 dark:border-slate-800">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           
           <div className="space-y-6">
-            <h2 className="text-3xl font-black text-[#111111] tracking-tight">Get in Touch</h2>
-            <p className="text-slate-550 text-sm leading-relaxed">
+            <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Get in Touch</h2>
+            <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
               Have bulk orders or customized requests? Want to partner as a farmer or supplier? Contact our team today.
             </p>
-            <div className="space-y-4 text-sm text-slate-600 font-bold">
+            <div className="space-y-4 text-sm text-slate-600 dark:text-slate-300 font-bold">
               <div className="flex items-center gap-3">
                 <Phone className="h-5 w-5 text-kaya-orange" />
                 <span>+234 (0) 803 123 4567</span>
@@ -1156,26 +883,26 @@ export default function HomeClient({ initialProducts, initialCategories, homepag
             </div>
           </div>
 
-          <form onSubmit={(e) => { e.preventDefault(); alert("Message sent successfully!"); }} className="lg:col-span-2 bg-[#F8FAFC] p-8 sm:p-10 rounded-[2.5rem] border border-slate-200 shadow-sm space-y-6">
+          <form onSubmit={(e) => { e.preventDefault(); alert("Message sent successfully!"); }} className="lg:col-span-2 bg-slate-50 dark:bg-slate-900 p-8 sm:p-10 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-600 uppercase tracking-widest">Your Name</label>
-                <input type="text" required placeholder="Chinedu Okafor" className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-kaya-orange/20 text-sm font-semibold text-slate-800" />
+                <label className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">Your Name</label>
+                <input type="text" required placeholder="Chinedu Okafor" className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-955 focus:outline-none focus:ring-2 focus:ring-kaya-orange/20 text-sm font-semibold text-slate-800 dark:text-white" />
               </div>
               <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-600 uppercase tracking-widest">Email Address</label>
-                <input type="email" required placeholder="chinedu@example.com" className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-kaya-orange/20 text-sm font-semibold text-slate-800" />
+                <label className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">Email Address</label>
+                <input type="email" required placeholder="chinedu@example.com" className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-955 focus:outline-none focus:ring-2 focus:ring-kaya-orange/20 text-sm font-semibold text-slate-800 dark:text-white" />
               </div>
             </div>
             
             <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-600 uppercase tracking-widest">Subject</label>
-              <input type="text" required placeholder="Bulk Order inquiry" className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-kaya-orange/20 text-sm font-semibold text-slate-800" />
+              <label className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">Subject</label>
+              <input type="text" required placeholder="Bulk Order inquiry" className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-955 focus:outline-none focus:ring-2 focus:ring-kaya-orange/20 text-sm font-semibold text-slate-800 dark:text-white" />
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-600 uppercase tracking-widest">Your Message</label>
-              <textarea required rows={4} placeholder="Tell us how we can help you..." className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-kaya-orange/20 text-sm font-semibold text-slate-800"></textarea>
+              <label className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">Your Message</label>
+              <textarea required rows={4} placeholder="Tell us how we can help you..." className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-955 focus:outline-none focus:ring-2 focus:ring-kaya-orange/20 text-sm font-semibold text-slate-800 dark:text-white"></textarea>
             </div>
 
             <button type="submit" className="w-full sm:w-auto bg-kaya-orange hover:bg-orange-600 text-white font-bold px-8 py-3.5 rounded-xl shadow-md transition-colors text-sm focus:outline-none">

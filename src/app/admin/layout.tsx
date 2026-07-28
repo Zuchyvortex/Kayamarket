@@ -7,7 +7,7 @@ import Link from "next/link";
 import { 
   LayoutDashboard, ShoppingBag, FolderTree, AlertTriangle, ClipboardList, 
   Truck, BarChart3, LogOut, ArrowLeft, ShieldAlert, Menu, X, Layout, Users,
-  Sun, Moon, FileText
+  Sun, Moon, FileText, Layers
 } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import NotificationDropdown from "@/components/NotificationDropdown";
@@ -26,13 +26,17 @@ export default function AdminLayout({
 
   useEffect(() => {
     if (!loading) {
-      setChecking(false);
+      if (!user || user.role !== "ADMIN") {
+        setChecking(false);
+      } else {
+        setChecking(false);
+      }
     }
   }, [user, loading]);
 
   if (loading || checking) {
     return (
-      <div className="min-h-screen bg-white dark:bg-slate-950 text-[#111111] dark:text-slate-100 flex items-center justify-center font-sans">
+      <div className="min-h-screen bg-white dark:bg-slate-955 text-[#111111] dark:text-slate-100 flex items-center justify-center font-sans">
         <p className="text-sm font-bold animate-pulse text-kaya-orange">Verifying Admin Credentials...</p>
       </div>
     );
@@ -48,7 +52,7 @@ export default function AdminLayout({
           </div>
           <div className="space-y-2">
             <h1 className="text-xl font-black text-[#111111] dark:text-white tracking-tight">Admin Area Access Denied</h1>
-            <p className="text-xs text-slate-550 dark:text-slate-400 leading-relaxed">
+            <p className="text-xs text-slate-555 dark:text-slate-400 leading-relaxed">
               This area is restricted to KayaMarket Administrators. Standard customers cannot view these analytics and management tools.
             </p>
           </div>
@@ -76,6 +80,7 @@ export default function AdminLayout({
     { href: "/admin", label: "Overview", icon: LayoutDashboard },
     { href: "/admin/invoices", label: "Permanent Invoices", icon: FileText },
     { href: "/admin/analytics", label: "Financial Analytics", icon: BarChart3 },
+    { href: "/admin/bundles", label: "Combo Bundles", icon: Layers },
     { href: "/admin/homepage", label: "Homepage Manager", icon: Layout },
     { href: "/admin/customers", label: "Customer Manager", icon: Users },
     { href: "/admin/products", label: "Products Manager", icon: ShoppingBag },
