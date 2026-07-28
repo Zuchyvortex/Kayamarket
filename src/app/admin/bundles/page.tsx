@@ -32,9 +32,70 @@ export default function AdminBundlesPage() {
   const [displayOrder, setDisplayOrder] = useState<number>(1);
   const [isVisible, setIsVisible] = useState(true);
 
-  useEffect(() => {
-    loadData();
-  }, []);
+  const [uploadingImage, setUploadingImage] = useState(false);
+
+  const compressImage = (file: File, maxWidth = 800, quality = 0.75): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = document.createElement("img");
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          let width = img.width;
+          let height = img.height;
+
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          ctx?.drawImage(img, 0, 0, width, height);
+
+          const dataUrl = canvas.toDataURL("image/jpeg", quality);
+          resolve(dataUrl);
+        };
+        img.onerror = reject;
+        img.src = e.target?.result as string;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleFileUpload = async (file: File) => {
+    setUploadingImage(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", "primewealth_kyc");
+
+      const res = await fetch("https://api.cloudinary.com/v1_1/qhmu5zob/image/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (res.ok && data.secure_url) {
+        setImage(data.secure_url);
+      } else {
+        const compressed = await compressImage(file);
+        setImage(compressed);
+      }
+    } catch (err) {
+      console.warn("Cloudinary upload failed, using compressed fallback:", err);
+      try {
+        const compressed = await compressImage(file);
+        setImage(compressed);
+      } catch (e) {
+        alert("Failed to process image file.");
+      }
+    } finally {
+      setUploadingImage(false);
+    }
+  };
 
   const loadData = async () => {
     setLoading(true);
@@ -400,23 +461,18 @@ export default function AdminBundlesPage() {
                   )}
 
                   <div className="space-y-2 flex-1 w-full">
-                    <label className="cursor-pointer inline-flex items-center gap-2 bg-slate-900 dark:bg-kaya-orange hover:bg-kaya-orange text-white px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm">
+                    <label className={`cursor-pointer inline-flex items-center gap-2 bg-slate-900 dark:bg-kaya-orange hover:bg-kaya-orange text-white px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm ${uploadingImage ? "opacity-50 pointer-events-none" : ""}`}>
                       <ImageIcon className="h-3.5 w-3.5" />
-                      <span>{image ? "Change Image File" : "Upload Image File"}</span>
+                      <span>{uploadingImage ? "Uploading Image..." : image ? "Change Image File" : "Upload Image File"}</span>
                       <input
                         type="file"
                         accept="image/*"
+                        disabled={uploadingImage}
                         className="hidden"
                         onChange={(e) => {
                           const file = e.target.files?.[0];
                           if (file) {
-                            const reader = new FileReader();
-                            reader.onloadend = () => {
-                              if (typeof reader.result === "string") {
-                                setImage(reader.result);
-                              }
-                            };
-                            reader.readAsDataURL(file);
+                            handleFileUpload(file);
                           }
                         }}
                       />
