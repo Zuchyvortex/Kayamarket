@@ -8,8 +8,7 @@ export const metadata: Metadata = {
   keywords: "KayaMarket, foodstuff delivery, fresh groceries, garri, rice, palm oil, express delivery",
   icons: {
     icon: [
-      { url: "/k-5.png", type: "image/png" },
-      { url: "/icon.png", type: "image/png" }
+      { url: "/k-5.png", type: "image/png" }
     ],
     shortcut: "/k-5.png",
     apple: "/k-5.png"
